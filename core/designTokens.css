@@ -1,0 +1,38 @@
+/*
+ * Tokens de diseño del módulo. Marca del Dr. Iván Jiménez Martínez.
+ * Importar una sola vez (desde InstrumentosModule). Todos los instrumentos
+ * heredan estas variables, de modo que el módulo es visualmente consistente.
+ */
+.instrumentos-root {
+  --verde: #1F3A2E;
+  --verde-tinta: #16291F;
+  --verde-claro: #3A5446;
+  --crema: #F1EADB;
+  --crema-papel: #F6F1E6;
+  --crema-hueco: #ECE3D0;
+  --dorado: #A88B5C;
+  --terracota: #B85042;
+
+  /* escala de riesgo / estadiaje */
+  --s0: #1F3A2E;
+  --s1: #4F6342;
+  --s2: #A88B5C;
+  --s3: #C16A3A;
+  --s4: #A8402F;
+
+  --linea: rgba(31,58,46,.16);
+  --linea-fuerte: rgba(31,58,46,.4);
+  --ok: #3A6B4C;
+  --aviso: #B85042;
+
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Manrope', system-ui, sans-serif;
+
+  color: var(--verde);
+  font-family: var(--sans);
+}
+
+/* Las familias tipográficas se cargan una vez. En GineOS conviene servirlas
+   localmente (sin depender de una red externa); aquí se importan por conveniencia
+   del prototipo. */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Manrope:wght@300;400;500;600;700;800&display=swap');

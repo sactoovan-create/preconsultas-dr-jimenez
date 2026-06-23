@@ -1,0 +1,83 @@
+/* Calculadora cardiometabólica. Hereda tokens de designTokens.css. */
+
+.cm { max-width: 1180px; margin: 0 auto; padding: 24px; }
+.cm-cab {
+  background: var(--verde); color: var(--crema-papel);
+  padding: 24px 30px; border-radius: 6px 6px 0 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+.cm-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--dorado); margin-bottom: 7px; }
+.cm-cab h1 { font-family: var(--serif); font-weight: 600; font-size: 28px; line-height: 1.05; }
+.cm-mono { width: 54px; height: 54px; flex-shrink: 0; border: 1.5px solid rgba(246,241,230,.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-weight: 600; font-size: 21px; }
+
+.cm-grid { display: grid; grid-template-columns: 1fr 1fr; }
+.cm-form { background: var(--crema-papel); padding: 26px 30px; border-radius: 0 0 0 6px; }
+.cm-res { background: var(--crema-hueco); padding: 26px; border-radius: 0 0 6px 0; border-left: 1px solid var(--linea); }
+
+/* Importador */
+.cm-importador { background: rgba(168,139,92,.09); border: 1px solid var(--dorado); border-radius: 5px; padding: 16px 18px; margin-bottom: 24px; }
+.cm-imp-titulo { font-family: var(--serif); font-size: 19px; font-weight: 600; margin-bottom: 4px; }
+.cm-imp-sub { font-size: 11.5px; color: rgba(31,58,46,.66); line-height: 1.45; margin-bottom: 12px; }
+.cm-estatus { font-size: 11.5px; font-weight: 600; color: var(--dorado); margin-top: 10px; }
+.cm-detectados { margin-top: 12px; border-top: 1px solid var(--linea); padding-top: 10px; }
+.cm-dt { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 4px 0; border-bottom: 1px dashed var(--linea); }
+.cm-dt span { color: rgba(31,58,46,.78); }
+.cm-dt b { color: var(--verde); }
+.cm-dt i { color: rgba(31,58,46,.4); }
+
+.cm-btn {
+  display: inline-block; font-family: var(--sans); font-size: 12.5px; font-weight: 700;
+  padding: 9px 15px; border-radius: 3px; border: 1px solid var(--verde);
+  background: var(--verde); color: var(--crema-papel); cursor: pointer; transition: .12s;
+}
+.cm-btn:hover { opacity: .9; }
+.cm-btn.pequeno { margin-top: 11px; }
+.cm-btn.imprimir { width: 100%; font-size: 13px; padding: 11px; margin-bottom: 16px; }
+.cm-btn.imprimir:disabled { opacity: .45; cursor: default; }
+
+.cm-checks { grid-column: 1 / -1; }
+
+/* Resultados */
+.cm-bloque { margin-bottom: 22px; }
+.cm-bloque h3 { font-family: var(--serif); font-size: 20px; font-weight: 600; margin-bottom: 12px; }
+
+.cm-prevent { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.cm-celda { background: #FDFBF6; border: 1px solid var(--linea); border-radius: 4px; padding: 12px 10px; text-align: center; }
+.cm-celda .et { font-size: 9.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: rgba(31,58,46,.55); margin-bottom: 7px; min-height: 24px; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
+.cm-celda .v10 { font-family: var(--serif); font-size: 28px; font-weight: 600; line-height: 1; }
+.cm-celda .v10 span, .cm-celda .v30 span { font-size: .5em; }
+.cm-celda .v30 { font-family: var(--serif); font-size: 20px; font-weight: 600; color: var(--dorado); line-height: 1; margin-top: 6px; }
+.cm-celda .l { font-size: 9px; color: rgba(31,58,46,.5); font-weight: 600; letter-spacing: .04em; margin-top: 2px; }
+.cm-celda-na { font-size: 11px; color: rgba(31,58,46,.5); padding: 14px 4px; line-height: 1.4; }
+.cm-nota { font-size: 11px; line-height: 1.45; color: rgba(31,58,46,.72); margin-top: 10px; padding: 9px 11px; background: rgba(168,139,92,.08); border-radius: 3px; border-left: 2px solid var(--dorado); }
+
+.cm-banda { display: grid; grid-template-columns: repeat(5,1fr); gap: 4px; margin-bottom: 9px; }
+.cm-est { border-radius: 3px; padding: 10px 5px; text-align: center; color: var(--crema-papel); opacity: .32; transition: .2s; }
+.cm-est.e0 { background: var(--s0); } .cm-est.e1 { background: var(--s1); } .cm-est.e2 { background: var(--s2); } .cm-est.e3 { background: var(--s3); } .cm-est.e4 { background: var(--s4); }
+.cm-est.activo { opacity: 1; box-shadow: 0 4px 12px rgba(22,41,31,.3); transform: translateY(-2px); }
+.cm-est .n { font-family: var(--serif); font-size: 24px; font-weight: 600; line-height: 1; }
+.cm-est-detalle { font-size: 12.5px; line-height: 1.5; color: rgba(31,58,46,.86); padding: 11px 13px; background: #FDFBF6; border-radius: 4px; border-left: 3px solid var(--verde); }
+.cm-est-detalle b { color: var(--verde); }
+
+.cm-pill { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 2px 8px; border-radius: 20px; margin-bottom: 9px; }
+.cm-pill.manejo { background: rgba(58,107,76,.16); color: var(--ok); }
+.cm-pill.coordinar { background: rgba(168,139,92,.18); color: #8a6f3f; }
+.cm-pill.estratificar, .cm-pill.multidisciplinario { background: rgba(184,80,66,.16); color: var(--terracota); }
+.cm-conducta { font-size: 12.5px; line-height: 1.55; color: rgba(31,58,46,.88); }
+
+.cm-th { padding: 13px 15px; border-radius: 5px; }
+.cm-th.favorable { background: rgba(58,107,76,.12); border: 1px solid rgba(58,107,76,.3); }
+.cm-th.cautela { background: rgba(168,139,92,.14); border: 1px solid rgba(168,139,92,.4); }
+.cm-th.contra { background: rgba(184,80,66,.12); border: 1px solid rgba(184,80,66,.35); }
+.cm-th-titulo { font-family: var(--serif); font-size: 18px; font-weight: 600; margin-bottom: 5px; }
+.cm-th-detalle { font-size: 12px; line-height: 1.5; color: rgba(31,58,46,.85); margin-top: 4px; }
+
+.cm-disclaimer { font-size: 10.5px; line-height: 1.5; color: rgba(31,58,46,.55); margin-top: 8px; padding-top: 14px; border-top: 1px solid var(--linea); }
+
+@media (max-width: 820px) {
+  .cm { padding: 12px; }
+  .cm-grid { grid-template-columns: 1fr; }
+  .cm-prevent { grid-template-columns: 1fr; }
+}
+
+.cm-aviso-mujer { margin-top: 10px; font-size: 11.5px; line-height: 1.45; padding: 9px 12px; border-radius: 4px; background: rgba(184,80,66,.1); border-left: 2px solid var(--terracota); color: rgba(31,58,46,.85); }

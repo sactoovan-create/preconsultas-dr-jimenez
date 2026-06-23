@@ -1,0 +1,25 @@
+/* Específico del instrumento de endometriosis. */
+
+.end-checks { grid-column: 1 / -1; }
+.end-eval { grid-column: 1 / -1; font-size: 11.5px; line-height: 1.45; color: rgba(31,58,46,.8); background: rgba(168,139,92,.08); border-left: 2px solid var(--dorado); border-radius: 3px; padding: 8px 11px; margin-top: 8px; }
+.end-eval b { color: var(--verde); }
+.end-detalle { font-size: 12.5px; line-height: 1.55; color: rgba(31,58,46,.88); margin-bottom: 4px; }
+
+/* Estadio revisado */
+.end-estadio { display: flex; gap: 14px; align-items: center; background: #FDFBF6; border: 1px solid var(--linea); border-radius: 5px; padding: 13px 15px; margin-bottom: 10px; }
+.end-est-num { font-family: var(--serif); font-size: 32px; font-weight: 600; color: var(--verde); width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--dorado); border-radius: 8px; flex-shrink: 0; }
+.end-est-t { font-size: 14px; font-weight: 700; color: var(--verde); }
+.end-est-s { font-size: 11.5px; color: rgba(31,58,46,.6); margin-top: 2px; }
+
+/* Índice de fertilidad */
+.end-efi { background: #FDFBF6; border: 1px solid var(--linea); border-radius: 5px; padding: 12px 15px; margin-bottom: 10px; }
+.end-efi-barra { height: 9px; background: var(--crema-hueco); border-radius: 6px; overflow: hidden; }
+.end-efi-relleno { height: 100%; background: linear-gradient(90deg, var(--terracota), var(--dorado) 55%, var(--ok)); border-radius: 6px; transition: width .25s; }
+.end-efi-txt { font-size: 12px; color: rgba(31,58,46,.85); margin-top: 7px; }
+.end-efi-txt b { color: var(--verde); }
+
+/* Tratamiento */
+.end-tx { margin-bottom: 14px; }
+.end-tx-eje { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--dorado); margin-bottom: 6px; }
+.end-tx ul, .end-lista { margin: 0; padding-left: 18px; }
+.end-tx li, .end-lista li { font-size: 12px; line-height: 1.5; color: rgba(31,58,46,.86); margin-bottom: 6px; }

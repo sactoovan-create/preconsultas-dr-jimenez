@@ -1,0 +1,47 @@
+/* Específico del instrumento de menopausia. */
+
+.men-checks { grid-column: 1 / -1; }
+.men-detalle { font-size: 12.5px; line-height: 1.55; color: rgba(31,58,46,.88); margin-top: 4px; }
+
+/* Escala de síntomas (captura) */
+.men-dominio { grid-column: 1 / -1; margin-bottom: 12px; }
+.men-dom-cab { display: flex; justify-content: space-between; align-items: baseline; font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--dorado); padding: 7px 0 5px; border-bottom: 1px solid var(--linea); margin-bottom: 7px; }
+.men-dom-pt { font-family: var(--serif); font-size: 14px; font-weight: 600; color: var(--verde); letter-spacing: 0; }
+.men-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0; }
+.men-item-txt { font-size: 12px; color: rgba(31,58,46,.84); flex: 1; }
+.men-item-btns { display: flex; gap: 4px; flex-shrink: 0; }
+.men-item-btns button { width: 28px; height: 28px; border-radius: 4px; border: 1px solid var(--linea-fuerte); background: #FDFBF6; color: rgba(31,58,46,.6); font-family: var(--sans); font-size: 12px; font-weight: 600; cursor: pointer; transition: .12s; }
+.men-item-btns button:hover { border-color: var(--dorado); }
+.men-item-btns button.on { background: var(--verde); color: var(--crema-papel); border-color: var(--verde); }
+
+/* Resultados de la escala */
+.men-total { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.men-total-n { font-family: var(--serif); font-size: 40px; font-weight: 600; color: var(--verde); line-height: 1; }
+.men-total-n span { font-size: .45em; color: rgba(31,58,46,.5); }
+.men-dominios-res { display: flex; flex-direction: column; gap: 9px; }
+.men-dom-res-cab { display: flex; justify-content: space-between; font-size: 11.5px; color: rgba(31,58,46,.8); margin-bottom: 4px; }
+.men-barra { height: 8px; background: var(--crema-hueco); border-radius: 5px; overflow: hidden; }
+.men-barra-r { height: 100%; border-radius: 5px; transition: width .25s; }
+.men-barra-r.mínima, .men-barra-r.leve { background: var(--ok); }
+.men-barra-r.moderada { background: var(--dorado); }
+.men-barra-r.severa { background: var(--terracota); }
+
+/* Candidatura */
+.men-card { padding: 13px 15px; border-radius: 5px; }
+.men-card.favorable { background: rgba(58,107,76,.12); border: 1px solid rgba(58,107,76,.3); }
+.men-card.cautela { background: rgba(168,139,92,.14); border: 1px solid rgba(168,139,92,.4); }
+.men-card-t { font-family: var(--serif); font-size: 18px; font-weight: 600; margin-bottom: 5px; color: var(--verde); }
+.men-card-d { font-size: 12px; line-height: 1.5; color: rgba(31,58,46,.85); margin-top: 4px; }
+.men-via { font-size: 11.5px; line-height: 1.5; color: rgba(31,58,46,.82); margin-top: 10px; padding: 9px 12px; background: rgba(168,139,92,.08); border-left: 2px solid var(--dorado); border-radius: 3px; }
+.men-via b { color: var(--verde); }
+
+.men-lista { margin: 0; padding-left: 18px; }
+.men-lista li { font-size: 12px; line-height: 1.5; color: rgba(31,58,46,.86); margin-bottom: 6px; }
+
+.men-compuestas { margin-top: 10px; font-size: 11.5px; line-height: 1.45; padding: 9px 12px; border-radius: 4px; background: rgba(184,80,66,.1); border-left: 2px solid var(--terracota); color: rgba(31,58,46,.85); }
+
+.men-recos { display: flex; flex-direction: column; gap: 10px; }
+.men-reco { background: rgba(168,139,92,.08); border-left: 2px solid var(--dorado); border-radius: 4px; padding: 10px 13px; }
+.men-reco-t { font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--dorado); margin-bottom: 4px; }
+.men-reco-x { font-size: 12.5px; line-height: 1.5; color: rgba(31,58,46,.86); }
+.men-recos-pie { margin-top: 10px; font-size: 11px; font-style: italic; color: rgba(31,58,46,.6); }

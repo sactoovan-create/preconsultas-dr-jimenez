@@ -1,0 +1,90 @@
+/* Contenedor y navegación del módulo. Hereda los tokens de designTokens.css. */
+
+.instrumentos-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  min-height: 100%;
+  background: #E3DAC6;
+}
+
+/* Navegación lateral */
+.instrumentos-nav {
+  background: var(--verde);
+  color: var(--crema-papel);
+  padding: 26px 18px;
+  overflow-y: auto;
+}
+.nav-cab { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.nav-mono {
+  width: 46px; height: 46px; flex-shrink: 0;
+  border: 1.5px solid rgba(246,241,230,.45); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-weight: 600; font-size: 19px;
+}
+.nav-eyebrow { font-size: 9px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--dorado); }
+.nav-titulo { font-family: var(--serif); font-size: 20px; font-weight: 600; line-height: 1.1; margin-top: 2px; }
+
+.nav-lista { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+
+.nav-resumen {
+  width: 100%; text-align: left; cursor: pointer; margin-bottom: 14px;
+  background: rgba(168,139,92,.16); border: 1px solid rgba(168,139,92,.5);
+  border-radius: 6px; padding: 12px 14px; color: var(--crema-papel);
+  font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: .02em;
+  transition: background .12s;
+}
+.nav-resumen:hover { background: rgba(168,139,92,.26); }
+.nav-resumen.activo { background: var(--dorado); color: var(--verde-tinta); }
+
+.nav-seguimiento {
+  width: 100%; text-align: left; cursor: pointer; margin-bottom: 8px; margin-top: -8px;
+  background: rgba(168,139,92,.1); border: 1px solid rgba(168,139,92,.35);
+  border-radius: 6px; padding: 11px 14px; color: var(--crema-papel);
+  font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  transition: background .12s;
+}
+.nav-seguimiento:hover { background: rgba(168,139,92,.2); }
+.nav-seguimiento.activo { background: var(--dorado); color: var(--verde-tinta); }
+
+.nav-preconsulta {
+  width: 100%; text-align: left; cursor: pointer; margin-bottom: 14px; margin-top: -8px;
+  background: rgba(241,234,219,.08); border: 1px solid rgba(241,234,219,.28);
+  border-radius: 6px; padding: 11px 14px; color: var(--crema-papel);
+  font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  transition: background .12s;
+}
+.nav-preconsulta:hover { background: rgba(241,234,219,.16); }
+.nav-preconsulta.activo { background: var(--crema-papel); color: var(--verde-tinta); }
+.nav-item {
+  width: 100%; text-align: left; cursor: pointer;
+  background: transparent; border: none; border-radius: 6px;
+  padding: 12px 13px; color: rgba(246,241,230,.78);
+  display: flex; flex-direction: column; gap: 3px;
+  transition: background .12s, color .12s;
+  position: relative;
+}
+.nav-item:hover { background: rgba(246,241,230,.07); color: var(--crema-papel); }
+.nav-item.activo { background: rgba(246,241,230,.12); color: var(--crema-papel); }
+.nav-item.activo::before {
+  content: ''; position: absolute; left: 0; top: 12px; bottom: 12px; width: 3px;
+  background: var(--dorado); border-radius: 2px;
+}
+.nav-item-titulo { font-size: 13.5px; font-weight: 700; }
+.nav-item-desc { font-size: 11px; line-height: 1.35; color: rgba(246,241,230,.55); }
+.nav-item.activo .nav-item-desc { color: rgba(246,241,230,.72); }
+.nav-badge {
+  align-self: flex-start; margin-top: 5px;
+  font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--dorado); border: 1px solid rgba(168,139,92,.5);
+  border-radius: 20px; padding: 1px 8px;
+}
+
+/* Área de contenido */
+.instrumentos-contenido { padding: 0; overflow-y: auto; }
+
+@media (max-width: 820px) {
+  .instrumentos-layout { grid-template-columns: 1fr; }
+  .instrumentos-nav { padding: 16px; }
+  .nav-lista { flex-direction: row; overflow-x: auto; }
+  .nav-item { min-width: 220px; }
+}

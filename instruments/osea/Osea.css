@@ -1,0 +1,10 @@
+/* Específico del instrumento de salud ósea. */
+
+.osea-checks { grid-column: 1 / -1; }
+.osea-detalle { font-size: 12.5px; line-height: 1.55; color: rgba(31,58,46,.88); margin-top: 6px; }
+
+.osea-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.osea-chip { font-size: 11px; font-weight: 600; color: var(--verde); background: rgba(31,58,46,.07); border: 1px solid var(--linea); border-radius: 20px; padding: 4px 11px; }
+
+.osea-lista { margin: 0; padding-left: 18px; }
+.osea-lista li { font-size: 12px; line-height: 1.5; color: rgba(31,58,46,.86); margin-bottom: 6px; }

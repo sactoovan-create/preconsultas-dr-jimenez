@@ -1,0 +1,24 @@
+/* Específico del instrumento de anticoncepción. */
+
+.antic-checks { grid-column: 1 / -1; }
+
+.antic-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.antic-chip { font-size: 11px; font-weight: 600; color: var(--verde); background: rgba(31,58,46,.07); border: 1px solid var(--linea); border-radius: 20px; padding: 4px 11px; }
+
+/* Tabla de elegibilidad */
+.antic-tabla { display: flex; flex-direction: column; gap: 7px; }
+.antic-fila { display: flex; align-items: stretch; justify-content: space-between; gap: 10px; border: 1px solid var(--linea); border-radius: 5px; overflow: hidden; }
+.antic-metodo { padding: 9px 12px; flex: 1; display: flex; flex-direction: column; gap: 1px; }
+.antic-metodo-n { font-size: 12.5px; font-weight: 600; color: var(--verde); }
+.antic-metodo-d { font-size: 10.5px; color: rgba(31,58,46,.55); }
+.antic-causa { font-size: 10.5px; color: var(--terracota); margin-top: 3px; }
+
+.antic-cat { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 116px; padding: 7px 10px; text-align: center; }
+.antic-cat-n { font-family: var(--serif); font-size: 24px; font-weight: 600; line-height: 1; }
+.antic-cat-r { font-size: 9.5px; font-weight: 700; letter-spacing: .03em; margin-top: 3px; text-transform: uppercase; }
+.antic-cat.cat1 { background: rgba(58,107,76,.16); color: var(--ok); }
+.antic-cat.cat2 { background: rgba(58,107,76,.1); color: var(--ok); }
+.antic-cat.cat3 { background: rgba(168,139,92,.18); color: #8a6d3b; }
+.antic-cat.cat4 { background: rgba(184,80,66,.16); color: var(--terracota); }
+
+.antic-leyenda { font-size: 10.5px; line-height: 1.45; color: rgba(31,58,46,.6); margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--linea); }

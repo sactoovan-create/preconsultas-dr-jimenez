@@ -1,0 +1,50 @@
+/* Panel de resumen del paciente. Hereda tokens de designTokens.css. */
+
+.rp-cuerpo { max-width: 1180px; margin: 0 auto; padding: 24px; }
+
+.rp-guia {
+  background: rgba(168,139,92,.1); border: 1px solid var(--dorado); border-radius: 6px;
+  padding: 16px 18px; font-size: 13px; line-height: 1.55; color: rgba(31,58,46,.82);
+  margin-bottom: 22px;
+}
+
+.rp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+
+.rp-card {
+  text-align: left; cursor: pointer; font-family: var(--sans);
+  background: var(--crema-papel); border: 1px solid var(--linea);
+  border-left: 3px solid var(--linea-fuerte); border-radius: 6px;
+  padding: 16px 18px; transition: transform .12s, box-shadow .12s;
+  display: flex; flex-direction: column; min-height: 118px;
+}
+.rp-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(22,41,31,.12); }
+.rp-card.eval.ok { border-left-color: var(--ok); }
+.rp-card.eval.aviso { border-left-color: var(--dorado); }
+.rp-card.eval.alerta { border-left-color: var(--terracota); }
+
+.rp-card-cab { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.rp-card-titulo { font-size: 13px; font-weight: 700; color: var(--verde); line-height: 1.25; }
+.rp-punto { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+.rp-punto.ok { background: var(--ok); }
+.rp-punto.aviso { background: var(--dorado); }
+.rp-punto.alerta { background: var(--terracota); }
+
+.rp-card-titular { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--verde); margin-top: 10px; line-height: 1.1; }
+.rp-card-detalle { font-size: 11.5px; line-height: 1.4; color: rgba(31,58,46,.66); margin-top: 5px; }
+.rp-card-vacio { font-size: 14px; color: rgba(31,58,46,.4); margin-top: 12px; font-style: italic; }
+
+.rp-card-ir { margin-top: auto; padding-top: 12px; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--dorado); }
+
+@media (max-width: 820px) {
+  .rp-grid { grid-template-columns: 1fr; }
+}
+
+/* Barra de acciones e informe consolidado */
+.rp-acciones { display: flex; justify-content: flex-end; margin-bottom: 18px; }
+.rp-informe {
+  cursor: pointer; background: var(--verde); color: var(--crema-papel); border: none;
+  border-radius: 6px; font-family: var(--sans); font-size: 12.5px; font-weight: 700;
+  padding: 11px 18px; transition: background .12s;
+}
+.rp-informe:hover:not(:disabled) { background: var(--verde-tinta); }
+.rp-informe:disabled { opacity: .4; cursor: not-allowed; }

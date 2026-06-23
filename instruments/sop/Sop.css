@@ -1,0 +1,50 @@
+/* Específico del instrumento de síndrome poliendocrino ovárico. */
+
+.sop-checks { grid-column: 1 / -1; }
+.sop-eval { grid-column: 1 / -1; font-size: 11.5px; line-height: 1.45; color: rgba(31,58,46,.78); background: rgba(168,139,92,.08); border-left: 2px solid var(--dorado); border-radius: 3px; padding: 8px 11px; margin-top: 4px; }
+.sop-eval b { color: var(--verde); }
+
+/* Diagnóstico y criterios */
+.sop-dx-detalle { font-size: 12.5px; line-height: 1.55; color: rgba(31,58,46,.88); margin-bottom: 14px; }
+.sop-criterios { display: flex; flex-direction: column; gap: 7px; }
+.sop-crit { display: flex; gap: 10px; align-items: flex-start; background: #FDFBF6; border: 1px solid var(--linea); border-radius: 4px; padding: 10px 12px; }
+.sop-crit.si { border-left: 3px solid var(--ok); }
+.sop-crit.no { border-left: 3px solid var(--linea-fuerte); opacity: .72; }
+.sop-crit-marca { font-weight: 800; font-size: 14px; width: 16px; text-align: center; flex-shrink: 0; }
+.sop-crit.si .sop-crit-marca { color: var(--ok); }
+.sop-crit.no .sop-crit-marca { color: rgba(31,58,46,.4); }
+.sop-crit-t { font-size: 13px; font-weight: 700; color: var(--verde); }
+.sop-crit-s { font-size: 11px; color: rgba(31,58,46,.6); line-height: 1.4; margin-top: 2px; }
+
+/* Fenotipo */
+.sop-fenotipo { display: flex; gap: 14px; align-items: center; background: #FDFBF6; border: 1px solid var(--linea); border-radius: 5px; padding: 14px 16px; }
+.sop-fen-letra { font-family: var(--serif); font-size: 38px; font-weight: 600; color: var(--verde); width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--dorado); border-radius: 50%; flex-shrink: 0; }
+.sop-fen-desc { font-size: 12.5px; line-height: 1.45; color: rgba(31,58,46,.88); }
+.sop-fen-riesgo { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 2px 9px; border-radius: 20px; margin-top: 7px; }
+.sop-fen-riesgo.alto { background: rgba(184,80,66,.16); color: var(--terracota); }
+.sop-fen-riesgo.intermedio { background: rgba(168,139,92,.18); color: #8a6f3f; }
+.sop-fen-riesgo.menor { background: rgba(58,107,76,.16); color: var(--ok); }
+
+/* Avisos de exclusión */
+.sop-aviso { font-size: 11.5px; line-height: 1.45; padding: 9px 12px; border-radius: 4px; margin-bottom: 7px; background: rgba(168,139,92,.1); border-left: 2px solid var(--dorado); color: rgba(31,58,46,.85); }
+.sop-aviso.alerta { background: rgba(184,80,66,.1); border-left-color: var(--terracota); }
+
+/* Cribado */
+.sop-cribado { display: flex; flex-direction: column; gap: 5px; }
+.sop-crib-item { display: flex; gap: 9px; align-items: center; font-size: 11.5px; padding: 8px 10px; background: #FDFBF6; border: 1px solid var(--linea); border-radius: 4px; }
+.sop-crib-pt { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.sop-crib-item.normal .sop-crib-pt { background: var(--ok); }
+.sop-crib-item.alterado .sop-crib-pt { background: var(--terracota); }
+.sop-crib-item.pendiente .sop-crib-pt { background: rgba(31,58,46,.28); }
+.sop-crib-n { color: rgba(31,58,46,.85); line-height: 1.35; }
+.sop-crib-h { font-size: 10.5px; color: var(--terracota); margin-top: 2px; }
+.sop-crib-e { margin-left: auto; flex-shrink: 0; font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
+.sop-crib-item.normal .sop-crib-e { color: var(--ok); }
+.sop-crib-item.alterado .sop-crib-e { color: var(--terracota); }
+.sop-crib-item.pendiente .sop-crib-e { color: rgba(31,58,46,.45); }
+
+/* Tratamiento */
+.sop-tx { margin-bottom: 13px; }
+.sop-tx-obj { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--dorado); margin-bottom: 6px; }
+.sop-tx ul { margin: 0; padding-left: 18px; }
+.sop-tx li { font-size: 12px; line-height: 1.5; color: rgba(31,58,46,.86); margin-bottom: 5px; }
