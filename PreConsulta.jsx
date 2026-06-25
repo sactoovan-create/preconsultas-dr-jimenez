@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { usePaciente } from './core/PacienteContext.jsx';
 import './PreConsulta.css';
 
@@ -100,6 +100,41 @@ export default function PreConsulta({ onEnviar }) {
   const trampaRef = useRef(null);
   const inicioRef = useRef(Date.now());
 
+  // Anti-robots fuerte (opcional): Cloudflare Turnstile. Se activa SOLO si el portal
+  // tiene definida VITE_TURNSTILE_SITE_KEY; si no, todo este bloque queda inerte y el
+  // envío funciona igual que hoy.
+  const turnstileKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
+  const [tokenTurnstile, setTokenTurnstile] = useState('');
+  const turnstileRef = useRef(null);
+  const widgetIdRef = useRef(null);
+
+  useEffect(() => {
+    if (!turnstileKey || !onEnviar) return undefined;
+    let cancelado = false;
+    const render = () => {
+      if (cancelado || !window.turnstile || !turnstileRef.current || widgetIdRef.current) return;
+      widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
+        sitekey: turnstileKey,
+        callback: (t) => setTokenTurnstile(t),
+        'expired-callback': () => setTokenTurnstile(''),
+        'error-callback': () => setTokenTurnstile(''),
+      });
+    };
+    if (window.turnstile) {
+      render();
+    } else if (!document.querySelector('script[data-turnstile]')) {
+      const s = document.createElement('script');
+      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      s.async = true; s.defer = true; s.setAttribute('data-turnstile', '1');
+      s.onload = render;
+      document.head.appendChild(s);
+    } else {
+      const iv = setInterval(() => { if (window.turnstile) { clearInterval(iv); render(); } }, 200);
+      setTimeout(() => clearInterval(iv), 8000);
+    }
+    return () => { cancelado = true; };
+  }, [turnstileKey, onEnviar]);
+
   const setSintoma = (id, n) => { setMrs((p) => ({ ...p, [id]: n })); setGuardado(false); };
   const setH = (k, val) => { setHc((p) => ({ ...p, [k]: val })); setGuardado(false); };
 
@@ -119,13 +154,24 @@ export default function PreConsulta({ onEnviar }) {
       setBloqueo('Por favor escribe tu nombre para poder atenderte.');
       return;
     }
+    if (turnstileKey && onEnviar && !tokenTurnstile) {
+      setBloqueo('Confirma que no eres un robot antes de enviar.');
+      return;
+    }
     setBloqueo('');
     guardarAutoReporte({ mrs, dolor, hc });
     if (onEnviar) {
       setEnviando(true);
       try {
-        await onEnviar({ mrs, dolor, hc, contacto: { telefono: hc.telefono || null, correo: hc.correo || null }, demografia: { nombre: dem.nombre, edad: dem.edad }, consentimiento: acepto, consentimientoFecha: new Date().toISOString() });
-      } finally { setEnviando(false); }
+        await onEnviar({ mrs, dolor, hc, contacto: { telefono: hc.telefono || null, correo: hc.correo || null }, demografia: { nombre: dem.nombre, edad: dem.edad }, consentimiento: acepto, consentimientoFecha: new Date().toISOString(), turnstileToken: tokenTurnstile });
+      } finally {
+        setEnviando(false);
+        // Si quedó en la misma pantalla (p. ej. error), refresca el reto para reintentar.
+        if (turnstileKey && window.turnstile && widgetIdRef.current) {
+          try { window.turnstile.reset(widgetIdRef.current); } catch (_) { /* ignore */ }
+          setTokenTurnstile('');
+        }
+      }
       return;
     }
     setGuardado(true);
@@ -274,7 +320,10 @@ export default function PreConsulta({ onEnviar }) {
               Consulta el aviso de privacidad
             </a>
           )}
-          <button className="pc-guardar" onClick={guardar} disabled={enviando || (onEnviar && !acepto)}>
+          {turnstileKey && onEnviar && (
+            <div ref={turnstileRef} className="pc-turnstile" style={{ marginTop: '14px' }} />
+          )}
+          <button className="pc-guardar" onClick={guardar} disabled={enviando || (onEnviar && !acepto) || (turnstileKey && onEnviar && !tokenTurnstile)}>
             {onEnviar ? (enviando ? 'Enviando…' : 'Enviar mis respuestas a mi médico') : 'Guardar mis respuestas'}
           </button>
           <div className="pc-acciones-nota">Puedes enviar aunque hayas dejado en blanco la parte opcional.</div>

@@ -67,7 +67,8 @@ function PortalInterno() {
   const onEnviar = async (datos) => {
     setError('');
     try {
-      const guardado = await guardarRespuesta(construirRegistro(datos));
+      // El token de Turnstile (si está activo) viaja aparte; no se guarda en el contenido.
+      const guardado = await guardarRespuesta(construirRegistro(datos), { turnstileToken: datos.turnstileToken });
       setEnviado(guardado);
     } catch (e) {
       setError('No se pudieron enviar tus respuestas. Revisa tu conexión e inténtalo de nuevo.');

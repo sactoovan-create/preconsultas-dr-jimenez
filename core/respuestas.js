@@ -17,10 +17,11 @@ function hayBackend() {
   return !!(import.meta.env && import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
 }
 
-/** Guarda una respuesta de paciente. Devuelve el registro guardado. */
-export async function guardarRespuesta(registro) {
+/** Guarda una respuesta de paciente. Devuelve el registro guardado.
+ *  `opciones.turnstileToken` se usa solo si el portal tiene Turnstile activado. */
+export async function guardarRespuesta(registro, opciones = {}) {
   const completo = { ...registro, creado: registro.creado || new Date().toISOString() };
-  if (hayBackend()) return guardarEnSupabase(completo);
+  if (hayBackend()) return guardarEnSupabase(completo, opciones);
   // En producción NO debe caer en silencio a almacenamiento local: si falta la
   // configuración del consultorio, los datos quedarían solo en el teléfono de la
   // paciente y el médico nunca los vería. Se trata como error explícito.
@@ -79,14 +80,25 @@ async function cliente() {
   return _cliente;
 }
 
-async function guardarEnSupabase(registro) {
+async function guardarEnSupabase(registro, opciones = {}) {
   const sb = await cliente();
-  const { error } = await sb
-    .from('respuestas')
-    .insert({ contenido: registro, creado: registro.creado, nombre: registro.paciente?.nombre || null });
-  if (error) throw error;
-  // La clave anon solo puede insertar; no puede leer la fila insertada. El id
-  // devuelto aqui es solo para el estado visual de confirmacion de la paciente.
+  const siteKey = import.meta.env && import.meta.env.VITE_TURNSTILE_SITE_KEY;
+  if (siteKey) {
+    // Camino blindado (público masivo): el insert pasa por la Edge Function
+    // enviar-respuesta, que verifica el token de Turnstile e inserta con la clave de
+    // servicio. El insert anónimo directo queda cerrado por la seguridad por filas.
+    const { error } = await sb.functions.invoke('enviar-respuesta', {
+      body: { registro, token: opciones.turnstileToken || '' },
+    });
+    if (error) throw error;
+  } else {
+    // Camino directo: la clave anon inserta (no puede leer la fila de vuelta).
+    const { error } = await sb
+      .from('respuestas')
+      .insert({ contenido: registro, creado: registro.creado, nombre: registro.paciente?.nombre || null });
+    if (error) throw error;
+  }
+  // El id devuelto es solo para el estado visual de confirmacion de la paciente.
   const idLocal = registro.id || `supabase_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   return { ...registro, id: idLocal };
 }
