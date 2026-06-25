@@ -6,10 +6,12 @@
 > consentimiento que la paciente acepta antes de enviar.
 
 ## Responsable de tus datos
-El **Dr. Iván Jiménez Martínez** (Ginecología), con domicilio en [domicilio del
-consultorio] y correo de contacto [correo de contacto], es el responsable del uso y
-protección de tus datos personales, conforme a la Ley Federal de Protección de Datos
-Personales en Posesión de los Particulares.
+El **Dr. Iván Jiménez Martínez** (Ginecología), con domicilio en Hospital Star
+Médica Tlalnepantla, Consultorio 915, Piso 9, Av. Sor Juana Inés de la Cruz 280,
+Fracc. Industrial San Lázaro, Tlalnepantla de Baz, Estado de México, C.P. 54033,
+y correo de contacto drjimenezivan@gmail.com, es el responsable del uso y
+protección de tus datos personales, conforme a la Ley Federal de Protección de
+Datos Personales en Posesión de los Particulares.
 
 ## Qué datos recabamos
 Cuando respondes el cuestionario previo a tu consulta, recabamos:
@@ -47,7 +49,7 @@ seguro y no son públicas.
 Tienes derecho a **acceder** a tus datos, **rectificarlos** si son inexactos,
 **cancelarlos** cuando consideres que no se requieren, y **oponerte** a su uso para
 fines específicos. Para ejercer cualquiera de estos derechos o revocar tu
-consentimiento, escribe a [correo de contacto]; te responderemos en los plazos que
+consentimiento, escribe a drjimenezivan@gmail.com; te responderemos en los plazos que
 marca la ley. La eliminación de tus respuestas puede realizarse de forma permanente
 a tu solicitud.
 
@@ -58,4 +60,4 @@ los plazos que exige la normativa sanitaria aplicable al expediente clínico.
 ## Cambios a este aviso
 Este aviso puede actualizarse. Publicaremos la versión vigente en este mismo medio.
 
-Fecha de última actualización: [fecha].
+Fecha de última actualización: 25 de junio de 2026.

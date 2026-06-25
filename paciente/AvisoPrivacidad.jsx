@@ -5,16 +5,15 @@ import React from 'react';
  * consentimiento del portal. Por requerirlo el tratamiento de datos de salud, la
  * paciente debe poder leerlo antes de enviar.
  *
- * COMPLETAR antes de abrir al público los tres campos de DATOS (correo de contacto,
- * domicilio y fecha). El resto del texto es un borrador para que lo revises con tu
- * criterio profesional y, si lo consideras, asesoría legal.
+ * Borrador operativo para el portal. Conviene revisarlo con criterio profesional y,
+ * si lo consideras, asesoría legal antes de campañas públicas.
  */
 const DATOS = {
   responsable: 'Dr. Iván Jiménez Martínez',
   especialidad: 'Ginecología',
-  contacto: '[tu correo de contacto]',
-  domicilio: '[domicilio del consultorio]',
-  actualizado: '[fecha]',
+  contacto: 'drjimenezivan@gmail.com',
+  domicilio: 'Hospital Star Médica Tlalnepantla, Consultorio 915, Piso 9, Av. Sor Juana Inés de la Cruz 280, Fracc. Industrial San Lázaro, Tlalnepantla de Baz, Estado de México, C.P. 54033',
+  actualizado: '25 de junio de 2026',
 };
 
 const VERDE = '#1F3A2E';
