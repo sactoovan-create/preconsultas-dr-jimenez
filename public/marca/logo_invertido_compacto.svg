@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="180" viewBox="0 0 800 180">
+
+<defs>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&amp;display=swap');
+.wordmark { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 500; letter-spacing: -0.03em; }
+.descriptor { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 400; letter-spacing: 0.28em; }
+.meta { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 300; }
+.meta-bold { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 500; }
+.tiny-label { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 400; letter-spacing: 0.25em; }
+</style>
+</defs>
+<rect width="800" height="180" fill="#1F3A2E"/>
+<g>
+  <text x="230" y="115" class="wordmark" fill="#F1EADB" font-size="72">dr</text>
+  <circle cx="312" cy="110" r="10" fill="#F1EADB"/>
+  <text x="337" y="115" class="wordmark" fill="#F1EADB" font-size="72">jiménez</text>
+</g>
+</svg>

@@ -148,7 +148,9 @@ permite probarlo aislado antes de conectarlo.
   signos:     { sistolica, diastolica, peso, talla, circunferencia },
   labs:       { ct, hdl, tg, glu, hba1c, creat, egfr, uacr },
   antecedentes: { diabetes, tabaquismo, antihipertensivo, estatina,
-                  ecvEstablecida, ecvSubclinica, preeclampsia, diabetesGestacional,
+                  ecvEstablecida, ecvSubclinica,
+                  cancerMama, tromboembolismo, hepatica, sangradoNoDx,
+                  preeclampsia, diabetesGestacional,
                   partoPretermino, sindromePoliendocrino }
 }
 ```

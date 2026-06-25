@@ -1,0 +1,22 @@
+{
+  "name": "instrumentos-clinicos",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Suite de instrumentos clínicos de ginecología. Motores puros verificables.",
+  "scripts": {
+    "test": "node tests/suite.mjs",
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^5.4.11"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.108.2",
+    "react-router-dom": "^7.18.0"
+  }
+}

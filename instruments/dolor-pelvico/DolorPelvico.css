@@ -11,10 +11,10 @@
 
 /* Sistemas implicados */
 .dpc-sistemas { display: flex; flex-direction: column; gap: 8px; }
-.dpc-sist { background: #FDFBF6; border: 1px solid var(--linea); border-left: 3px solid var(--verde); border-radius: 4px; padding: 10px 13px; }
+.dpc-sist { background: var(--papel); border: 1px solid var(--linea-suave); border-left: 3px solid var(--verde); border-radius: 8px; padding: 11px 14px; }
 .dpc-sist-cab { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
 .dpc-sist-n { font-size: 13.5px; font-weight: 700; color: var(--verde); }
-.dpc-sist-c { font-family: var(--serif); font-size: 15px; font-weight: 600; color: var(--crema-papel); background: var(--verde); border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+.dpc-sist-c { font-family: var(--display); font-size: 17px; font-weight: 300; font-variation-settings: 'opsz' 144; color: var(--dorado); background: rgba(168,139,92,.12); border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; }
 .dpc-sist ul { margin: 0; padding-left: 17px; }
 .dpc-sist li { font-size: 11.5px; line-height: 1.4; color: rgba(31,58,46,.78); margin-bottom: 3px; }
 

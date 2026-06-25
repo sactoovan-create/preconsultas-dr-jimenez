@@ -4,6 +4,7 @@ import { INSTRUMENTOS } from './registry.js';
 import ResumenPaciente from './ResumenPaciente.jsx';
 import PreConsulta from './PreConsulta.jsx';
 import Seguimiento from './Seguimiento.jsx';
+import Respuestas from './Respuestas.jsx';
 import './core/designTokens.css';
 import './InstrumentosModule.css';
 
@@ -22,25 +23,29 @@ import './InstrumentosModule.css';
 export default function InstrumentosModule({ pacienteInicial, onGuardarResultado, apartadoInicial }) {
   const [activoId, setActivoId] = useState(apartadoInicial || 'resumen');
   const esResumen = activoId === 'resumen';
+  const esRespuestas = activoId === 'respuestas';
   const esPreConsulta = activoId === 'preconsulta';
   const esSeguimiento = activoId === 'seguimiento';
   const activo = INSTRUMENTOS.find((i) => i.id === activoId) || INSTRUMENTOS[0];
-  const Componente = esResumen ? ResumenPaciente : (esPreConsulta ? PreConsulta : (esSeguimiento ? Seguimiento : activo.Componente));
+  const Componente = esResumen ? ResumenPaciente
+    : (esRespuestas ? Respuestas
+      : (esPreConsulta ? PreConsulta
+        : (esSeguimiento ? Seguimiento : activo.Componente)));
 
   return (
     <PacienteProvider pacienteInicial={pacienteInicial} onGuardarResultado={onGuardarResultado} irA={setActivoId}>
       <div className="instrumentos-root">
         <div className="instrumentos-layout">
           <nav className="instrumentos-nav" aria-label="Instrumentos clínicos">
-            <div className="nav-cab">
-              <div className="nav-mono">IJ</div>
-              <div>
-                <div className="nav-eyebrow">Consultorio</div>
-                <div className="nav-titulo">Instrumentos clínicos</div>
-              </div>
+            <div className="nav-marca">
+              <img className="nav-logo" src="/marca/logo_invertido_transparente.svg" alt="dr. jiménez, ginecología" />
+              <div className="nav-eyebrow">Instrumentos clínicos</div>
             </div>
             <button className={'nav-resumen' + (esResumen ? ' activo' : '')} onClick={() => setActivoId('resumen')}>
               Resumen del paciente
+            </button>
+            <button className={'nav-resumen' + (esRespuestas ? ' activo' : '')} onClick={() => setActivoId('respuestas')}>
+              Respuestas de pacientes
             </button>
             <button className={'nav-seguimiento' + (esSeguimiento ? ' activo' : '')} onClick={() => setActivoId('seguimiento')}>
               Seguimiento

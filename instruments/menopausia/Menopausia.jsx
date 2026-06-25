@@ -31,11 +31,13 @@ export default function Menopausia() {
   const [d, setD] = useState(() => ({
     tipo: '',
     tabaquismo: false, hipertension: false, sindromeMetabolico: false, riesgoTev: false,
-    cancerMama: false, ecvEstablecida: false, tromboembolismo: false, hepatica: false, sangradoNoDx: false,
     gsmSintomas: false, prefiereNoHormonal: false,
     ...((paciente.autoReporte && paciente.autoReporte.mrs) || {}),
   }));
   const set = (k, val) => setD((p) => ({ ...p, [k]: val }));
+  // Las contraindicaciones se guardan en el paciente compartido, no en el estado local.
+  const ant = paciente.antecedentes;
+  const setAnt = (k, val) => actualizar('antecedentes', k, val);
 
   const r = useMemo(() => evaluarMenopausia(paciente, d), [paciente, d]);
 
@@ -105,13 +107,13 @@ export default function Menopausia() {
             </div>
           </Seccion>
 
-          <Seccion indice="V" titulo="Contraindicaciones de la terapia sistémica">
+          <Seccion indice="V" titulo="Contraindicaciones de la terapia sistémica" nota="Se comparten con el resto de los instrumentos de la paciente">
             <div className="men-checks">
-              <Casilla etiqueta="Cáncer de mama" valor={d.cancerMama} onChange={(v) => set('cancerMama', v)} />
-              <Casilla etiqueta="Enfermedad cardiovascular establecida" valor={d.ecvEstablecida} onChange={(v) => set('ecvEstablecida', v)} />
-              <Casilla etiqueta="Tromboembolismo venoso o trombofilia" valor={d.tromboembolismo} onChange={(v) => set('tromboembolismo', v)} />
-              <Casilla etiqueta="Enfermedad hepática activa" valor={d.hepatica} onChange={(v) => set('hepatica', v)} />
-              <Casilla etiqueta="Sangrado vaginal no diagnosticado" valor={d.sangradoNoDx} onChange={(v) => set('sangradoNoDx', v)} />
+              <Casilla etiqueta="Cáncer de mama" valor={ant.cancerMama} onChange={(v) => setAnt('cancerMama', v)} />
+              <Casilla etiqueta="Enfermedad cardiovascular establecida" valor={ant.ecvEstablecida} onChange={(v) => setAnt('ecvEstablecida', v)} />
+              <Casilla etiqueta="Tromboembolismo venoso o trombofilia" valor={ant.tromboembolismo} onChange={(v) => setAnt('tromboembolismo', v)} />
+              <Casilla etiqueta="Enfermedad hepática activa" valor={ant.hepatica} onChange={(v) => setAnt('hepatica', v)} />
+              <Casilla etiqueta="Sangrado vaginal no diagnosticado" valor={ant.sangradoNoDx} onChange={(v) => setAnt('sangradoNoDx', v)} />
             </div>
           </Seccion>
 

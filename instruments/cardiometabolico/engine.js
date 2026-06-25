@@ -130,10 +130,13 @@ export function evaluarTerapiaHormonal(p, prevent) {
 
   const contra = [];
   if (a.cancerMama) contra.push('cáncer de mama');
-  if (a.ecvEstablecida === true) contra.push('enfermedad cardiovascular establecida');
+  // Verdad-suave (no === true) para coincidir con el motor de menopausia y para
+  // fallar del lado seguro si el expediente inyecta la condición como valor
+  // verdadero no booleano (por ejemplo 1 o "sí") al mapear pacienteInicial.
+  if (a.ecvEstablecida) contra.push('enfermedad cardiovascular establecida');
   if (a.tromboembolismo) contra.push('tromboembolismo venoso o trombofilia');
   if (a.hepatica) contra.push('enfermedad hepática activa');
-  if (a.sangradoNoDx) contra.push('sangrado uterino no diagnosticado');
+  if (a.sangradoNoDx) contra.push('sangrado vaginal no diagnosticado');
 
   const aniosMeno = (v(edadMenopausia) && v(edad) && etapaReproductiva === 'post') ? edad - edadMenopausia : null;
   const enVentana = v(edad) && edad < 60 && (aniosMeno === null || aniosMeno < 10) && etapaReproductiva !== 'pre';

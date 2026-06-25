@@ -53,7 +53,7 @@ export function evaluarMrs(d) {
   const total = somatico + psicologico + urogenital;
   return {
     total, somatico, psicologico, urogenital,
-    sevTotal: severidad(total, [4, 8, 15]),
+    sevTotal: severidad(total, [4, 8, 16]),
     sevSomatico: severidad(somatico, [2, 4, 8]),
     sevPsicologico: severidad(psicologico, [1, 3, 6]),
     sevUrogenital: severidad(urogenital, [0, 1, 3]),
@@ -79,7 +79,9 @@ export function clasificarTipo(d) {
 /** Candidatura a terapia hormonal sistémica. */
 export function evaluarCandidatura(paciente, d, tipo) {
   const { edad, histerectomia } = d;
-  const a = d;
+  // Las contraindicaciones viven en el paciente compartido (fuente única), no en
+  // el estado local del instrumento. Así coinciden con el cardiometabólico.
+  const a = paciente.antecedentes;
 
   const contra = [];
   if (a.cancerMama) contra.push('cáncer de mama');

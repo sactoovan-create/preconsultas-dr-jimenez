@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { usePaciente } from './core/PacienteContext.jsx';
 import './PreConsulta.css';
 
@@ -82,7 +82,7 @@ function Casilla({ etiqueta, valor, onChange }) {
   );
 }
 
-export default function PreConsulta() {
+export default function PreConsulta({ onEnviar }) {
   const { paciente, actualizar, guardarAutoReporte } = usePaciente();
   const dem = paciente.demografia;
   const ar = paciente.autoReporte || {};
@@ -91,22 +91,52 @@ export default function PreConsulta() {
   const [dolor, setDolor] = useState(() => ar.dolor || { tiene: false, intensidad: null, meses: null });
   const [hc, setHc] = useState(() => ar.hc || {});
   const [guardado, setGuardado] = useState(false);
+  const [acepto, setAcepto] = useState(false);
+  const [enviando, setEnviando] = useState(false);
+
+  // Anti-robots discretos (sin captcha): un campo trampa invisible y un tiempo
+  // mínimo de llenado. No estorban a una persona; frenan envíos automáticos.
+  const trampaRef = useRef(null);
+  const inicioRef = useRef(Date.now());
 
   const setSintoma = (id, n) => { setMrs((p) => ({ ...p, [id]: n })); setGuardado(false); };
   const setH = (k, val) => { setHc((p) => ({ ...p, [k]: val })); setGuardado(false); };
 
-  const guardar = () => { guardarAutoReporte({ mrs, dolor, hc }); setGuardado(true); };
+  const guardar = async () => {
+    // Si el campo trampa trae texto (lo llenan los robots) o el envío llega en
+    // menos de 2 segundos (imposible para una persona en este cuestionario), se
+    // descarta en silencio: no se envía nada ni se avisa, para no dar pistas.
+    const trampa = trampaRef.current ? trampaRef.current.value : '';
+    if (trampa || Date.now() - inicioRef.current < 2000) {
+      setGuardado(true);
+      return;
+    }
+    guardarAutoReporte({ mrs, dolor, hc });
+    if (onEnviar) {
+      setEnviando(true);
+      try {
+        await onEnviar({ mrs, dolor, hc, contacto: { telefono: hc.telefono || null, correo: hc.correo || null }, demografia: { nombre: dem.nombre, edad: dem.edad }, consentimiento: acepto, consentimientoFecha: new Date().toISOString() });
+      } finally { setEnviando(false); }
+      return;
+    }
+    setGuardado(true);
+  };
 
   return (
     <div className="pc">
-      <header className="pc-cab">
-        <div className="pc-marca">dr. iván jiménez martínez<small>Ginecología</small></div>
-        <div className="pc-mono">IJ</div>
-      </header>
+      {!onEnviar && (
+        <header className="pc-cab">
+          <div className="pc-marca">dr. iván jiménez martínez<small>Ginecología</small></div>
+          <div className="pc-mono">IJ</div>
+        </header>
+      )}
 
       <div className="pc-cuerpo">
-        <h1 className="pc-titulo">Antes de tu consulta</h1>
-        <p className="pc-intro">Tómate un momento para responder estas preguntas. Tus respuestas le ayudan al doctor a conocer mejor cómo te sientes y a dedicar la consulta a lo que más te importa. No hay respuestas correctas o incorrectas.</p>
+        {/* Campo trampa anti-robots: invisible para personas; los robots lo llenan. */}
+        <input ref={trampaRef} type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true"
+               style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', opacity: 0 }} />
+        {!onEnviar && <h1 className="pc-titulo">Antes de tu consulta</h1>}
+        {!onEnviar && <p className="pc-intro">Tómate un momento para responder estas preguntas. Tus respuestas le ayudan al doctor a conocer mejor cómo te sientes y a dedicar la consulta a lo que más te importa. No hay respuestas correctas o incorrectas.</p>}
 
         <div className="pc-seccion">
           <div className="pc-seccion-t">Cuéntanos un poco de ti</div>
@@ -119,6 +149,18 @@ export default function PreConsulta() {
               <span>Tu edad</span>
               <input type="number" value={dem.edad ?? ''} onChange={(e) => actualizar('demografia', 'edad', e.target.value === '' ? null : Number(e.target.value))} placeholder="años" />
             </label>
+            {onEnviar && (
+              <>
+                <label className="pc-campo">
+                  <span>Tu teléfono</span>
+                  <input type="tel" value={hc.telefono || ''} onChange={(e) => setH('telefono', e.target.value)} placeholder="Para poder contactarte" />
+                </label>
+                <label className="pc-campo">
+                  <span>Tu correo (opcional)</span>
+                  <input type="email" value={hc.correo || ''} onChange={(e) => setH('correo', e.target.value)} placeholder="correo electrónico" />
+                </label>
+              </>
+            )}
           </div>
         </div>
 
@@ -211,9 +253,17 @@ export default function PreConsulta() {
         </div>
 
         <div className="pc-acciones">
-          <button className="pc-guardar" onClick={guardar}>Guardar mis respuestas</button>
+          {onEnviar && (
+            <label className="pc-consent">
+              <input type="checkbox" checked={acepto} onChange={(e) => setAcepto(e.target.checked)} />
+              <span>Autorizo que mis respuestas se compartan con el consultorio del Dr. Iván Jiménez Martínez para mi atención. Son confidenciales y se usan solo para mi cuidado médico.</span>
+            </label>
+          )}
+          <button className="pc-guardar" onClick={guardar} disabled={enviando || (onEnviar && !acepto)}>
+            {onEnviar ? (enviando ? 'Enviando…' : 'Enviar mis respuestas a mi médico') : 'Guardar mis respuestas'}
+          </button>
           <div className="pc-acciones-nota">Puedes enviar aunque hayas dejado en blanco la parte opcional.</div>
-          {guardado && <div className="pc-ok">Gracias. Tus respuestas quedaron guardadas para tu consulta.</div>}
+          {guardado && !onEnviar && <div className="pc-ok">Gracias. Tus respuestas quedaron guardadas para tu consulta.</div>}
         </div>
       </div>
     </div>

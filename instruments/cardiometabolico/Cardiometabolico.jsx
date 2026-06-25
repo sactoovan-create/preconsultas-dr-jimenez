@@ -145,6 +145,15 @@ export default function Cardiometabolico() {
               <Casilla etiqueta="Síndrome poliendocrino ovárico" valor={ant.sindromePoliendocrino} onChange={(v) => setAnt('sindromePoliendocrino', v)} />
             </div>
           </Seccion>
+
+          {(dem.etapaReproductiva === 'peri' || dem.etapaReproductiva === 'post') && (
+            <Seccion indice="V" titulo="Contraindicaciones de terapia hormonal sistémica" nota="Definen si la terapia hormonal está contraindicada. Se comparten con el instrumento de menopausia">
+              <ToggleSiNo etiqueta="Cáncer de mama" full alerta valor={ant.cancerMama} onChange={(v) => setAnt('cancerMama', v)} />
+              <ToggleSiNo etiqueta="Tromboembolismo venoso o trombofilia" full alerta valor={ant.tromboembolismo} onChange={(v) => setAnt('tromboembolismo', v)} />
+              <ToggleSiNo etiqueta="Enfermedad hepática activa" full alerta valor={ant.hepatica} onChange={(v) => setAnt('hepatica', v)} />
+              <ToggleSiNo etiqueta="Sangrado vaginal no diagnosticado" full alerta valor={ant.sangradoNoDx} onChange={(v) => setAnt('sangradoNoDx', v)} />
+            </Seccion>
+          )}
         </div>
 
         {/* -------- RESULTADOS -------- */}

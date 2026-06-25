@@ -34,7 +34,7 @@ export default function Hemorragia() {
     const evaluado = r.palm.hayClasificacion || r.sangrado.anormal || !!r.agudo || !!r.posmeno || d.hb != null;
     let titular = 'Hemorragia uterina anormal';
     if (r.agudo) titular = r.agudo.inestable ? 'Hemorragia aguda inestable' : 'Hemorragia aguda estable';
-    else if (r.palm.hayClasificacion) titular = r.palm.presentes.map((x) => x.codigo).join(', ');
+    else if (r.palm.hayClasificacion) titular = r.palm.presentes.map((x) => x.nombre).join(', ');
     let estado = 'ok';
     if ((r.agudo && r.agudo.inestable) || r.anemia.estado === 'severa') estado = 'alerta';
     else if (r.palm.hayClasificacion || r.agudo || r.posmeno || r.anemia.estado === 'moderada' || r.anemia.estado === 'leve') estado = 'aviso';

@@ -21,6 +21,9 @@ const formaVacia = () => ({
   antecedentes: {
     diabetes: null, tabaquismo: null, antihipertensivo: null, estatina: null,
     ecvEstablecida: null, ecvSubclinica: null,
+    // Contraindicaciones de terapia hormonal sistémica. Fuente única compartida:
+    // las capturan y leen tanto el instrumento de menopausia como el cardiometabólico.
+    cancerMama: null, tromboembolismo: null, hepatica: null, sangradoNoDx: null,
     preeclampsia: false, diabetesGestacional: false, partoPretermino: false,
     restriccionCrecimiento: false, sindromePoliendocrino: false,
   },

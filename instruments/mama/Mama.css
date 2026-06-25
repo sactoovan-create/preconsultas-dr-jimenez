@@ -6,7 +6,8 @@
   font-size: 11.5px; line-height: 1.45; padding: 9px 12px; border-radius: 4px; margin-bottom: 7px;
   background: rgba(184,80,66,.1); border-left: 2px solid var(--terracota); color: rgba(31,58,46,.85);
 }
-.mama-genetica { font-size: 12px; font-weight: 600; color: var(--verde); margin-bottom: 6px; }
+.mama-genetica { display: inline-flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--dorado); margin-bottom: 8px; }
+.mama-genetica::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--dorado); flex-shrink: 0; }
 
 .mama-lista { margin: 0; padding-left: 18px; }
 .mama-lista li { font-size: 12px; line-height: 1.5; color: rgba(31,58,46,.86); margin-bottom: 6px; }

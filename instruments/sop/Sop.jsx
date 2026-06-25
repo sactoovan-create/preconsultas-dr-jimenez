@@ -260,7 +260,7 @@ export default function Sop() {
 function Criterio({ activo, texto, sub }) {
   return (
     <div className={'sop-crit ' + (activo ? 'si' : 'no')}>
-      <span className="sop-crit-marca">{activo ? '✓' : '·'}</span>
+      <span className={'sop-crit-marca ' + (activo ? 'si' : 'no')} aria-hidden="true" />
       <div>
         <div className="sop-crit-t">{texto}</div>
         {sub && <div className="sop-crit-s">{sub}</div>}

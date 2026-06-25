@@ -15,7 +15,7 @@
 .inst-btn.diario:hover { border-color: var(--dorado); background: #fff; }
 
 .iu-detalle { font-size: 12px; line-height: 1.5; color: rgba(31,58,46,.82); margin-top: 5px; }
-.iu-puntajes { font-size: 11.5px; color: rgba(31,58,46,.62); margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--linea); }
+.iu-puntajes { font-size: 11.5px; color: rgba(31,58,46,.62); margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--hair-dorada); }
 .iu-alerta { font-size: 11.5px; line-height: 1.45; padding: 9px 12px; border-radius: 4px; margin-bottom: 7px; background: rgba(184,80,66,.1); border-left: 2px solid var(--terracota); color: rgba(31,58,46,.85); }
 
 .iu-tx { margin-bottom: 12px; }

@@ -3,7 +3,7 @@
 .rp-cuerpo { max-width: 1180px; margin: 0 auto; padding: 24px; }
 
 .rp-guia {
-  background: rgba(168,139,92,.1); border: 1px solid var(--dorado); border-radius: 6px;
+  background: rgba(168,139,92,.1); border: 1px solid var(--dorado); border-radius: 12px;
   padding: 16px 18px; font-size: 13px; line-height: 1.55; color: rgba(31,58,46,.82);
   margin-bottom: 22px;
 }
@@ -11,13 +11,15 @@
 .rp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
 
 .rp-card {
-  text-align: left; cursor: pointer; font-family: var(--sans);
-  background: var(--crema-papel); border: 1px solid var(--linea);
-  border-left: 3px solid var(--linea-fuerte); border-radius: 6px;
-  padding: 16px 18px; transition: transform .12s, box-shadow .12s;
+  position: relative; text-align: left; cursor: pointer; font-family: var(--sans);
+  background: var(--papel); border: 1px solid var(--linea-suave);
+  border-left: 3px solid var(--linea-fuerte); border-radius: var(--radio);
+  padding: 18px 20px; box-shadow: var(--sombra-1); transition: transform .14s, box-shadow .14s;
   display: flex; flex-direction: column; min-height: 118px;
 }
-.rp-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(22,41,31,.12); }
+/* Filete dorado superior: sensación impresa. */
+.rp-card::before { content: ''; position: absolute; top: 0; left: 18px; right: 18px; height: 1px; background: linear-gradient(90deg, transparent, rgba(168,139,92,.5) 18%, rgba(168,139,92,.5) 82%, transparent); }
+.rp-card:hover { transform: translateY(-2px); box-shadow: var(--sombra-2); }
 .rp-card.eval.ok { border-left-color: var(--ok); }
 .rp-card.eval.aviso { border-left-color: var(--dorado); }
 .rp-card.eval.alerta { border-left-color: var(--terracota); }
@@ -29,7 +31,8 @@
 .rp-punto.aviso { background: var(--dorado); }
 .rp-punto.alerta { background: var(--terracota); }
 
-.rp-card-titular { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--verde); margin-top: 10px; line-height: 1.1; }
+/* Titular editorial: el momento de cifra grande de la tarjeta. */
+.rp-card-titular { font-family: var(--display); font-size: 28px; font-weight: 300; font-variation-settings: 'opsz' 144; letter-spacing: -.015em; color: var(--verde); margin-top: 10px; line-height: 1.05; }
 .rp-card-detalle { font-size: 11.5px; line-height: 1.4; color: rgba(31,58,46,.66); margin-top: 5px; }
 .rp-card-vacio { font-size: 14px; color: rgba(31,58,46,.4); margin-top: 12px; font-style: italic; }
 
@@ -43,8 +46,8 @@
 .rp-acciones { display: flex; justify-content: flex-end; margin-bottom: 18px; }
 .rp-informe {
   cursor: pointer; background: var(--verde); color: var(--crema-papel); border: none;
-  border-radius: 6px; font-family: var(--sans); font-size: 12.5px; font-weight: 700;
-  padding: 11px 18px; transition: background .12s;
+  border-radius: 12px; font-family: var(--sans); font-size: 12.5px; font-weight: 700; letter-spacing: .03em;
+  padding: 12px 20px; box-shadow: var(--sombra-1); transition: background .14s, transform .14s, box-shadow .14s;
 }
-.rp-informe:hover:not(:disabled) { background: var(--verde-tinta); }
+.rp-informe:hover:not(:disabled) { background: var(--verde-tinta); transform: translateY(-1px); box-shadow: var(--sombra-2); }
 .rp-informe:disabled { opacity: .4; cursor: not-allowed; }

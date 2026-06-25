@@ -4,44 +4,50 @@
   display: grid;
   grid-template-columns: 300px 1fr;
   min-height: 100%;
-  background: #E3DAC6;
+  background: radial-gradient(120% 80% at 50% 0%, var(--crema-papel), var(--crema) 64%);
 }
 
-/* Navegación lateral */
+/* Navegación lateral — verde profundo con velo dorado y filo hairline. */
 .instrumentos-nav {
-  background: var(--verde);
+  background:
+    radial-gradient(120% 60% at 50% -8%, rgba(168,139,92,.10), transparent 60%),
+    linear-gradient(180deg, #24432F 0%, #1F3A2E 46%, #16291F 100%);
   color: var(--crema-papel);
   padding: 26px 18px;
   overflow-y: auto;
+  border-right: 1px solid rgba(168,139,92,.18);
 }
-.nav-cab { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
-.nav-mono {
-  width: 46px; height: 46px; flex-shrink: 0;
-  border: 1.5px solid rgba(246,241,230,.45); border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--serif); font-weight: 600; font-size: 19px;
+.nav-marca { margin-bottom: 24px; padding: 4px 2px 18px; position: relative; }
+/* Filete dorado bajo la marca: sensación de membrete. */
+.nav-marca::after {
+  content: ''; position: absolute; left: 2px; right: 2px; bottom: 0; height: 1px;
+  background: linear-gradient(90deg, rgba(168,139,92,.5), transparent 78%);
 }
-.nav-eyebrow { font-size: 9px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--dorado); }
-.nav-titulo { font-family: var(--serif); font-size: 20px; font-weight: 600; line-height: 1.1; margin-top: 2px; }
+.nav-logo { width: 100%; max-width: 212px; height: auto; display: block; margin-bottom: 12px; }
+.nav-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 9px; font-weight: 800; letter-spacing: .24em; text-transform: uppercase; color: var(--dorado);
+}
+.nav-eyebrow::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--dorado); flex-shrink: 0; }
 
 .nav-lista { list-style: none; display: flex; flex-direction: column; gap: 4px; }
 
 .nav-resumen {
   width: 100%; text-align: left; cursor: pointer; margin-bottom: 14px;
   background: rgba(168,139,92,.16); border: 1px solid rgba(168,139,92,.5);
-  border-radius: 6px; padding: 12px 14px; color: var(--crema-papel);
+  border-radius: 12px; padding: 12px 14px; color: var(--crema-papel);
   font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: .02em;
-  transition: background .12s;
+  transition: background .14s, box-shadow .14s, transform .14s;
 }
-.nav-resumen:hover { background: rgba(168,139,92,.26); }
+.nav-resumen:hover { background: rgba(168,139,92,.26); transform: translateY(-1px); box-shadow: 0 6px 16px -8px rgba(0,0,0,.4); }
 .nav-resumen.activo { background: var(--dorado); color: var(--verde-tinta); }
 
 .nav-seguimiento {
   width: 100%; text-align: left; cursor: pointer; margin-bottom: 8px; margin-top: -8px;
   background: rgba(168,139,92,.1); border: 1px solid rgba(168,139,92,.35);
-  border-radius: 6px; padding: 11px 14px; color: var(--crema-papel);
+  border-radius: 12px; padding: 11px 14px; color: var(--crema-papel);
   font-family: var(--sans); font-size: 12.5px; font-weight: 600;
-  transition: background .12s;
+  transition: background .14s;
 }
 .nav-seguimiento:hover { background: rgba(168,139,92,.2); }
 .nav-seguimiento.activo { background: var(--dorado); color: var(--verde-tinta); }
@@ -49,18 +55,18 @@
 .nav-preconsulta {
   width: 100%; text-align: left; cursor: pointer; margin-bottom: 14px; margin-top: -8px;
   background: rgba(241,234,219,.08); border: 1px solid rgba(241,234,219,.28);
-  border-radius: 6px; padding: 11px 14px; color: var(--crema-papel);
+  border-radius: 12px; padding: 11px 14px; color: var(--crema-papel);
   font-family: var(--sans); font-size: 12.5px; font-weight: 600;
-  transition: background .12s;
+  transition: background .14s;
 }
 .nav-preconsulta:hover { background: rgba(241,234,219,.16); }
 .nav-preconsulta.activo { background: var(--crema-papel); color: var(--verde-tinta); }
 .nav-item {
   width: 100%; text-align: left; cursor: pointer;
-  background: transparent; border: none; border-radius: 6px;
+  background: transparent; border: none; border-radius: 10px;
   padding: 12px 13px; color: rgba(246,241,230,.78);
   display: flex; flex-direction: column; gap: 3px;
-  transition: background .12s, color .12s;
+  transition: background .14s, color .14s;
   position: relative;
 }
 .nav-item:hover { background: rgba(246,241,230,.07); color: var(--crema-papel); }
