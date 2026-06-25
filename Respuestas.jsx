@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { listarRespuestas, eliminarRespuesta, modoAlmacenamiento, sesion, iniciarSesion, cerrarSesion } from './core/respuestas.js';
-import { buzonActivo, listarEstudios } from './core/estudios.js';
+import { listarEstudios } from './core/estudios.js';
 import { MRS_ITEMS } from './instruments/menopausia/engine.js';
 import './Respuestas.css';
 
@@ -151,7 +151,7 @@ function Detalle({ r, onEliminar }) {
         </section>
       )}
 
-      {buzonActivo() && r.estudiosFolder && <EstudiosAdjuntos folder={r.estudiosFolder} />}
+      {r.estudiosFolder && <EstudiosAdjuntos folder={r.estudiosFolder} />}
     </div>
   );
 }

@@ -38,12 +38,21 @@ Cada envío de una paciente es **un objeto JSON** con esta forma:
     "dolor":      { "intensidad": 6, "meses": 4 }              // o null si no hay
   },
 
-  "consentimiento": true        // la paciente autorizó compartir (siempre true al enviar)
+  "consentimiento": true,       // la paciente autorizó compartir (siempre true al enviar)
+
+  "estudiosFolder": "uuid|null" // opcional (aditivo). Carpeta del buzón de estudios en
+                                // Storage; null si el buzón está apagado o no se usó.
 }
 ```
 
 `id` y `creado` los pone el almacén (Supabase o local), no el portal. El resto lo
 arma el portal.
+
+`estudiosFolder` es un campo **opcional y aditivo** (no sube `version`): el ERP lo
+ignora si no lo conoce. No es dato personal por sí mismo, pero es una clave de
+capacidad que apunta a archivos clínicos privados, así que **no debe exponerse en
+claro** fuera del sistema. La idempotencia del ERP descansa en `source_response_id`
+(el `id`), no en el hash del contenido, así que agregar este campo no la afecta.
 
 ---
 

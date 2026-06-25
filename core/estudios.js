@@ -82,8 +82,14 @@ export async function listarEstudios(folder) {
   const salida = [];
   for (const o of archivos) {
     const ruta = `${folder}/${o.name}`;
-    const { data: firmado } = await sb.storage.from(bucket()).createSignedUrl(ruta, 3600);
-    salida.push({ nombre: o.name, url: firmado ? firmado.signedUrl : null, size: o.metadata && o.metadata.size });
+    let url = null;
+    try {
+      const { data: firmado } = await sb.storage.from(bucket()).createSignedUrl(ruta, 3600);
+      url = firmado ? firmado.signedUrl : null;
+    } catch (_) {
+      url = null; // un enlace que falle no debe tumbar toda la lista
+    }
+    salida.push({ nombre: o.name, url, size: o.metadata && o.metadata.size });
   }
   return salida;
 }

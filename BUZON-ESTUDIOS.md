@@ -43,6 +43,24 @@ mes. Cuando te acerques a 1 GB tienes tres caminos: comprimir más, subir de pla
 o activar el paso a Google Drive (lo dejamos como plan futuro). No hace falta hacer nada
 hasta entonces.
 
+## Seguridad: lo que cubre y lo que no
+
+- **Privacidad de lectura (cubierto):** el bucket es privado y la paciente (clave
+  anónima) **solo puede subir; nunca leer ni listar**. Solo tú, autenticado, abres los
+  archivos, con enlaces firmados que caducan en una hora. Una paciente no puede ver los
+  estudios de otra.
+- **El tope de tamaño (15 MB) y los tipos permitidos se hacen cumplir en el servidor**
+  (en el bucket), no solo en el navegador.
+- **Lo que NO cubre todavía (igual que el envío del cuestionario):** la subida usa la
+  clave anónima pública directo al almacenamiento. Para un enlace privado por WhatsApp el
+  riesgo es bajo, pero un actor que tenga esa clave podría subir basura (llenar el bucket)
+  o, si conoce el identificador de carpeta de una paciente, plantarle archivos. El tope de
+  10 archivos es solo del navegador. Por eso: **antes de abrir el portal a público masivo,
+  la subida debe pasar por la misma Edge Function blindada con Cloudflare Turnstile que el
+  cuestionario** (ver `LANZAMIENTO-PUBLICO.md`), y ahí se cierra el acceso anónimo directo.
+- El identificador de carpeta (`estudiosFolder`) es una clave de capacidad: no lo
+  expongas en claro fuera del sistema.
+
 ## Pendiente / futuro
 
 - **Verlo dentro del expediente (sistema):** hoy los estudios se ven en el panel del

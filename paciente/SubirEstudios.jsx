@@ -21,6 +21,15 @@ export default function SubirEstudios({ folder }) {
   const [items, setItems] = useState([]);
   const [aviso, setAviso] = useState('');
 
+  const subirUno = (file, id) => {
+    setItems((l) => l.map((it) => (it.id === id ? { ...it, estado: 'subiendo', detalle: undefined } : it)));
+    subirEstudio(folder, file)
+      .then(() => setItems((l) => l.map((it) => (it.id === id ? { ...it, estado: 'listo' } : it))))
+      .catch((err) => setItems((l) => l.map((it) => (it.id === id
+        ? { ...it, estado: 'error', detalle: err && err.code === 'grande' ? 'Pesa demasiado; intenta una foto más pequeña' : 'No se pudo subir' }
+        : it))));
+  };
+
   const onElegir = (e) => {
     const files = Array.from(e.target.files || []);
     e.target.value = '';
@@ -33,12 +42,8 @@ export default function SubirEstudios({ folder }) {
     if (files.length > disponibles) setAviso(`Se tomaron ${disponibles}; el máximo es ${MAX_ARCHIVOS} archivos.`);
     aSubir.forEach((file) => {
       const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-      setItems((l) => [...l, { id, nombre: file.name, estado: 'subiendo' }]);
-      subirEstudio(folder, file)
-        .then(() => setItems((l) => l.map((it) => (it.id === id ? { ...it, estado: 'listo' } : it))))
-        .catch((err) => setItems((l) => l.map((it) => (it.id === id
-          ? { ...it, estado: 'error', detalle: err && err.code === 'grande' ? 'Muy pesado' : 'Inténtalo de nuevo' }
-          : it))));
+      setItems((l) => [...l, { id, nombre: file.name, estado: 'subiendo', file }]);
+      subirUno(file, id);
     });
   };
 
@@ -69,8 +74,16 @@ export default function SubirEstudios({ folder }) {
           {items.map((it) => (
             <li key={it.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, padding: '8px 0', borderBottom: `1px solid ${DORADO}22`, fontSize: '0.9rem' }}>
               <span style={{ color: TINTA, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{it.nombre}</span>
-              <span style={{ color: ICONO[it.estado].c, fontWeight: 600, whiteSpace: 'nowrap' }}>
-                {ICONO[it.estado].t}{it.estado === 'error' && it.detalle ? `: ${it.detalle}` : ''}
+              <span style={{ display: 'flex', alignItems: 'center', gap: 10, whiteSpace: 'nowrap' }}>
+                <span style={{ color: ICONO[it.estado].c, fontWeight: 600 }}>
+                  {ICONO[it.estado].t}{it.estado === 'error' && it.detalle ? `: ${it.detalle}` : ''}
+                </span>
+                {it.estado === 'error' && it.file && (
+                  <button onClick={() => subirUno(it.file, it.id)}
+                          style={{ border: `1px solid ${DORADO}`, background: 'transparent', color: VERDE, borderRadius: 8, padding: '3px 10px', fontSize: '0.82rem', cursor: 'pointer' }}>
+                    Reintentar
+                  </button>
+                )}
               </span>
             </li>
           ))}
