@@ -38,23 +38,30 @@ hacer eso por ti). Todo lo demás —código, configuración, pruebas— ya est�
 
 ## Lo que tú haces, en orden (cada fase desbloquea la siguiente)
 
+> En `DESPLIEGUE.md` las secciones están en otro orden; guíate por el **título** de
+> la sección, no por su número de posición.
+
 ### Fase 1 — Base de datos (Supabase, gratis)
-Sigue los pasos 2 de [`DESPLIEGUE.md`](DESPLIEGUE.md): crear proyecto, correr
-`supabase/schema.sql`, crear tu usuario médico, y copiar de **Project Settings → API**:
+Sigue la sección «**2. Base de datos (Supabase)**» de [`DESPLIEGUE.md`](DESPLIEGUE.md):
+crear proyecto, correr `supabase/schema.sql`, crear tu usuario médico, y copiar de
+**Project Settings → API**:
 - **Project URL**
 - clave **anon public** (para el portal)
 - clave **service_role** (para el sistema; es secreta, nunca la pongas en el portal)
 
 ### Fase 2 — Portal en línea (Vercel, gratis)
-Sigue el paso 5 de [`DESPLIEGUE.md`](DESPLIEGUE.md). Importante: **Root Directory** =
-la carpeta que contiene este archivo (`extraido/codigo`). Pega las dos variables
-`VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`. **Deploy**.
+Sigue la sección «**5. Subir el sitio (Vercel)**» de [`DESPLIEGUE.md`](DESPLIEGUE.md).
+Importante: **Root Directory** = la carpeta que contiene este archivo
+(`extraido/codigo`). Pega las dos variables `VITE_SUPABASE_URL` y
+`VITE_SUPABASE_ANON_KEY`. **Deploy**. (Estas variables se incrustan al construir el
+sitio: si las cambias después, vuelve a desplegar para que surtan efecto.)
 - Prueba: abre el sitio, envía una respuesta de prueba, y confirma que aparece una
   fila en la tabla `respuestas` de Supabase (Table Editor).
 
 ### Fase 3 — Avisos por correo (Resend, gratis)
-Sigue el paso 4 de [`DESPLIEGUE.md`](DESPLIEGUE.md): cuenta en Resend, subir la Edge
-Function, definir sus secretos y crear el webhook de Insert.
+Sigue la sección «**4. Avisos por correo (Resend)**» de [`DESPLIEGUE.md`](DESPLIEGUE.md):
+cuenta en Resend, subir la Edge Function, definir sus secretos y crear el webhook de
+Insert.
 - Prueba: envía otra respuesta y confirma que te llega el correo.
 
 ### Fase 4 — El expediente consume las respuestas

@@ -93,6 +93,7 @@ export default function PreConsulta({ onEnviar }) {
   const [guardado, setGuardado] = useState(false);
   const [acepto, setAcepto] = useState(false);
   const [enviando, setEnviando] = useState(false);
+  const [bloqueo, setBloqueo] = useState('');
 
   // Anti-robots discretos (sin captcha): un campo trampa invisible y un tiempo
   // mínimo de llenado. No estorban a una persona; frenan envíos automáticos.
@@ -103,14 +104,22 @@ export default function PreConsulta({ onEnviar }) {
   const setH = (k, val) => { setHc((p) => ({ ...p, [k]: val })); setGuardado(false); };
 
   const guardar = async () => {
-    // Si el campo trampa trae texto (lo llenan los robots) o el envío llega en
-    // menos de 2 segundos (imposible para una persona en este cuestionario), se
-    // descarta en silencio: no se envía nada ni se avisa, para no dar pistas.
-    const trampa = trampaRef.current ? trampaRef.current.value : '';
-    if (trampa || Date.now() - inicioRef.current < 2000) {
-      setGuardado(true);
+    // Campo trampa: si trae texto, lo llenó un robot (una persona no lo ve). Se
+    // descarta en silencio. Su nombre no corresponde a un campo real, así que el
+    // autollenado del navegador no lo toca y nunca afecta a una paciente.
+    if (trampaRef.current && trampaRef.current.value) return;
+    // Tiempo mínimo: un envío en menos de 2 segundos no es de una persona en este
+    // cuestionario largo. Se avisa (no se pierde en silencio) y se puede reintentar.
+    if (Date.now() - inicioRef.current < 2000) {
+      setBloqueo('Espera un momento antes de enviar e inténtalo de nuevo.');
       return;
     }
+    // En el portal, el nombre es necesario para poder atenderte.
+    if (onEnviar && !(dem.nombre && String(dem.nombre).trim())) {
+      setBloqueo('Por favor escribe tu nombre para poder atenderte.');
+      return;
+    }
+    setBloqueo('');
     guardarAutoReporte({ mrs, dolor, hc });
     if (onEnviar) {
       setEnviando(true);
@@ -133,7 +142,7 @@ export default function PreConsulta({ onEnviar }) {
 
       <div className="pc-cuerpo">
         {/* Campo trampa anti-robots: invisible para personas; los robots lo llenan. */}
-        <input ref={trampaRef} type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true"
+        <input ref={trampaRef} type="text" name="pc_no_rellenar" tabIndex={-1} autoComplete="off" aria-hidden="true"
                style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', opacity: 0 }} />
         {!onEnviar && <h1 className="pc-titulo">Antes de tu consulta</h1>}
         {!onEnviar && <p className="pc-intro">Tómate un momento para responder estas preguntas. Tus respuestas le ayudan al doctor a conocer mejor cómo te sientes y a dedicar la consulta a lo que más te importa. No hay respuestas correctas o incorrectas.</p>}
@@ -263,6 +272,7 @@ export default function PreConsulta({ onEnviar }) {
             {onEnviar ? (enviando ? 'Enviando…' : 'Enviar mis respuestas a mi médico') : 'Guardar mis respuestas'}
           </button>
           <div className="pc-acciones-nota">Puedes enviar aunque hayas dejado en blanco la parte opcional.</div>
+          {bloqueo && <div className="pc-bloqueo" style={{ marginTop: '12px', color: '#9a3412', fontWeight: 600 }}>{bloqueo}</div>}
           {guardado && !onEnviar && <div className="pc-ok">Gracias. Tus respuestas quedaron guardadas para tu consulta.</div>}
         </div>
       </div>

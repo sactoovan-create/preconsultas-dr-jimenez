@@ -37,11 +37,19 @@ Deno.serve(async (req) => {
     const telefono = (pac.telefono ?? "").toString().trim();
     const correo = (pac.correo ?? "").toString().trim();
 
-    // Anti-spam: una fila sin nombre NI contacto es ruido de robot. No se envía
-    // aviso para no inundar el correo del médico; la fila igual queda en la base
-    // y se puede depurar desde el panel.
-    if (!nombreReal && !telefono && !correo) {
-      return new Response("Sin datos de contacto; no se notifica", { status: 200 });
+    // ¿La fila trae respuestas clínicas reales? (síntomas, dolor o historia).
+    const ar = (contenido && contenido.autoReporte) || {};
+    const tieneReporte = !!(
+      (ar.mrs && Object.keys(ar.mrs).length) ||
+      (ar.dolor && ar.dolor.tiene) ||
+      (ar.hc && Object.keys(ar.hc).length)
+    );
+
+    // Anti-spam: una fila sin nombre, sin contacto y sin ninguna respuesta es ruido
+    // de robot. No se envía aviso para no inundar el correo del médico; la fila igual
+    // queda en la base y se puede depurar desde el panel.
+    if (!nombreReal && !telefono && !correo && !tieneReporte) {
+      return new Response("Fila sin datos; no se notifica", { status: 200 });
     }
     const nombre = nombreReal || "una paciente";
 
