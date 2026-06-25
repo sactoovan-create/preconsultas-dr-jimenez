@@ -109,6 +109,27 @@ Para que las respuestas entren solas, sin pulsar **Sincronizar**:
    (al pulsar **Sincronizar**, o sola si activaste el cron).
 5. Entra al detalle: síntomas, dolor e historia que compartió.
 
+### Verificación rápida por consola (opcional)
+Hay un script que comprueba cada pieza sin abrir el navegador: el envío de la
+paciente, la lectura del sistema y el endpoint del cron. No guarda secretos; los lees
+de variables de entorno que exportas tú. Úsalo después de cada fase para un sí/no claro:
+
+```
+export SUPABASE_URL="https://TU-PROYECTO.supabase.co"
+export SUPABASE_ANON_KEY="..."         # tras la Fase 1
+export SUPABASE_SERVICE_KEY="..."      # tras la Fase 1 (opcional, para leer)
+export ERP_BASE_URL="https://consultorio-erp2.onrender.com"   # tras la Fase 4
+export PRECONSULTAS_CRON_TOKEN="..."   # tras la Fase 5
+bash verificar-en-vivo.sh
+```
+
+Deja una fila "PRUEBA - borrar" que eliminas desde el panel cuando termines.
+
+### Secretos que tú generas (no van en ningún archivo)
+- `WEBHOOK_SECRET` (Fase 3) y `PRECONSULTAS_CRON_TOKEN` (Fase 5): cadenas largas al
+  azar. Genera cada una con `openssl rand -hex 24` y guárdalas en tu gestor de
+  contraseñas; nunca las pongas en el código ni en un repositorio.
+
 ---
 
 ## Escalamiento anti-spam (solo si hace falta): Cloudflare Turnstile
