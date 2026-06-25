@@ -79,6 +79,9 @@ async function cliente() {
   return _cliente;
 }
 
+/** Cliente de Supabase compartido (lo reutiliza el buzón de estudios). */
+export async function clienteSupabase() { return cliente(); }
+
 async function guardarEnSupabase(registro) {
   const sb = await cliente();
   const { error } = await sb

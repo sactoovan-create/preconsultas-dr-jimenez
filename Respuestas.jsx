@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { listarRespuestas, eliminarRespuesta, modoAlmacenamiento, sesion, iniciarSesion, cerrarSesion } from './core/respuestas.js';
+import { buzonActivo, listarEstudios } from './core/estudios.js';
 import { MRS_ITEMS } from './instruments/menopausia/engine.js';
 import './Respuestas.css';
 
@@ -149,7 +150,43 @@ function Detalle({ r, onEliminar }) {
           </ul>
         </section>
       )}
+
+      {buzonActivo() && r.estudiosFolder && <EstudiosAdjuntos folder={r.estudiosFolder} />}
     </div>
+  );
+}
+
+function EstudiosAdjuntos({ folder }) {
+  const [estado, setEstado] = useState('cargando'); // 'cargando' | 'listo' | 'error'
+  const [archivos, setArchivos] = useState([]);
+
+  useEffect(() => {
+    let vivo = true;
+    setEstado('cargando');
+    listarEstudios(folder)
+      .then((a) => { if (vivo) { setArchivos(a); setEstado('listo'); } })
+      .catch(() => { if (vivo) setEstado('error'); });
+    return () => { vivo = false; };
+  }, [folder]);
+
+  return (
+    <section className="resp-sec">
+      <h3>Estudios adjuntos</h3>
+      {estado === 'cargando' && <p className="resp-nada">Cargando estudios…</p>}
+      {estado === 'error' && <p className="resp-nada">No se pudieron cargar los estudios.</p>}
+      {estado === 'listo' && (archivos.length ? (
+        <ul className="resp-hc">
+          {archivos.map((a) => (
+            <li key={a.nombre}>
+              <span>{a.nombre}</span>
+              {a.url
+                ? <a href={a.url} target="_blank" rel="noopener noreferrer"><b>Abrir</b></a>
+                : <b>—</b>}
+            </li>
+          ))}
+        </ul>
+      ) : <p className="resp-nada">No subió estudios.</p>)}
+    </section>
   );
 }
 

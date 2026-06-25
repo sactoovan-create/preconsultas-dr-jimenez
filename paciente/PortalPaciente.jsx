@@ -3,6 +3,8 @@ import { PacienteProvider } from '../core/PacienteContext.jsx';
 import PreConsulta from '../PreConsulta.jsx';
 import { guardarRespuesta } from '../core/respuestas.js';
 import { construirResumen } from '../core/resumenPaciente.js';
+import { buzonActivo, nuevaCarpeta } from '../core/estudios.js';
+import SubirEstudios from './SubirEstudios.jsx';
 import './PortalPaciente.css';
 
 /**
@@ -35,7 +37,7 @@ function RamaBotanica() {
   );
 }
 
-function construirRegistro(datos) {
+function construirRegistro(datos, estudiosFolder) {
   return {
     // Versión del contrato de datos. Lo consume el ERP; no cambiar sin
     // actualizar CONTRATO-PRECONSULTA.md y subir el número.
@@ -49,6 +51,8 @@ function construirRegistro(datos) {
     autoReporte: { mrs: datos.mrs, dolor: datos.dolor, hc: datos.hc },
     resumen: construirResumen(datos),
     consentimiento: true,
+    // Carpeta de estudios adjuntos (opcional; campo aditivo del contrato).
+    estudiosFolder: estudiosFolder || null,
   };
 }
 
@@ -66,8 +70,9 @@ function PortalInterno() {
 
   const onEnviar = async (datos) => {
     setError('');
+    const folder = buzonActivo() ? nuevaCarpeta() : null;
     try {
-      const guardado = await guardarRespuesta(construirRegistro(datos));
+      const guardado = await guardarRespuesta(construirRegistro(datos, folder));
       setEnviado(guardado);
     } catch (e) {
       setError('No se pudieron enviar tus respuestas. Revisa tu conexión e inténtalo de nuevo.');
@@ -85,6 +90,7 @@ function PortalInterno() {
           <div className="portal-sello" aria-hidden="true" />
           <h1>Gracias{primerNombre ? `, ${primerNombre}` : ''}.</h1>
           <p>Tus respuestas llegaron al consultorio del Dr. Iván Jiménez Martínez. Las revisará antes de tu consulta para dedicarle el tiempo a lo que más te importa.</p>
+          {buzonActivo() && enviado.estudiosFolder && <SubirEstudios folder={enviado.estudiosFolder} />}
           <p className="portal-fin-nota">Ya puedes cerrar esta ventana.</p>
         </div>
       </div>
