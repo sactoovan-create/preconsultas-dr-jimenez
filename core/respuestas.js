@@ -81,13 +81,14 @@ async function cliente() {
 
 async function guardarEnSupabase(registro) {
   const sb = await cliente();
-  const { data, error } = await sb
+  const { error } = await sb
     .from('respuestas')
-    .insert({ contenido: registro, creado: registro.creado, nombre: registro.paciente?.nombre || null })
-    .select()
-    .single();
+    .insert({ contenido: registro, creado: registro.creado, nombre: registro.paciente?.nombre || null });
   if (error) throw error;
-  return { ...registro, id: data.id };
+  // La clave anon solo puede insertar; no puede leer la fila insertada. El id
+  // devuelto aqui es solo para el estado visual de confirmacion de la paciente.
+  const idLocal = registro.id || `supabase_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  return { ...registro, id: idLocal };
 }
 
 async function listarDeSupabase() {

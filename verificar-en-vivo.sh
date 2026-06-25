@@ -26,7 +26,7 @@ if [ -n "${SUPABASE_URL:-}" ] && [ -n "${SUPABASE_ANON_KEY:-}" ]; then
   body="{\"nombre\":\"PRUEBA - borrar\",\"creado\":\"$ahora\",\"contenido\":{\"version\":1,\"paciente\":{\"nombre\":\"PRUEBA - borrar\"},\"autoReporte\":{},\"resumen\":{},\"consentimiento\":false}}"
   code=$(curl -sS -o /tmp/humo1.json -w "%{http_code}" -X POST "${SUPABASE_URL%/}/rest/v1/respuestas" \
     -H "apikey: $SUPABASE_ANON_KEY" -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
-    -H "Content-Type: application/json" -H "Prefer: return=representation" \
+    -H "Content-Type: application/json" -H "Prefer: return=minimal" \
     --data "$body" --max-time 30 || echo "000")
   if [ "$code" = "201" ]; then echo "  OK ($code): la respuesta se guardó. La fila 'PRUEBA - borrar' debe estar en Supabase."; ok=$((ok+1))
   else echo "  FALLA ($code): no se pudo insertar. Revisa el esquema y la política RLS."; cat /tmp/humo1.json 2>/dev/null; fallas=$((fallas+1)); fi
