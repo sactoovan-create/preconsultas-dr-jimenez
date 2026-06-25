@@ -25,6 +25,12 @@ expediente clínico y darte seguimiento. No los usamos con fines de publicidad n
 mercadotecnia, y no los vendemos ni los compartimos con terceros ajenos a tu
 atención sin tu consentimiento.
 
+Además, cuando tu médico lo decida después de tu consulta, podemos enviarte material
+educativo relacionado con tu atención al teléfono o correo que proporcionaste. Si es
+por WhatsApp, ten presente que es un servicio de un tercero (Meta). Ese envío siempre
+lo inicia tu médico de forma manual, nunca es automático, y puedes pedir que dejemos
+de hacerlo en cualquier momento.
+
 ## Consentimiento para datos sensibles
 Por tratarse de datos de salud, antes de enviar tus respuestas se te pide tu
 consentimiento expreso. Al marcar la casilla y enviar, autorizas su tratamiento para
