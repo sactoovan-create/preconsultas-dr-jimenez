@@ -13,6 +13,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
  */
 const PortalPaciente = lazy(() => import('./paciente/PortalPaciente.jsx'));
 const InstrumentosModule = lazy(() => import('./InstrumentosModule.jsx'));
+const AvisoPrivacidad = lazy(() => import('./paciente/AvisoPrivacidad.jsx'));
 
 function Cargando() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
       <Suspense fallback={<Cargando />}>
         <Routes>
           <Route path="/" element={<PortalPaciente />} />
+          <Route path="/privacidad" element={<AvisoPrivacidad />} />
           <Route path="/consultorio" element={<InstrumentosModule />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

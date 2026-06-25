@@ -268,6 +268,12 @@ export default function PreConsulta({ onEnviar }) {
               <span>Autorizo que mis respuestas se compartan con el consultorio del Dr. Iván Jiménez Martínez para mi atención. Son confidenciales y se usan solo para mi cuidado médico.</span>
             </label>
           )}
+          {onEnviar && (
+            <a className="pc-aviso-link" href="/privacidad" target="_blank" rel="noopener noreferrer"
+               style={{ display: 'block', fontSize: '0.85rem', color: '#A88B5C', marginTop: '6px' }}>
+              Consulta el aviso de privacidad
+            </a>
+          )}
           <button className="pc-guardar" onClick={guardar} disabled={enviando || (onEnviar && !acepto)}>
             {onEnviar ? (enviando ? 'Enviando…' : 'Enviar mis respuestas a mi médico') : 'Guardar mis respuestas'}
           </button>

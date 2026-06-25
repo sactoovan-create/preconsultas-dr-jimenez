@@ -34,6 +34,22 @@ else
   linea; echo "Prueba 1: OMITIDA (faltan SUPABASE_URL y/o SUPABASE_ANON_KEY)"
 fi
 
+# --- Prueba 1b: la paciente NO puede LEER lo enviado (la RLS bloquea el select anónimo) ---
+if [ -n "${SUPABASE_URL:-}" ] && [ -n "${SUPABASE_ANON_KEY:-}" ]; then
+  linea; echo "Prueba 1b: privacidad (la clave anon NO debe poder leer respuestas)"
+  code=$(curl -sS -o /tmp/humo1b.json -w "%{http_code}" \
+    "${SUPABASE_URL%/}/rest/v1/respuestas?select=id,nombre&limit=5" \
+    -H "apikey: $SUPABASE_ANON_KEY" -H "Authorization: Bearer $SUPABASE_ANON_KEY" --max-time 30 || echo "000")
+  cuerpo="$(cat /tmp/humo1b.json 2>/dev/null)"
+  if grep -q '"id"' /tmp/humo1b.json 2>/dev/null; then
+    echo "  FALLA ($code): la clave anon PUDO leer respuestas. NO debe existir una política de SELECT para 'anon'."; fallas=$((fallas+1))
+  else
+    echo "  OK ($code): la clave anon no puede leer (respuesta: ${cuerpo:-vacía}). La seguridad por filas funciona."; ok=$((ok+1))
+  fi
+else
+  linea; echo "Prueba 1b: OMITIDA (faltan SUPABASE_URL y/o SUPABASE_ANON_KEY)"
+fi
+
 # --- Prueba 2: el sistema puede leer (select con la service_role) ---
 if [ -n "${SUPABASE_URL:-}" ] && [ -n "${SUPABASE_SERVICE_KEY:-}" ]; then
   linea; echo "Prueba 2: lectura del sistema (select con la clave service_role)"
