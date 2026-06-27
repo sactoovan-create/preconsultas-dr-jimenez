@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { PacienteProvider } from '../core/PacienteContext.jsx';
 import PreConsulta from '../PreConsulta.jsx';
 import { guardarRespuesta } from '../core/respuestas.js';
@@ -67,12 +67,17 @@ export default function PortalPaciente() {
 function PortalInterno() {
   const [enviado, setEnviado] = useState(null);
   const [error, setError] = useState('');
+  const [estudiosFolder] = useState(() => (buzonActivo() ? nuevaCarpeta() : null));
+  const [estudiosEstado, setEstudiosEstado] = useState({ total: 0, subiendo: false, listos: 0, errores: 0 });
+
+  const onEstudiosEstado = useCallback((estado) => {
+    setEstudiosEstado(estado);
+  }, []);
 
   const onEnviar = async (datos) => {
     setError('');
-    const folder = buzonActivo() ? nuevaCarpeta() : null;
     try {
-      const guardado = await guardarRespuesta(construirRegistro(datos, folder));
+      const guardado = await guardarRespuesta(construirRegistro(datos, estudiosFolder));
       setEnviado(guardado);
     } catch (e) {
       setError('No se pudieron enviar tus respuestas. Revisa tu conexión e inténtalo de nuevo.');
@@ -82,6 +87,9 @@ function PortalInterno() {
 
   if (enviado) {
     const primerNombre = enviado.paciente?.nombre ? enviado.paciente.nombre.trim().split(/\s+/)[0] : '';
+    const estudiosTexto = estudiosEstado.listos > 0
+      ? ` También recibimos ${estudiosEstado.listos === 1 ? 'el estudio que subiste' : `los ${estudiosEstado.listos} estudios que subiste`}.`
+      : '';
     return (
       <div className="portal portal-centro">
         <Grano />
@@ -89,8 +97,7 @@ function PortalInterno() {
           <img className="portal-logo" src="/marca/logo_maestro_verde.svg" alt="dr. jiménez, ginecología" />
           <div className="portal-sello" aria-hidden="true" />
           <h1>Gracias{primerNombre ? `, ${primerNombre}` : ''}.</h1>
-          <p>Tus respuestas llegaron al consultorio del Dr. Iván Jiménez Martínez. Las revisará antes de tu consulta para dedicarle el tiempo a lo que más te importa.</p>
-          {buzonActivo() && enviado.estudiosFolder && <SubirEstudios folder={enviado.estudiosFolder} />}
+          <p>Tus respuestas llegaron al consultorio del Dr. Iván Jiménez Martínez.{estudiosTexto} Las revisará antes de tu consulta para dedicarle el tiempo a lo que más te importa.</p>
           <p className="portal-fin-nota">Ya puedes cerrar esta ventana.</p>
         </div>
       </div>
@@ -109,7 +116,12 @@ function PortalInterno() {
       </header>
       {error && <div className="portal-error">{error}</div>}
       <div className="portal-form">
-        <PreConsulta onEnviar={onEnviar} />
+        <PreConsulta
+          onEnviar={onEnviar}
+          extraAntesDeEnviar={estudiosFolder ? <SubirEstudios folder={estudiosFolder} onEstadoCambio={onEstudiosEstado} /> : null}
+          envioBloqueado={estudiosEstado.subiendo}
+          envioBloqueadoMensaje="Espera a que terminen de subir tus estudios para enviar tus respuestas."
+        />
         <footer className="portal-colofon" aria-hidden="true">
           <div className="portal-sello" />
           <div className="portal-firma">dr. jiménez · ginecología</div>

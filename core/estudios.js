@@ -3,8 +3,8 @@
  * recetas desde el portal; los archivos van al almacenamiento PRIVADO de Supabase
  * (no público), y solo el médico autenticado los abre con enlaces firmados.
  *
- * Se activa SOLO si el portal define VITE_ESTUDIOS_BUCKET (el nombre del bucket, por
- * ejemplo "estudios"). Sin esa variable, el buzón no aparece y nada cambia.
+ * Se activa cuando el portal tiene Supabase configurado. Por defecto usa el bucket
+ * privado "estudios"; VITE_ESTUDIOS_BUCKET queda como override si algún día cambia.
  *
  * Las imágenes se comprimen en el navegador (con canvas, sin dependencias) para que
  * el almacenamiento se llene muy despacio. Los PDF se suben tal cual.
@@ -16,10 +16,10 @@ export const MAX_BYTES = 15 * 1024 * 1024; // 15 MB por archivo (tras comprimir 
 const MAX_LADO = 1600; // px: lado mayor al que se reduce una imagen
 
 export function buzonActivo() {
-  return !!(import.meta.env && import.meta.env.VITE_ESTUDIOS_BUCKET);
+  return !!(import.meta.env && import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
 }
 function bucket() {
-  return import.meta.env.VITE_ESTUDIOS_BUCKET;
+  return import.meta.env.VITE_ESTUDIOS_BUCKET || 'estudios';
 }
 
 /** Identificador de carpeta para ligar los estudios a una preconsulta. */

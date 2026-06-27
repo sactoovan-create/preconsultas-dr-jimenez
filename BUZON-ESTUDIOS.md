@@ -5,13 +5,15 @@ antes de la consulta. Los archivos van al **almacenamiento privado de Supabase**
 público); la paciente nunca ve una carpeta ni inicia sesión en nada, y solo tú,
 autenticado, los abres.
 
-Está **apagado por defecto**: el portal funciona igual que hoy hasta que defines
-`VITE_ESTUDIOS_BUCKET`.
+Se activa cuando el portal tiene Supabase configurado. Por defecto usa el bucket
+`estudios`; `VITE_ESTUDIOS_BUCKET` solo hace falta si algún día cambias el nombre
+del bucket.
 
 ## Cómo se ve
 
-- **Paciente:** al terminar la pre-consulta, en la pantalla de "Gracias" aparece
+- **Paciente:** al final de la pre-consulta, antes del botón de enviar, aparece
   "¿Tienes estudios? Súbelos aquí (opcional)". Sube y sigue, con estado por archivo.
+  Después del envío recibe una confirmación clara de que sus respuestas llegaron.
 - **Tú:** en el panel del médico (`/consultorio`), cada respuesta muestra "Estudios
   adjuntos" con un botón **Abrir** por archivo (enlace firmado que caduca en 1 hora).
 
@@ -21,10 +23,11 @@ Está **apagado por defecto**: el portal funciona igual que hoy hasta que define
    [`supabase/schema-estudios.sql`](supabase/schema-estudios.sql). Crea un bucket privado
    `estudios` donde la paciente (anon) **solo puede subir**, y solo tú (autenticado)
    lees y borras.
-2. **Enciende el portal:** en Vercel → Environment Variables, agrega
-   `VITE_ESTUDIOS_BUCKET=estudios` y **vuelve a desplegar**.
+2. **Enciende el portal:** verifica que Vercel tenga `VITE_SUPABASE_URL` y
+   `VITE_SUPABASE_ANON_KEY`, y **vuelve a desplegar**. El bucket usado por defecto
+   es `estudios`.
 
-Para apagarlo, quita esa variable y re-despliega.
+Para usar otro bucket, agrega `VITE_ESTUDIOS_BUCKET=<nombre>`.
 
 ## Qué hace que sea barato
 

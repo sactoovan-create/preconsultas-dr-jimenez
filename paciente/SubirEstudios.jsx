@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { subirEstudio, MAX_ARCHIVOS } from '../core/estudios.js';
 
 /**
- * Buzón de estudios para la paciente, en la pantalla de agradecimiento. Sube y sigue:
+ * Buzón de estudios para la paciente, al final del cuestionario. Sube y sigue:
  * cada archivo muestra su estado. Los archivos van al almacenamiento privado; la
  * paciente nunca ve una carpeta ni inicia sesión en nada.
  */
@@ -17,9 +17,18 @@ const ICONO = {
   error: { t: 'No se pudo', c: '#9a3412' },
 };
 
-export default function SubirEstudios({ folder }) {
+export default function SubirEstudios({ folder, onEstadoCambio }) {
   const [items, setItems] = useState([]);
   const [aviso, setAviso] = useState('');
+
+  const subiendo = items.some((i) => i.estado === 'subiendo');
+  const listos = items.filter((i) => i.estado === 'listo').length;
+  const errores = items.filter((i) => i.estado === 'error').length;
+
+  useEffect(() => {
+    if (!onEstadoCambio) return;
+    onEstadoCambio({ total: items.length, subiendo, listos, errores });
+  }, [errores, items.length, listos, onEstadoCambio, subiendo]);
 
   const subirUno = (file, id) => {
     setItems((l) => l.map((it) => (it.id === id ? { ...it, estado: 'subiendo', detalle: undefined } : it)));
@@ -47,11 +56,8 @@ export default function SubirEstudios({ folder }) {
     });
   };
 
-  const subiendo = items.some((i) => i.estado === 'subiendo');
-  const listos = items.filter((i) => i.estado === 'listo').length;
-
   return (
-    <div style={{ marginTop: 28, textAlign: 'left', borderTop: `1px solid ${DORADO}33`, paddingTop: 24 }}>
+    <div className="pc-estudios" style={{ marginTop: 28, textAlign: 'left', borderTop: `1px solid ${DORADO}33`, paddingTop: 24 }}>
       <h2 style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: '1.25rem', color: VERDE, margin: '0 0 6px' }}>
         ¿Tienes estudios? Súbelos aquí <span style={{ fontWeight: 400, color: TINTA }}>(opcional)</span>
       </h2>

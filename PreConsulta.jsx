@@ -82,7 +82,12 @@ function Casilla({ etiqueta, valor, onChange }) {
   );
 }
 
-export default function PreConsulta({ onEnviar }) {
+export default function PreConsulta({
+  onEnviar,
+  extraAntesDeEnviar = null,
+  envioBloqueado = false,
+  envioBloqueadoMensaje = 'Espera a que terminen de subir tus estudios para enviar.',
+}) {
   const { paciente, actualizar, guardarAutoReporte } = usePaciente();
   const dem = paciente.demografia;
   const ar = paciente.autoReporte || {};
@@ -117,6 +122,14 @@ export default function PreConsulta({ onEnviar }) {
     // En el portal, el nombre es necesario para poder atenderte.
     if (onEnviar && !(dem.nombre && String(dem.nombre).trim())) {
       setBloqueo('Por favor escribe tu nombre para poder atenderte.');
+      return;
+    }
+    if (onEnviar && !acepto) {
+      setBloqueo('Por favor marca la autorización para poder enviar tus respuestas.');
+      return;
+    }
+    if (onEnviar && envioBloqueado) {
+      setBloqueo(envioBloqueadoMensaje);
       return;
     }
     setBloqueo('');
@@ -262,6 +275,7 @@ export default function PreConsulta({ onEnviar }) {
         </div>
 
         <div className="pc-acciones">
+          {extraAntesDeEnviar}
           {onEnviar && (
             <label className="pc-consent">
               <input type="checkbox" checked={acepto} onChange={(e) => setAcepto(e.target.checked)} />
@@ -274,7 +288,7 @@ export default function PreConsulta({ onEnviar }) {
               Consulta el aviso de privacidad
             </a>
           )}
-          <button className="pc-guardar" onClick={guardar} disabled={enviando || (onEnviar && !acepto)}>
+          <button className="pc-guardar" onClick={guardar} disabled={enviando} aria-busy={enviando ? 'true' : 'false'}>
             {onEnviar ? (enviando ? 'Enviando…' : 'Enviar mis respuestas a mi médico') : 'Guardar mis respuestas'}
           </button>
           <div className="pc-acciones-nota">Puedes enviar aunque hayas dejado en blanco la parte opcional.</div>
