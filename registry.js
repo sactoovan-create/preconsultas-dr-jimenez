@@ -26,6 +26,7 @@ import Anticoncepcion from './instruments/anticoncepcion/Anticoncepcion.jsx';
 import Mama from './instruments/mama/Mama.jsx';
 import Osea from './instruments/osea/Osea.jsx';
 import Incontinencia from './instruments/incontinencia/Incontinencia.jsx';
+import SeguimientoMetabolico from './instruments/seguimiento-metabolico/SeguimientoMetabolico.jsx';
 
 export const INSTRUMENTOS = [
   {
@@ -107,5 +108,13 @@ export const INSTRUMENTOS = [
     tipo: 'cuestionario',
     estado: 'activo',
     Componente: Incontinencia,
+  },
+  {
+    id: 'seguimiento-metabolico',
+    titulo: 'Seguimiento metabólico',
+    descripcion: 'Composición corporal y avances con tirzepatida o semaglutida; pérdida de peso, grasa visceral y masa muscular.',
+    tipo: 'calculadora',
+    estado: 'activo',
+    Componente: SeguimientoMetabolico,
   },
 ];

@@ -654,11 +654,43 @@ function bOsea(r, p) {
   return { titulo: 'Salud ósea / osteoporosis', bloques };
 }
 
+function bSeguimientoMetabolico(r) {
+  const tono = { ok: 'ok', aviso: 'aviso', alerta: 'alerta', neutro: 'neutro' };
+  const bloques = [];
+  const det = [
+    r.farmacoNombre ? `Fármaco: ${r.farmacoNombre}.` : '',
+    r.semanas != null ? `${r.semanas} semanas de tratamiento.` : '',
+    r.perdida.detalle,
+  ].filter(Boolean).join(' ');
+  bloques.push({ tipo: 'conclusion', encabezado: 'Respuesta al tratamiento', titular: r.perdida.etiqueta, detalle: det, tono: tono[r.perdida.estado] || 'neutro' });
+
+  const FILAS = [
+    ['peso', 'Peso (kg)'], ['imc', 'Índice de masa corporal'], ['grasa', 'Grasa corporal (%)'],
+    ['musculoKg', 'Masa muscular (kg)'], ['visceral', 'Grasa visceral (nivel)'],
+    ['cintura', 'Cintura (cm)'], ['metabolismo', 'Metabolismo (kcal)'], ['edadCorporal', 'Edad corporal'],
+  ];
+  const filas = FILAS.map(([k, et]) => {
+    const t = r.tendencias[k];
+    if (!t || (t.basal == null && t.actual == null)) return null;
+    const camb = (t.delta == null || t.delta === 0) ? '—' : `${t.delta > 0 ? '+' : ''}${t.delta}`;
+    return { celdas: [et, t.basal == null ? '—' : String(t.basal), t.actual == null ? '—' : String(t.actual), camb] };
+  }).filter(Boolean);
+  if (filas.length) bloques.push({ tipo: 'tabla', encabezado: 'Avances (inicio y actual)', columnas: ['Parámetro', 'Inicio', 'Actual', 'Cambio'], filas });
+
+  bloques.push({ tipo: 'conclusion', encabezado: 'Masa muscular', titular: r.musculo.estado === 'alerta' ? 'Vigilar masa muscular' : (r.musculo.estado === 'aviso' ? 'Descenso de masa muscular' : 'Masa muscular preservada'), detalle: r.musculo.nota, tono: tono[r.musculo.estado] || 'ok' });
+
+  if (r.recordatorios && r.recordatorios.length) bloques.push({ tipo: 'lista', encabezado: 'Recordatorios clínicos', items: r.recordatorios });
+  if (r.banderas && r.banderas.length) bloques.push({ tipo: 'banderas', items: r.banderas });
+
+  return { titulo: 'Seguimiento metabólico (control de peso)', bloques };
+}
+
 const BUILDERS = {
   menopausia: bMenopausia, cardiometabolico: bCardiometabolico,
   sop: bSop, hemorragia: bHemorragia, 'dolor-pelvico': bDolorPelvico,
   endometriosis: bEndometriosis, anticoncepcion: bAnticoncepcion,
   incontinencia: bIncontinencia, mama: bMama, osea: bOsea,
+  'seguimiento-metabolico': bSeguimientoMetabolico,
 };
 export function instrumentoSoportado(id) { return !!BUILDERS[id]; }
 
