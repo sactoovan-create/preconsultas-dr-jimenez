@@ -135,14 +135,18 @@ ni estado; `generadoEn` lo agrega `PortalPaciente.jsx` al construir el registro.
   `accionSugerida`.
 - `banderas`: alertas para revisión médica. No se borran solas; el ERP debe permitir
   marcarlas como revisadas o descartadas por el médico.
-- `instrumento` puede ser: `menopausia`, `cardiometabolico`,
-  `seguimiento-metabolico`, `mama`, `osea`, `sop`, `hemorragia`,
-  `dolor-pelvico`, `endometriosis`, `anticoncepcion`, `incontinencia`.
+- `instrumento` puede ser: `menopausia`, `cardiometabolico`, `mama`,
+  `osea`, `sop`, `hemorragia`, `dolor-pelvico`, `endometriosis`,
+  `anticoncepcion`, `incontinencia`.
 - `prioridad`: `alta`, `media`, `baja`.
 - `accionSugerida`: `revisar_en_consulta`, `completar_datos`.
 
 Estas salidas **no diagnostican** ni obligan a aplicar instrumentos. Son el punto de
 partida del plan que el Dr. Iván puede aceptar, quitar o complementar manualmente.
+
+> El seguimiento metabólico longitudinal no se emite desde el portal. Vive en el
+> expediente del ERP como fuente única de captura para evitar doble registro de
+> peso, grasa, músculo y cintura.
 
 ---
 

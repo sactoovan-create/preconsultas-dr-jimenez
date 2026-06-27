@@ -69,16 +69,16 @@ cada fuente es la de mejor calidad metodológica y la más aceptada en su
 subespecialidad. Las fuentes de `core/evidencia.js` y las advertencias en pantalla
 reflejan sus hallazgos (revisión de junio de 2026).
 
-### Pre-consulta y seguimiento
+### Pre-consulta
 
 La **pre-consulta** (`PreConsulta.jsx`) es un modo en lenguaje de paciente donde
 ella auto-reporta las escalas que puede responder (síntomas de menopausia y dolor).
 Las respuestas quedan en el auto-reporte del paciente compartido (`autoReporte`) y
 prellenan los instrumentos del médico al abrirlos.
 
-El **seguimiento** (`Seguimiento.jsx`) grafica la evolución de las métricas
-seguibles que cada instrumento publica en su resumen (campo `metrica`). El punto de
-hoy proviene del dato real; en GineOS, la serie histórica se llena con el expediente.
+El **seguimiento metabólico longitudinal** vive solo en el expediente del ERP. Este
+portal conserva calculadoras puntuales y hojas clínicas, pero no captura series de
+peso, grasa, músculo o cintura para evitar doble registro.
 
 ### Informe consolidado y trazabilidad
 

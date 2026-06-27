@@ -3,7 +3,6 @@ import { PacienteProvider } from './core/PacienteContext.jsx';
 import { INSTRUMENTOS } from './registry.js';
 import ResumenPaciente from './ResumenPaciente.jsx';
 import PreConsulta from './PreConsulta.jsx';
-import Seguimiento from './Seguimiento.jsx';
 import Respuestas from './Respuestas.jsx';
 import './core/designTokens.css';
 import './InstrumentosModule.css';
@@ -25,12 +24,10 @@ export default function InstrumentosModule({ pacienteInicial, onGuardarResultado
   const esResumen = activoId === 'resumen';
   const esRespuestas = activoId === 'respuestas';
   const esPreConsulta = activoId === 'preconsulta';
-  const esSeguimiento = activoId === 'seguimiento';
   const activo = INSTRUMENTOS.find((i) => i.id === activoId) || INSTRUMENTOS[0];
   const Componente = esResumen ? ResumenPaciente
     : (esRespuestas ? Respuestas
-      : (esPreConsulta ? PreConsulta
-        : (esSeguimiento ? Seguimiento : activo.Componente)));
+      : (esPreConsulta ? PreConsulta : activo.Componente));
 
   return (
     <PacienteProvider pacienteInicial={pacienteInicial} onGuardarResultado={onGuardarResultado} irA={setActivoId}>
@@ -46,9 +43,6 @@ export default function InstrumentosModule({ pacienteInicial, onGuardarResultado
             </button>
             <button className={'nav-resumen' + (esRespuestas ? ' activo' : '')} onClick={() => setActivoId('respuestas')}>
               Respuestas de pacientes
-            </button>
-            <button className={'nav-seguimiento' + (esSeguimiento ? ' activo' : '')} onClick={() => setActivoId('seguimiento')}>
-              Seguimiento
             </button>
             <button className={'nav-preconsulta' + (esPreConsulta ? ' activo' : '')} onClick={() => setActivoId('preconsulta')}>
               Pre-consulta de la paciente

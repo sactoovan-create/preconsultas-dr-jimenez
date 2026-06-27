@@ -14,12 +14,10 @@
 
 export const RUTEO_VERSION = 1;
 
-// Catálogo de instrumentos (ids = carpetas en instruments/). 'seguimiento-metabolico'
-// está planeado; se sugiere aunque su instrumento aún no exista.
+// Catálogo de instrumentos (ids = carpetas en instruments/).
 const NOMBRE = {
   menopausia: 'Climaterio y terapia hormonal',
   cardiometabolico: 'Riesgo cardiovascular-renal-metabólico',
-  'seguimiento-metabolico': 'Seguimiento metabólico (tirzepatida/semaglutida)',
   mama: 'Salud y riesgo mamario',
   osea: 'Salud ósea / osteoporosis',
   sop: 'Síndrome ovárico metabólico poliendocrino',
@@ -119,14 +117,14 @@ export function instrumentosPara(pre) {
   // Incontinencia / vejiga
   if (num(mrs.mrs_vejiga) >= 2) add('incontinencia', 'media', 'Molestias urinarias reportadas en la escala.', ['mrs']);
 
-  // Cardiometabólico por antecedentes + seguimiento metabólico por fármaco
+  // Cardiometabólico por antecedentes o fármaco metabólico. El seguimiento
+  // longitudinal de composición corporal vive solo en el ERP/expediente.
   const meds = txt(hc.medicamentos);
   const enMetabolico = RE_METABOLICO.test(meds);
   if (hc.enfDiabetes || hc.enfHipertension || hc.fuma || enMetabolico) {
     const causas = [hc.enfDiabetes && 'diabetes', hc.enfHipertension && 'hipertensión', hc.fuma && 'tabaquismo', enMetabolico && 'fármaco metabólico'].filter(Boolean);
     add('cardiometabolico', 'alta', `Factores cardiometabólicos: ${causas.join(', ')}.`, ['antecedentes'], {}, 'completar_datos');
   }
-  if (enMetabolico) add('seguimiento-metabolico', 'alta', 'Usa fármaco para control metabólico: dar seguimiento de composición corporal.', ['medicamentos'], {}, 'completar_datos');
 
   // Mama por antecedente familiar
   if (hc.famCancerMama || hc.famCancerOvario) {

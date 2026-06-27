@@ -21,7 +21,7 @@ t('sop ALTA (ciclos + androgénico)', prio(r2, 'sop') === 'alta');
 // 3) En tirzepatida
 const r3 = instrumentosPara({ paciente: { edad: 45 }, autoReporte: { mrs: {}, dolor: {}, hc: { medicamentos: 'Mounjaro 5 mg subcutáneo semanal' } } });
 console.log('\n[3] 45 en Mounjaro:'); r3.instrumentosSugeridos.forEach((s) => console.log(`   - ${s.prioridad.toUpperCase()} · ${s.nombre} — ${s.motivo}`));
-t('seguimiento-metabolico ALTA', prio(r3, 'seguimiento-metabolico') === 'alta');
+t('no sugiere seguimiento-metabolico (vive en ERP)', !has(r3, 'seguimiento-metabolico'));
 t('cardiometabolico ALTA', prio(r3, 'cardiometabolico') === 'alta');
 
 // 4) Sangrado posmenopáusico -> bandera roja
