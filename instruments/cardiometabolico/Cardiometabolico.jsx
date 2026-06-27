@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { usePaciente } from '../../core/PacienteContext.jsx';
 import { evaluarCardiometabolico } from './engine.js';
 import { imprimirHoja } from '../../core/printSheet.js';
+import { imprimirHojaClinica } from '../../core/hojaClinica.js';
 import { textoDeArchivo } from '../../core/labReaderBrowser.js';
 import { parseLabs, parseIdent, ETIQUETAS_LAB } from '../../core/labParser.js';
 import { Seccion, CampoNumero, CampoTexto, Selector, ToggleSiNo, Casilla , Puente, BaseEvidencia } from '../../core/ui.jsx';
@@ -161,6 +162,7 @@ export default function Cardiometabolico() {
           <button className="cm-btn imprimir" disabled={!hayDatosHoja} onClick={() => imprimirHoja(r.hojaPaciente)}>
             Imprimir hoja para la paciente
           </button>
+          <button className="inst-btn imprimir" onClick={() => imprimirHojaClinica('cardiometabolico', r, paciente)}>Imprimir hoja clínica</button>
 
           {r.prevent && (
             <div className="cm-bloque">
