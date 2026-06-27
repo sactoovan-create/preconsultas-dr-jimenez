@@ -163,6 +163,7 @@ export default function Sop() {
             <CampoNumero etiqueta="Presión sistólica" unidad="milímetros de mercurio" valor={sig.sistolica} onChange={(v) => setSig('sistolica', v)} />
             <CampoNumero etiqueta="Presión diastólica" unidad="milímetros de mercurio" valor={sig.diastolica} onChange={(v) => setSig('diastolica', v)} />
             <CampoNumero etiqueta="Glucosa en ayuno" unidad="miligramos por decilitro" valor={lab.glu} onChange={(v) => setLab('glu', v)} />
+            <CampoNumero etiqueta="Insulina basal en ayuno" unidad="microunidades por mililitro" valor={lab.insulina} onChange={(v) => setLab('insulina', v)} step={0.1} nota={r.cribado.homa != null ? `HOMA-IR ${r.cribado.homa.toFixed(1)}${r.cribado.ir ? ', sugiere resistencia a la insulina' : ''}` : 'Con la glucosa en ayuno calcula el HOMA-IR'} />
             <CampoNumero etiqueta="Hemoglobina glucosilada" unidad="por ciento" valor={lab.hba1c} onChange={(v) => setLab('hba1c', v)} step={0.1} />
             <CampoNumero etiqueta="Triglicéridos" unidad="miligramos por decilitro" valor={lab.tg} onChange={(v) => setLab('tg', v)} />
             <CampoNumero etiqueta="Colesterol de alta densidad" unidad="miligramos por decilitro" valor={lab.hdl} onChange={(v) => setLab('hdl', v)} />
