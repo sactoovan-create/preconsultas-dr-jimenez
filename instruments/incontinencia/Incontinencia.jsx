@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { usePaciente } from '../../core/PacienteContext.jsx';
 import { evaluarIncontinencia, ITEMS_ESFUERZO, ITEMS_URGENCIA } from './engine.js';
 import { imprimirHoja } from '../../core/printSheet.js';
+import { imprimirHojaClinica } from '../../core/hojaClinica.js';
 import { imprimirDiario } from '../../core/printDiario.js';
 import { Seccion, CampoNumero, CampoTexto, ToggleSiNo, Casilla, BaseEvidencia } from '../../core/ui.jsx';
 import { evidenciaDe } from '../../core/evidencia.js';
@@ -121,6 +122,7 @@ export default function Incontinencia() {
         <div className="inst-res">
           <div className="iu-botones">
             <button className="inst-btn imprimir" onClick={() => imprimirHoja(r.hojaPaciente)}>Hoja para la paciente</button>
+          <button className="inst-btn imprimir" onClick={() => imprimirHojaClinica('incontinencia', r, paciente)}>Imprimir hoja clínica</button>
             <button className="inst-btn diario" onClick={() => imprimirDiario(r.hojaDiario)}>Diario miccional en blanco</button>
           </div>
 

@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { usePaciente } from '../../core/PacienteContext.jsx';
 import { evaluarSop, indiceAndrogenosLibres } from './engine.js';
 import { imprimirHoja } from '../../core/printSheet.js';
+import { imprimirHojaClinica } from '../../core/hojaClinica.js';
 import { textoDeArchivo } from '../../core/labReaderBrowser.js';
 import { parseLabs, parseIdent, ETIQUETAS_LAB } from '../../core/labParser.js';
 import { Seccion, CampoNumero, CampoTexto, Selector, ToggleSiNo, Casilla , Puente, BaseEvidencia } from '../../core/ui.jsx';
@@ -184,6 +185,7 @@ export default function Sop() {
         {/* -------- RESULTADOS -------- */}
         <div className="inst-res">
           <button className="inst-btn imprimir" disabled={!hayHoja} onClick={() => imprimirHoja(r.hojaPaciente)}>Imprimir hoja para la paciente</button>
+          <button className="inst-btn imprimir" onClick={() => imprimirHojaClinica('sop', r, paciente)}>Imprimir hoja clínica</button>
 
           <div className="inst-bloque">
             <h3>Diagnóstico</h3>

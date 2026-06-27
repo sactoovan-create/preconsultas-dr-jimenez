@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { usePaciente } from '../../core/PacienteContext.jsx';
 import { evaluarMenopausia, MRS_ITEMS } from './engine.js';
 import { imprimirHoja } from '../../core/printSheet.js';
+import { imprimirHojaClinica } from '../../core/hojaClinica.js';
 import { Seccion, CampoNumero, CampoTexto, Selector, ToggleSiNo, Casilla , Puente, BaseEvidencia } from '../../core/ui.jsx';
 import { evidenciaDe } from '../../core/evidencia.js';
 import '../../core/instrumentLayout.css';
@@ -128,6 +129,7 @@ export default function Menopausia() {
         {/* -------- RESULTADOS -------- */}
         <div className="inst-res">
           <button className="inst-btn imprimir" onClick={() => imprimirHoja(r.hojaPaciente)}>Imprimir hoja para la paciente</button>
+          <button className="inst-btn imprimir" onClick={() => imprimirHojaClinica('menopausia', r, paciente)}>Imprimir hoja clínica</button>
 
           <div className="inst-bloque">
             <h3>Escala de síntomas</h3>
