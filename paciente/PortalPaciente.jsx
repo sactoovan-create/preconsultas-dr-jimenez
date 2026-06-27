@@ -4,6 +4,7 @@ import PreConsulta from '../PreConsulta.jsx';
 import { guardarRespuesta } from '../core/respuestas.js';
 import { construirResumen } from '../core/resumenPaciente.js';
 import { buzonActivo, nuevaCarpeta } from '../core/estudios.js';
+import { instrumentosPara } from '../core/ruteoClinico.js';
 import SubirEstudios from './SubirEstudios.jsx';
 import './PortalPaciente.css';
 
@@ -38,7 +39,7 @@ function RamaBotanica() {
 }
 
 function construirRegistro(datos, estudiosFolder) {
-  return {
+  const registro = {
     // Versión del contrato de datos. Lo consume el ERP; no cambiar sin
     // actualizar CONTRATO-PRECONSULTA.md y subir el número.
     version: 1,
@@ -54,6 +55,8 @@ function construirRegistro(datos, estudiosFolder) {
     // Carpeta de estudios adjuntos (opcional; campo aditivo del contrato).
     estudiosFolder: estudiosFolder || null,
   };
+  registro.ruteoClinico = { ...instrumentosPara(registro), generadoEn: new Date().toISOString() };
+  return registro;
 }
 
 export default function PortalPaciente() {

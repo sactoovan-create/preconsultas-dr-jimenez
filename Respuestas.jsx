@@ -13,7 +13,9 @@ import './Respuestas.css';
 const HC_LABEL = {
   motivo: 'Motivo de la visita', edadMenarca: 'Edad de la primera regla', embarazos: 'Embarazos',
   partos: 'Partos', cesareas: 'Cesáreas', abortos: 'Pérdidas o abortos', reglasRegulares: 'Reglas regulares',
-  anticonceptivo: 'Método anticonceptivo', ultimoPap: 'Último Papanicolaou', cirugiasGineco: 'Cirugías ginecológicas',
+  sangrado: 'Sangrado vaginal fuera de lo normal', anticonceptivo: 'Método anticonceptivo',
+  ultimoPap: 'Último Papanicolaou', cirugiasGineco: 'Cirugías ginecológicas',
+  acne: 'Acné', hirsutismo: 'Aumento de vello', caidaCabello: 'Caída de cabello',
   enfDiabetes: 'Diabetes', enfHipertension: 'Presión alta', enfTiroides: 'Problemas de tiroides',
   enfCorazon: 'Problemas del corazón', enfCancer: 'Antecedente de cáncer', enfOtra: 'Otra enfermedad',
   cirugias: 'Otras cirugías', fuma: 'Fuma', alcohol: 'Bebe alcohol', medicamentos: 'Medicamentos', alergias: 'Alergias',

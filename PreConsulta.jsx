@@ -234,9 +234,16 @@ export default function PreConsulta({
             <Numero etiqueta="Pérdidas o abortos" valor={hc.abortos} onChange={(v) => setH('abortos', v)} />
           </div>
           <SiNo etiqueta="¿Tus reglas son regulares?" valor={hc.reglasRegulares} onChange={(v) => setH('reglasRegulares', v)} />
+          <Casilla etiqueta="He tenido sangrado vaginal fuera de lo normal o después de la menopausia" valor={hc.sangrado} onChange={(v) => setH('sangrado', v)} />
           <Texto etiqueta="¿Usas algún método anticonceptivo? ¿Cuál?" valor={hc.anticonceptivo} onChange={(v) => setH('anticonceptivo', v)} placeholder="Por ejemplo, pastillas, dispositivo, ninguno" />
           <Texto etiqueta="¿Cuándo fue tu último Papanicolaou y qué resultado tuvo?" valor={hc.ultimoPap} onChange={(v) => setH('ultimoPap', v)} placeholder="Fecha aproximada y resultado si lo recuerdas" />
           <Texto etiqueta="¿Te han operado de algo ginecológico?" valor={hc.cirugiasGineco} onChange={(v) => setH('cirugiasGineco', v)} placeholder="Por ejemplo, matriz, ovarios, quistes" />
+          <div className="pc-seccion-d">Marca si has notado alguno de estos cambios.</div>
+          <div className="pc-casillas">
+            <Casilla etiqueta="Acné" valor={hc.acne} onChange={(v) => setH('acne', v)} />
+            <Casilla etiqueta="Aumento de vello en cara, pecho o abdomen" valor={hc.hirsutismo} onChange={(v) => setH('hirsutismo', v)} />
+            <Casilla etiqueta="Caída de cabello" valor={hc.caidaCabello} onChange={(v) => setH('caidaCabello', v)} />
+          </div>
         </div>
 
         <div className="pc-seccion pc-op">

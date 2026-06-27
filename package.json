@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Suite de instrumentos clínicos de ginecología. Motores puros verificables.",
   "scripts": {
-    "test": "node tests/suite.mjs",
+    "test": "node tests/suite.mjs && node tests/ruteo.mjs",
     "dev": "vite",
     "build": "vite build"
   },

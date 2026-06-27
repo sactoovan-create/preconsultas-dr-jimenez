@@ -40,19 +40,48 @@ Cada envío de una paciente es **un objeto JSON** con esta forma:
 
   "consentimiento": true,       // la paciente autorizó compartir (siempre true al enviar)
 
-  "estudiosFolder": "uuid|null" // opcional (aditivo). Carpeta del buzón de estudios en
-                                // Storage; null si el buzón está apagado o no se usó.
+  "estudiosFolder": "uuid|null", // opcional (aditivo). Carpeta del buzón de estudios en
+                                 // Storage; null si el buzón está apagado o no se usó.
+
+  "ruteoClinico": {              // opcional/aditivo. Sugerencias, no diagnóstico.
+    "version": 1,
+    "generadoEn": "2026-06-27T00:00:00.000Z",
+    "instrumentosSugeridos": [
+      {
+        "instrumento": "cardiometabolico",
+        "nombre": "Riesgo cardiovascular-renal-metabólico",
+        "prioridad": "alta",
+        "motivo": "Factores cardiometabólicos: diabetes.",
+        "fuente": ["antecedentes"],
+        "precarga": {},
+        "accionSugerida": "completar_datos"
+      }
+    ],
+    "banderas": [
+      {
+        "tipo": "roja",
+        "mensaje": "Sangrado posmenopáusico: descartar patología endometrial.",
+        "instrumentoRelacionado": "hemorragia"
+      }
+    ]
+  }
 }
 ```
 
 `id` y `creado` los pone el almacén (Supabase o local), no el portal. El resto lo
 arma el portal.
 
-`estudiosFolder` es un campo **opcional y aditivo** (no sube `version`): el ERP lo
-ignora si no lo conoce. No es dato personal por sí mismo, pero es una clave de
-capacidad que apunta a archivos clínicos privados, así que **no debe exponerse en
-claro** fuera del sistema. La idempotencia del ERP descansa en `source_response_id`
-(el `id`), no en el hash del contenido, así que agregar este campo no la afecta.
+`estudiosFolder` y `ruteoClinico` son campos **opcionales y aditivos** (no suben
+`version`): el ERP los ignora si no los conoce. `estudiosFolder` no es dato personal
+por sí mismo, pero es una clave de capacidad que apunta a archivos clínicos privados,
+así que **no debe exponerse en claro** fuera del sistema. La idempotencia del ERP
+descansa en `source_response_id` (el `id`), no en el hash del contenido, así que
+agregar estos campos no la afecta.
+
+`ruteoClinico` es una **sugerencia clínica para el médico**, nunca un diagnóstico
+automático ni una indicación definitiva para la paciente. El ERP debe conservar la
+diferencia entre la sugerencia original del motor y la decisión médica posterior
+(aceptar, quitar, agregar manualmente o marcar revisado).
 
 ---
 
@@ -84,7 +113,8 @@ autenticado **lee y borra**. Tope de tamaño del `jsonb` como anti-abuso.
 
 ### `hc` — historia clínica, toda **opcional** (claves ausentes = sin responder)
 `motivo`, `edadMenarca`, `embarazos`, `partos`, `cesareas`, `abortos`,
-`reglasRegulares` (bool), `anticonceptivo`, `ultimoPap`, `cirugiasGineco`,
+`reglasRegulares` (bool), `sangrado` (bool), `anticonceptivo`, `ultimoPap`,
+`cirugiasGineco`, `acne` (bool), `hirsutismo` (bool), `caidaCabello` (bool),
 `enfDiabetes` (bool), `enfHipertension` (bool), `enfTiroides` (bool),
 `enfCorazon` (bool), `enfCancer` (bool), `enfOtra`, `cirugias`, `fuma` (bool),
 `alcohol` (bool), `medicamentos`, `alergias`, `famCancerMama` (bool),
@@ -94,6 +124,25 @@ mapa `HC_LABEL`.)
 
 > Nota: `hc` también lleva `telefono` y `correo` cuando se capturan; la fuente
 > autoritativa de contacto es `paciente.telefono` / `paciente.correo`.
+
+### `ruteoClinico` — instrumentos sugeridos para revisión médica
+
+Campo aditivo producido por `core/ruteoClinico.js`. El motor es puro: no usa reloj
+ni estado; `generadoEn` lo agrega `PortalPaciente.jsx` al construir el registro.
+
+- `instrumentosSugeridos`: lista ya ordenada por prioridad. Cada elemento trae
+  `instrumento`, `nombre`, `prioridad`, `motivo`, `fuente`, `precarga` y
+  `accionSugerida`.
+- `banderas`: alertas para revisión médica. No se borran solas; el ERP debe permitir
+  marcarlas como revisadas o descartadas por el médico.
+- `instrumento` puede ser: `menopausia`, `cardiometabolico`,
+  `seguimiento-metabolico`, `mama`, `osea`, `sop`, `hemorragia`,
+  `dolor-pelvico`, `endometriosis`, `anticoncepcion`, `incontinencia`.
+- `prioridad`: `alta`, `media`, `baja`.
+- `accionSugerida`: `revisar_en_consulta`, `completar_datos`.
+
+Estas salidas **no diagnostican** ni obligan a aplicar instrumentos. Son el punto de
+partida del plan que el Dr. Iván puede aceptar, quitar o complementar manualmente.
 
 ---
 
