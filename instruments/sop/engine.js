@@ -171,6 +171,12 @@ export function evaluarCribado(p, d) {
   const disglucemia = (v(glu) && glu >= 100) || (v(hba1c) && hba1c >= 5.7);
   items.push({ nombre: 'Glucémico (curva de tolerancia oral a la glucosa preferida; glucosa u hemoglobina glucosilada como alternativa)', estado: estado(v(glu) || v(hba1c), disglucemia), hallazgo: disglucemia ? 'Disglucemia: glucosa o hemoglobina glucosilada en rango de alteración.' : '' });
 
+  // Resistencia a la insulina por HOMA-IR (insulina basal en ayuno y glucosa basal).
+  const insulina = p.labs.insulina;
+  const homa = (v(glu) && v(insulina)) ? (glu * insulina) / 405 : null;
+  const ir = v(homa) && homa >= 2.5;
+  items.push({ nombre: 'Resistencia a la insulina (HOMA-IR, con insulina basal en ayuno)', estado: estado(v(homa), ir), hallazgo: v(homa) ? `HOMA-IR ${homa.toFixed(1)}${ir ? ': sugiere resistencia a la insulina (umbral según ensayo y población).' : ' dentro de rango.'}` : '' });
+
   const dislip = (v(p.labs.tg) && p.labs.tg >= 150) || (v(p.labs.hdl) && p.labs.hdl < 50) || (v(p.labs.ct) && p.labs.ct >= 200);
   items.push({ nombre: 'Perfil lipídico', estado: estado(v(p.labs.tg) || v(p.labs.hdl) || v(p.labs.ct), dislip), hallazgo: dislip ? 'Dislipidemia con los valores capturados.' : '' });
 
@@ -182,7 +188,7 @@ export function evaluarCribado(p, d) {
   items.push({ nombre: 'Apnea obstructiva del sueño (cribar si hay síntomas)', estado: d.sintomasApnea ? 'alterado' : 'pendiente', hallazgo: d.sintomasApnea ? 'Síntomas sugestivos: considerar estudio del sueño.' : '' });
   items.push({ nombre: 'Ansiedad y depresión (cribado en toda paciente)', estado: d.tamizajeAnimoPositivo ? 'alterado' : 'pendiente', hallazgo: d.tamizajeAnimoPositivo ? 'Tamizaje positivo: valorar manejo o derivación.' : '' });
 
-  return { items, imc, riesgoCardiometabolico: disglucemia || dislip || hta || (v(imc) && imc >= 25) };
+  return { items, imc, homa, ir, riesgoCardiometabolico: disglucemia || dislip || hta || ir || (v(imc) && imc >= 25) };
 }
 
 /** Orientación a tratamiento por objetivo. */

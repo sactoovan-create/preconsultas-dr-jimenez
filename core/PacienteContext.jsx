@@ -18,7 +18,7 @@ import { pacienteDesdeRespuesta, ruteoDesdeRespuesta } from './precarga.js';
 const formaVacia = () => ({
   demografia: { nombre: '', edad: null, etapaReproductiva: 'pre', edadMenopausia: null, histerectomia: null },
   signos: { sistolica: null, diastolica: null, peso: null, talla: null, circunferencia: null },
-  labs: { ct: null, hdl: null, tg: null, glu: null, hba1c: null, creat: null, egfr: null, uacr: null },
+  labs: { ct: null, hdl: null, tg: null, glu: null, insulina: null, hba1c: null, creat: null, egfr: null, uacr: null },
   antecedentes: {
     diabetes: null, tabaquismo: null, antihipertensivo: null, estatina: null,
     ecvEstablecida: null, ecvSubclinica: null,
