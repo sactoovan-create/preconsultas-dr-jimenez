@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { listarRespuestas, eliminarRespuesta, modoAlmacenamiento, sesion, iniciarSesion, cerrarSesion } from './core/respuestas.js';
 import { listarEstudios } from './core/estudios.js';
 import { ruteoDesdeRespuesta } from './core/precarga.js';
+import { agendaDeHoy, cruzarAgenda } from './core/agenda.js';
 import { usePaciente } from './core/PacienteContext.jsx';
 import { INSTRUMENTOS } from './registry.js';
 import { MRS_ITEMS } from './instruments/menopausia/engine.js';
@@ -38,19 +39,59 @@ function fmtFecha(iso) {
 }
 function fmtValor(v) { if (v === true) return 'Sí'; if (v === false) return 'No'; return String(v); }
 
+function fmtHora(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+}
+
+// Chips de síntomas para la lista, reutilizados por agenda y por respuestas sueltas.
+function Chips({ r }) {
+  return (
+    <>
+      {r.resumen?.menopausia?.total > 0 && <span className="resp-chip">Síntomas: intensidad {r.resumen.menopausia.intensidad}</span>}
+      {r.resumen?.dolor && <span className="resp-chip alerta">{r.resumen.dolor.intensidad != null ? `Dolor ${r.resumen.dolor.intensidad}/10` : 'Dolor presente'}</span>}
+    </>
+  );
+}
+
 function Panel() {
   const [lista, setLista] = useState(null);
+  const [agenda, setAgenda] = useState([]);
+  const [estado, setEstado] = useState('cargando'); // 'cargando' | 'error' | 'listo'
   const [selId, setSelId] = useState(null);
   const [enlace, setEnlace] = useState('');
 
+  const recargar = () => {
+    setEstado('cargando');
+    // La agenda es opcional: si falla o no está configurada, el panel sigue con las
+    // respuestas. Las respuestas sí son esenciales; su fallo es un error real.
+    Promise.all([listarRespuestas(), agendaDeHoy().catch(() => [])])
+      .then(([r, ag]) => {
+        setLista(r); setAgenda(ag || []);
+        if (r.length) setSelId((s) => s || r[0].id);
+        setEstado('listo');
+      })
+      .catch(() => setEstado('error'));
+  };
+
   useEffect(() => {
-    listarRespuestas().then((r) => { setLista(r); if (r.length) setSelId(r[0].id); }).catch(() => setLista([]));
+    recargar();
     try { setEnlace(window.location.origin + '/'); } catch (_) { /* sin window */ }
   }, []);
 
-  if (lista === null) return <div className="resp"><div className="resp-cargando">Cargando respuestas…</div></div>;
-  const sel = lista.find((r) => r.id === selId) || null;
   const modo = modoAlmacenamiento();
+  // Cruce agenda del día × cuestionarios recibidos.
+  const { agendadas, sinAgendar } = useMemo(
+    () => cruzarAgenda(agenda, lista || []),
+    [agenda, lista],
+  );
+  const contestadas = agendadas.filter((a) => a.contesto).length;
+
+  if (estado === 'cargando') return <div className="resp"><div className="resp-cargando">Cargando…</div></div>;
+
+  const sel = (lista || []).find((r) => r.id === selId) || null;
 
   const eliminar = async (id) => {
     if (!window.confirm('¿Eliminar esta respuesta de forma permanente? No se puede deshacer.')) return;
@@ -63,16 +104,15 @@ function Panel() {
     }
   };
 
-  return (
-    <div className="resp">
+  const cab = (
+    <>
       <header className="resp-cab">
         <div>
           <div className="resp-eyebrow">Respuestas de pacientes</div>
-          <h1>Lo que respondieron tus pacientes<small>{lista.length} {lista.length === 1 ? 'respuesta recibida' : 'respuestas recibidas'}</small></h1>
+          <h1>Lo que respondieron tus pacientes<small>{(lista || []).length} {(lista || []).length === 1 ? 'respuesta recibida' : 'respuestas recibidas'}</small></h1>
         </div>
         <div className="inst-mono" aria-hidden="true" />
       </header>
-
       <div className="resp-barra">
         <div className="resp-enlace">
           <span className="resp-enlace-et">Enlace para tus pacientes</span>
@@ -86,25 +126,85 @@ function Panel() {
           <button className="resp-salir" onClick={async () => { await cerrarSesion(); window.location.reload(); }}>Cerrar sesión</button>
         )}
       </div>
+    </>
+  );
 
-      {lista.length === 0 ? (
+  // Error real al traer las respuestas: no confundirlo con "no hay respuestas".
+  if (estado === 'error') {
+    return (
+      <div className="resp">
+        {cab}
+        <div className="resp-error">
+          No se pudieron cargar las respuestas. Puede ser un problema de conexión o del consultorio.
+          <button onClick={recargar}>Reintentar</button>
+        </div>
+      </div>
+    );
+  }
+
+  const hayAgenda = agendadas.length > 0;
+  const totalVacio = (lista || []).length === 0 && !hayAgenda;
+
+  return (
+    <div className="resp">
+      {cab}
+
+      {totalVacio ? (
         <div className="resp-vacio">Aún no hay respuestas. Comparte el enlace con tus pacientes; cuando una responda, aparecerá aquí.</div>
       ) : (
         <div className="resp-grid">
-          <ul className="resp-lista">
-            {lista.map((r) => (
-              <li key={r.id}>
-                <button className={'resp-item' + (r.id === selId ? ' activo' : '')} onClick={() => setSelId(r.id)}>
-                  <span className="resp-item-n">{r.paciente?.nombre || 'Sin nombre'}</span>
-                  <span className="resp-item-f">{fmtFecha(r.creado)}</span>
-                  {r.resumen?.menopausia?.total > 0 && <span className="resp-chip">Síntomas: intensidad {r.resumen.menopausia.intensidad}</span>}
-                  {r.resumen?.dolor && <span className="resp-chip alerta">{r.resumen.dolor.intensidad != null ? `Dolor ${r.resumen.dolor.intensidad}/10` : 'Dolor presente'}</span>}
-                </button>
-              </li>
-            ))}
-          </ul>
+          <div className="resp-lista">
+            {hayAgenda && (
+              <section className="resp-grupo">
+                <div className="resp-grupo-cab">
+                  <h2>Hoy en agenda</h2>
+                  <span>{contestadas} de {agendadas.length} con cuestionario</span>
+                </div>
+                <ul>
+                  {agendadas.map(({ cita, respuesta, contesto }) => (
+                    <li key={cita.cita_id}>
+                      <button
+                        className={'resp-item cita' + (contesto ? '' : ' pendiente') + (respuesta && respuesta.id === selId ? ' activo' : '')}
+                        onClick={() => { if (respuesta) setSelId(respuesta.id); }}
+                        disabled={!respuesta}
+                      >
+                        <span className="resp-item-fila">
+                          <span className="resp-hora">{fmtHora(cita.inicio) || '—'}</span>
+                          <span className="resp-item-n">{cita.nombre || (respuesta && respuesta.paciente?.nombre) || 'Sin nombre'}</span>
+                          <span className={'resp-estado ' + (contesto ? 'ok' : 'falta')}>{contesto ? 'Contestó' : 'Sin cuestionario'}</span>
+                        </span>
+                        {respuesta && <span className="resp-item-chips"><Chips r={respuesta} /></span>}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {sinAgendar.length > 0 && (
+              <section className="resp-grupo">
+                <div className="resp-grupo-cab">
+                  <h2>{hayAgenda ? 'Otras respuestas' : 'Respuestas recibidas'}</h2>
+                  <span>{sinAgendar.length}</span>
+                </div>
+                <ul>
+                  {sinAgendar.map((r) => (
+                    <li key={r.id}>
+                      <button className={'resp-item' + (r.id === selId ? ' activo' : '')} onClick={() => setSelId(r.id)}>
+                        <span className="resp-item-fila">
+                          <span className="resp-item-n">{r.paciente?.nombre || 'Sin nombre'}</span>
+                          <span className="resp-item-f">{fmtFecha(r.creado)}</span>
+                        </span>
+                        <span className="resp-item-chips"><Chips r={r} /></span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+          </div>
           <div className="resp-detalle">
-            {sel ? <Detalle r={sel} onEliminar={eliminar} /> : <div className="resp-vacio">Selecciona una respuesta de la lista.</div>}
+            {sel ? <Detalle r={sel} onEliminar={eliminar} /> : <div className="resp-vacio">Selecciona una paciente de la lista para ver su cuestionario.</div>}
           </div>
         </div>
       )}

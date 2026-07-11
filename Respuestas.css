@@ -101,3 +101,41 @@
 }
 .resp-abrir:hover { background: var(--verde-tinta, #16291F); }
 .resp-abrir-nota { flex: 1; min-width: 220px; margin: 0; font-size: 12px; line-height: 1.45; color: rgba(31,58,46,.62); }
+
+/* ---- Panel ordenado por agenda del día ---- */
+
+/* La columna izquierda deja de ser <ul> plano: ahora agrupa por secciones. */
+.resp-lista { gap: 18px; }
+.resp-grupo { display: flex; flex-direction: column; gap: 8px; }
+.resp-grupo > ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.resp-grupo-cab { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 0 2px 2px; border-bottom: 1px solid var(--linea, rgba(31,58,46,.14)); }
+.resp-grupo-cab h2 { font-family: var(--display); font-size: 15px; font-weight: 500; color: var(--verde); margin: 0; }
+.resp-grupo-cab span { font-size: 11px; font-weight: 700; color: rgba(31,58,46,.5); }
+
+/* Fila superior de cada tarjeta: hora, nombre, estado. */
+.resp-item-fila { display: flex; align-items: center; gap: 8px; width: 100%; }
+.resp-item-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.resp-hora { font-size: 12px; font-weight: 800; color: var(--verde); font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.resp-item.cita .resp-item-n { flex: 1; }
+
+/* Estado del cuestionario junto a la paciente agendada. */
+.resp-estado { font-size: 9.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; border-radius: 20px; padding: 3px 9px; white-space: nowrap; flex-shrink: 0; }
+.resp-estado.ok { color: #2f6b47; background: rgba(58,107,70,.14); }
+.resp-estado.falta { color: #8a6f3f; background: rgba(168,139,92,.16); }
+
+/* Cita sin cuestionario: presente pero apagada; no navega a detalle. */
+.resp-item.cita.pendiente { cursor: default; opacity: .82; }
+.resp-item.cita.pendiente:hover { border-color: var(--linea-suave); transform: none; box-shadow: var(--sombra-1); }
+.resp-item.cita.pendiente .resp-item-n { color: rgba(31,58,46,.62); font-weight: 600; }
+
+/* Estado de error (distinto del vacío). */
+.resp-error {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  background: rgba(184,80,66,.08); border: 1px solid var(--terracota); border-left-width: 4px;
+  border-radius: 12px; padding: 16px 18px; margin-top: 8px; font-size: 13.5px; color: var(--terracota); font-weight: 600;
+}
+.resp-error button {
+  font-family: var(--sans); font-size: 12px; font-weight: 700; cursor: pointer;
+  background: var(--terracota); color: var(--crema); border: none; border-radius: 999px; padding: 8px 16px;
+}
+.resp-error button:hover { filter: brightness(.94); }
