@@ -86,3 +86,18 @@
 @media (max-width: 820px) {
   .resp-grid { grid-template-columns: 1fr; }
 }
+
+/* ---- Abrir la respuesta en los instrumentos ---- */
+
+.resp-abrir-zona {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  background: rgba(31,58,46,.05); border: 1px solid var(--linea, rgba(31,58,46,.16));
+  border-radius: 12px; padding: 13px 16px; margin: 14px 0 4px;
+}
+.resp-abrir {
+  font-family: var(--sans, 'Inter', sans-serif); font-size: 12.5px; font-weight: 700; cursor: pointer;
+  background: var(--verde, #1F3A2E); color: var(--crema, #F1EADB);
+  border: none; border-radius: 999px; padding: 10px 20px; white-space: nowrap;
+}
+.resp-abrir:hover { background: var(--verde-tinta, #16291F); }
+.resp-abrir-nota { flex: 1; min-width: 220px; margin: 0; font-size: 12px; line-height: 1.45; color: rgba(31,58,46,.62); }

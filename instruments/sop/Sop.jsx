@@ -15,6 +15,10 @@ const ESTADO_PILL = { cumple: 'ok', en_riesgo: 'aviso', requiere_exclusion: 'avi
 export default function Sop() {
   const { paciente, actualizar, mezclar, publicarResumen, irA } = usePaciente();
   const dem = paciente.demografia, sig = paciente.signos, lab = paciente.labs;
+  // El acné y la caída de cabello que la paciente reporta NO se prellenan aquí:
+  // el criterio diagnóstico exige severidad (moderado a severo en adolescentes)
+  // que el portal no captura. La sugerencia de ruteo ya avisa del dato
+  // androgénico; marcarlo es decisión del médico tras interrogarlo.
 
   const [d, setD] = useState(() => ({
     poblacion: (dem.edad && dem.edad < 20) ? 'adolescente' : 'adulta',

@@ -30,7 +30,8 @@ const NOMBRE = {
 
 const ORDEN_PRIORIDAD = { alta: 0, media: 1, baja: 2 };
 
-function num(x) { const n = Number(x); return Number.isFinite(n) ? n : null; }
+// Ojo: Number(null) y Number('') dan 0; un dato ausente debe quedar en null.
+function num(x) { if (x == null || x === '') return null; const n = Number(x); return Number.isFinite(n) ? n : null; }
 function txt(x) { return (x == null ? '' : String(x)).toLowerCase(); }
 
 /** Suma del MRS a partir de los síntomas crudos (0..44). */
@@ -99,7 +100,7 @@ export function instrumentosPara(pre) {
   if (sintomatica || (edad != null && edad >= 45)) {
     const prio = total >= 17 ? 'alta' : (sintomatica ? 'media' : 'baja');
     const motivo = sintomatica
-      ? `Escala de síntomas (MRS) total ${total}/44.`
+      ? `Menopause Rating Scale: total ${total}/44.`
       : 'Edad perimenopáusica: valorar síntomas y candidatura a terapia hormonal.';
     add('menopausia', prio, motivo, sintomatica ? ['mrs'] : ['edad'],
       { mrs: { total, resumen: p.resumen && p.resumen.menopausia } });

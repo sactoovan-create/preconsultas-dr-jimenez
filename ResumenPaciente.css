@@ -51,3 +51,81 @@
 }
 .rp-informe:hover:not(:disabled) { background: var(--verde-tinta); transform: translateY(-1px); box-shadow: var(--sombra-2); }
 .rp-informe:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ---- Paciente cargada desde una respuesta de pre-consulta ---- */
+
+.rp-origen {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+  background: var(--verde); color: var(--crema); border-radius: 12px;
+  padding: 13px 18px; margin-bottom: 18px; font-size: 13px; line-height: 1.5;
+}
+.rp-origen b { font-weight: 700; }
+.rp-origen span { opacity: .82; }
+.rp-origen button {
+  font-family: var(--sans); font-size: 11.5px; font-weight: 700; cursor: pointer;
+  background: transparent; color: var(--crema); border: 1px solid rgba(241,234,219,.45);
+  border-radius: 999px; padding: 7px 14px; white-space: nowrap;
+}
+.rp-origen button:hover { background: rgba(241,234,219,.12); }
+
+.rp-banderas { display: grid; gap: 8px; margin-bottom: 18px; }
+.rp-bandera {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  background: rgba(184,80,66,.09); border: 1px solid var(--terracota); border-left-width: 4px;
+  border-radius: 10px; padding: 12px 16px; font-size: 13px; font-weight: 600; color: var(--terracota);
+}
+.rp-bandera button {
+  font-family: var(--sans); font-size: 11.5px; font-weight: 700; cursor: pointer;
+  background: var(--terracota); color: var(--crema); border: none; border-radius: 999px; padding: 7px 14px;
+}
+.rp-bandera button:hover { filter: brightness(.94); }
+
+.rp-sug {
+  background: var(--papel); border: 1px solid var(--linea-suave); border-radius: var(--radio);
+  padding: 20px 22px; margin-bottom: 22px; box-shadow: var(--sombra-1); position: relative;
+}
+.rp-sug::before { content: ''; position: absolute; top: 0; left: 18px; right: 18px; height: 1px; background: linear-gradient(90deg, transparent, rgba(168,139,92,.5) 18%, rgba(168,139,92,.5) 82%, transparent); }
+.rp-sug-cab h2 { font-family: var(--display); font-size: 21px; font-weight: 400; color: var(--verde); margin: 0 0 4px; }
+.rp-sug-cab p { font-size: 12.5px; color: rgba(31,58,46,.66); margin: 0 0 14px; }
+
+.rp-sug-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.rp-sug-item {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  border: 1px solid var(--linea-suave); border-left: 3px solid var(--linea-fuerte);
+  border-radius: 10px; padding: 12px 14px; background: var(--crema-papel);
+}
+.rp-sug-item.prio-alta { border-left-color: var(--terracota); }
+.rp-sug-item.prio-media { border-left-color: var(--dorado); }
+
+.rp-prio {
+  font-size: 9.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
+  border-radius: 999px; padding: 4px 10px; white-space: nowrap; flex-shrink: 0;
+  background: var(--crema-hueco); color: rgba(31,58,46,.6);
+}
+.rp-prio.alta { background: rgba(184,80,66,.12); color: var(--terracota); }
+.rp-prio.media { background: rgba(168,139,92,.16); color: #7d6437; }
+
+.rp-sug-texto { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 200px; }
+.rp-sug-texto b { font-size: 13.5px; color: var(--verde); }
+.rp-sug-texto span { font-size: 12px; color: rgba(31,58,46,.62); line-height: 1.4; }
+
+.rp-sug-botones { display: flex; gap: 8px; flex-shrink: 0; }
+.rp-sug-abrir {
+  font-family: var(--sans); font-size: 11.5px; font-weight: 700; cursor: pointer;
+  background: var(--verde); color: var(--crema); border: none; border-radius: 999px; padding: 8px 18px;
+}
+.rp-sug-abrir:hover { background: var(--verde-tinta); }
+.rp-sug-quitar {
+  font-family: var(--sans); font-size: 11.5px; font-weight: 600; cursor: pointer;
+  background: transparent; color: rgba(31,58,46,.55); border: 1px solid var(--linea); border-radius: 999px; padding: 8px 14px;
+}
+.rp-sug-quitar:hover { color: var(--terracota); border-color: var(--terracota); }
+
+.rp-sug-quitadas { margin-top: 12px; font-size: 12px; color: rgba(31,58,46,.55); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rp-sug-quitadas button {
+  font-family: var(--sans); font-size: 11.5px; cursor: pointer; background: transparent;
+  color: var(--dorado); border: 1px dashed var(--dorado); border-radius: 999px; padding: 5px 12px;
+}
+.rp-sug-quitadas button:hover { background: rgba(168,139,92,.1); }
+
+.rp-grid-titulo { font-family: var(--display); font-size: 19px; font-weight: 400; color: var(--verde); margin: 0 0 12px; }

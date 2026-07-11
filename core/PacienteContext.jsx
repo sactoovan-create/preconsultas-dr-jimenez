@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import { pacienteDesdeRespuesta, ruteoDesdeRespuesta } from './precarga.js';
 
 /**
  * Estado del paciente compartido por todos los instrumentos del módulo.
@@ -35,11 +36,51 @@ export function PacienteProvider({ children, pacienteInicial, onGuardarResultado
   const [paciente, setPaciente] = useState(() => ({ ...formaVacia(), ...(pacienteInicial || {}) }));
   // Resumen clave que cada instrumento publica para el panel del paciente.
   const [resumenes, setResumenes] = useState({});
-  // Respuestas que la paciente deja en la pre-consulta; prellenan los instrumentos.
-  const [autoReporte, setAutoReporte] = useState((pacienteInicial && pacienteInicial.autoReporte) || {});
+  // De dónde viene la paciente activa: null = captura manual;
+  // { id, nombre, fecha } = se cargó desde una respuesta de pre-consulta.
+  const [origen, setOrigen] = useState(null);
+  // Ruteo clínico de la respuesta cargada (sugerencia inmutable del motor) y la
+  // capa de decisión del médico (qué sugerencias quitó). La sugerencia nunca se
+  // modifica; solo se marca como descartada y se puede restaurar.
+  const [ruteo, setRuteo] = useState(null);
+  const [descartados, setDescartados] = useState([]);
 
+  // El auto-reporte de la paciente vive DENTRO del paciente compartido: es lo
+  // que leen los instrumentos para prellenar. Una sola fuente de verdad.
   const guardarAutoReporte = useCallback((parcial) => {
-    setAutoReporte((prev) => ({ ...prev, ...parcial }));
+    setPaciente((p) => ({ ...p, autoReporte: { ...(p.autoReporte || {}), ...parcial } }));
+  }, []);
+
+  // Carga una respuesta de pre-consulta como paciente activa: demografía,
+  // antecedentes afirmados y auto-reporte, más su ruteo de instrumentos
+  // sugeridos. Reinicia resúmenes y decisiones previas.
+  const cargarRespuesta = useCallback((registro) => {
+    const parcial = pacienteDesdeRespuesta(registro);
+    setPaciente(() => {
+      const v = formaVacia();
+      return {
+        ...v,
+        demografia: { ...v.demografia, ...parcial.demografia },
+        antecedentes: { ...v.antecedentes, ...parcial.antecedentes },
+        autoReporte: parcial.autoReporte,
+      };
+    });
+    setResumenes({});
+    setRuteo(ruteoDesdeRespuesta(registro));
+    setDescartados([]);
+    setOrigen({
+      id: registro && registro.id,
+      nombre: (registro && registro.paciente && registro.paciente.nombre) || null,
+      fecha: (registro && registro.creado) || null,
+    });
+  }, []);
+
+  // Decisión del médico sobre las sugerencias: quitar y restaurar.
+  const descartarSugerencia = useCallback((instrumento) => {
+    setDescartados((d) => (d.includes(instrumento) ? d : [...d, instrumento]));
+  }, []);
+  const restaurarSugerencia = useCallback((instrumento) => {
+    setDescartados((d) => d.filter((x) => x !== instrumento));
   }, []);
 
   // Actualiza un campo de un grupo: actualizar('labs', 'glu', 92)
@@ -52,7 +93,10 @@ export function PacienteProvider({ children, pacienteInicial, onGuardarResultado
     setPaciente((p) => ({ ...p, [grupo]: { ...p[grupo], ...parcial } }));
   }, []);
 
-  const reiniciar = useCallback(() => { setPaciente(formaVacia()); setResumenes({}); }, []);
+  const reiniciar = useCallback(() => {
+    setPaciente(formaVacia()); setResumenes({});
+    setOrigen(null); setRuteo(null); setDescartados([]);
+  }, []);
 
   const guardarResultado = useCallback((instrumentoId, resultado) => {
     if (onGuardarResultado) onGuardarResultado({ instrumentoId, resultado, paciente });
@@ -71,8 +115,10 @@ export function PacienteProvider({ children, pacienteInicial, onGuardarResultado
   const valor = useMemo(() => ({
     paciente, actualizar, mezclar, reiniciar, guardarResultado,
     resumenes, publicarResumen, irA: irA || (() => {}),
-    autoReporte, guardarAutoReporte,
-  }), [paciente, actualizar, mezclar, reiniciar, guardarResultado, resumenes, publicarResumen, irA, autoReporte, guardarAutoReporte]);
+    autoReporte: paciente.autoReporte || {}, guardarAutoReporte,
+    origen, ruteo, descartados, cargarRespuesta, descartarSugerencia, restaurarSugerencia,
+  }), [paciente, actualizar, mezclar, reiniciar, guardarResultado, resumenes, publicarResumen, irA,
+    guardarAutoReporte, origen, ruteo, descartados, cargarRespuesta, descartarSugerencia, restaurarSugerencia]);
 
   return <PacienteContext.Provider value={valor}>{children}</PacienteContext.Provider>;
 }

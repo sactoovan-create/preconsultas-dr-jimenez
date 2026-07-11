@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { listarRespuestas, eliminarRespuesta, modoAlmacenamiento, sesion, iniciarSesion, cerrarSesion } from './core/respuestas.js';
 import { listarEstudios } from './core/estudios.js';
+import { ruteoDesdeRespuesta } from './core/precarga.js';
+import { usePaciente } from './core/PacienteContext.jsx';
+import { INSTRUMENTOS } from './registry.js';
 import { MRS_ITEMS } from './instruments/menopausia/engine.js';
 import './Respuestas.css';
 
@@ -27,8 +30,11 @@ const ESCALA = ['Nada', 'Leve', 'Moderado', 'Intenso', 'Muy intenso'];
 const OCULTAR = new Set(['telefono', 'correo']);
 
 function fmtFecha(iso) {
-  try { return new Date(iso).toLocaleString('es-MX', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
-  catch (_) { return iso; }
+  if (!iso) return '';
+  const d = new Date(iso);
+  // Una cadena corrupta no lanza excepción: da una fecha inválida.
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleString('es-MX', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 function fmtValor(v) { if (v === true) return 'Sí'; if (v === false) return 'No'; return String(v); }
 
@@ -107,11 +113,29 @@ function Panel() {
 }
 
 function Detalle({ r, onEliminar }) {
+  const { cargarRespuesta, irA, origen, resumenes, paciente } = usePaciente();
   const mrs = r.autoReporte?.mrs || {};
   const dolor = r.autoReporte?.dolor || {};
   const hc = r.autoReporte?.hc || {};
   const sintomas = MRS_ITEMS.filter((i) => mrs[i.id] != null && mrs[i.id] > 0);
   const hcEntradas = Object.entries(hc).filter(([k, v]) => !OCULTAR.has(k) && v !== '' && v != null && HC_LABEL[k]);
+  // Sugerencias del ruteo clínico que existen en este módulo (vista previa).
+  const sugeridos = useMemo(() => {
+    try {
+      return (ruteoDesdeRespuesta(r).instrumentosSugeridos || [])
+        .filter((s) => INSTRUMENTOS.some((i) => i.id === s.instrumento && i.estado === 'activo'));
+    } catch (_) { return []; }
+  }, [r]);
+
+  const abrir = () => {
+    // Si ya hay trabajo en curso (otra respuesta cargada, instrumentos evaluados
+    // o una paciente capturada a mano), avisar antes de reemplazarlo.
+    const hayTrabajo = origen || Object.keys(resumenes || {}).length > 0
+      || (paciente && paciente.demografia && paciente.demografia.nombre);
+    if (hayTrabajo && !window.confirm('Vas a reemplazar a la paciente activa en los instrumentos; lo capturado y evaluado se perderá. ¿Continuar?')) return;
+    cargarRespuesta(r);
+    irA('resumen');
+  };
 
   return (
     <div className="resp-card">
@@ -124,6 +148,16 @@ function Detalle({ r, onEliminar }) {
           <span>{fmtFecha(r.creado)}</span>
         </div>
         {onEliminar && <button className="resp-eliminar" onClick={() => onEliminar(r.id)}>Eliminar respuesta</button>}
+      </div>
+
+      <div className="resp-abrir-zona">
+        <button className="resp-abrir" onClick={abrir}>Abrir en instrumentos</button>
+        <p className="resp-abrir-nota">
+          Carga a la paciente en los instrumentos con lo que contestó ya prellenado
+          {sugeridos.length > 0 && (
+            <> · sugiere {sugeridos.map((s) => s.nombre).join(', ')}</>
+          )}.
+        </p>
       </div>
 
       <section className="resp-sec">
