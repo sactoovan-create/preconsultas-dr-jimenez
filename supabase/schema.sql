@@ -1,6 +1,23 @@
 -- Esquema de la base de datos del consultorio (Supabase / PostgreSQL).
 -- Ejecutar una vez en el editor SQL de Supabase (SQL Editor → New query → pegar → Run).
 
+-- Autoriza únicamente al primer usuario creado en Auth: el médico principal.
+-- Un usuario nuevo no obtiene acceso a datos clínicos solo por autenticarse.
+create or replace function public.es_medico_principal()
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select (select auth.uid()) = (
+    select id from auth.users order by created_at asc limit 1
+  );
+$$;
+
+revoke all on function public.es_medico_principal() from public;
+grant execute on function public.es_medico_principal() to authenticated;
+
 -- Tabla de respuestas de las pacientes.
 create table if not exists public.respuestas (
   id        uuid primary key default gen_random_uuid(),
@@ -29,7 +46,7 @@ drop policy if exists "medico_lee" on public.respuestas;
 create policy "medico_lee"
   on public.respuestas for select
   to authenticated
-  using (true);
+  using ((select public.es_medico_principal()));
 
 -- El médico (autenticado) puede BORRAR respuestas: depurar spam o atender una
 -- solicitud de borrado de datos de la paciente (derechos de protección de datos).
@@ -37,7 +54,7 @@ drop policy if exists "medico_borra" on public.respuestas;
 create policy "medico_borra"
   on public.respuestas for delete
   to authenticated
-  using (true);
+  using ((select public.es_medico_principal()));
 
 -- Nota: el usuario del médico se crea en Authentication → Users → Add user
 -- (con su correo y una contraseña). Con ese usuario inicia sesión en el panel.

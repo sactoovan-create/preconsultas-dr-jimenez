@@ -79,6 +79,34 @@ else
   linea; echo "Prueba 3: OMITIDA (faltan ERP_BASE_URL y/o PRECONSULTAS_CRON_TOKEN)"
 fi
 
+# --- Prueba 4: la tabla de agenda existe y anon no puede leerla ---
+if [ -n "${SUPABASE_URL:-}" ] && [ -n "${SUPABASE_ANON_KEY:-}" ] && [ -n "${SUPABASE_SERVICE_KEY:-}" ]; then
+  linea; echo "Prueba 4: agenda privada (tabla disponible; anon sin lectura)"
+  test_id="prueba-rls-agenda-$(date +%s)"
+  cleanup_url="${SUPABASE_URL%/}/rest/v1/agenda_dia?cita_id=eq.${test_id}"
+  body="{\"cita_id\":\"$test_id\",\"fecha\":\"2099-12-31\",\"inicio\":\"2099-12-31T12:00:00-06:00\",\"nombre\":\"PRUEBA RLS\",\"telefono\":\"0000000000\",\"estado\":\"BOOKED\"}"
+  code=$(curl -sS -o /tmp/humo4-insert.json -w "%{http_code}" -X POST "${SUPABASE_URL%/}/rest/v1/agenda_dia" \
+    -H "apikey: $SUPABASE_SERVICE_KEY" -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+    -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+    --data "$body" --max-time 30 || echo "000")
+  if [ "$code" != "201" ]; then
+    echo "  FALLA ($code): la tabla agenda_dia no existe o la service_role no puede escribir."; cat /tmp/humo4-insert.json 2>/dev/null; fallas=$((fallas+1))
+  else
+    anon_code=$(curl -sS -o /tmp/humo4-anon.json -w "%{http_code}" \
+      "$cleanup_url&select=cita_id" \
+      -H "apikey: $SUPABASE_ANON_KEY" -H "Authorization: Bearer $SUPABASE_ANON_KEY" --max-time 30 || echo "000")
+    if grep -q "$test_id" /tmp/humo4-anon.json 2>/dev/null; then
+      echo "  FALLA ($anon_code): la clave anon pudo leer la agenda."; fallas=$((fallas+1))
+    else
+      echo "  OK ($anon_code): la tabla existe y la clave anon no puede leerla."; ok=$((ok+1))
+    fi
+    curl -sS -o /dev/null -X DELETE "$cleanup_url" \
+      -H "apikey: $SUPABASE_SERVICE_KEY" -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" --max-time 30 || true
+  fi
+else
+  linea; echo "Prueba 4: OMITIDA (faltan claves de Supabase)"
+fi
+
 linea
 echo "Resumen: $ok correctas, $fallas con falla."
 echo "Recuerda borrar la fila 'PRUEBA - borrar' cuando termines."
