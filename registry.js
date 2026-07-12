@@ -38,7 +38,7 @@ export const INSTRUMENTOS = [
   },
   {
     id: 'sop',
-    titulo: 'Síndrome poliendocrino ovárico',
+    titulo: 'Síndrome poliendocrino metabólico ovárico',
     descripcion: 'Diagnóstico por criterios de Rotterdam, fenotipo, cribado metabólico y orientación a tratamiento.',
     tipo: 'calculadora',
     estado: 'activo',

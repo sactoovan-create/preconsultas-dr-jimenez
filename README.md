@@ -182,7 +182,7 @@ no cambian.
 
 ## Cómo agregar una calculadora o cuestionario nuevo
 
-Tres pasos. Tomemos el síndrome poliendocrino ovárico como ejemplo.
+Tres pasos. Tomemos el síndrome poliendocrino metabólico ovárico como ejemplo.
 
 1. **La lógica, en un motor puro.** Crea `instruments/sop/engine.js` con funciones
    que reciben el paciente y devuelven el resultado. Sin interfaz. Si necesitas
@@ -244,7 +244,7 @@ tratamiento en lugar de un score.
 | Apartado | Tipo | Estado |
 | --- | --- | --- |
 | Riesgo cardiometabólico | Calculadora | Completo y validado |
-| Síndrome poliendocrino ovárico | Calculadora | Completo y validado |
+| Síndrome poliendocrino metabólico ovárico | Calculadora | Completo y validado |
 | Endometriosis | Cuestionario | Completo y validado |
 | Hemorragia uterina anormal | Cuestionario | Completo y validado |
 | Dolor pélvico crónico | Cuestionario | Completo y validado |

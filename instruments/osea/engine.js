@@ -17,6 +17,8 @@
  * Cubre mujeres adultas. Instrumento de apoyo a la decisión.
  */
 
+import { imcSeguro } from '../../core/antropometria.js';
+
 const v = (x) => x !== null && x !== undefined && !isNaN(x);
 
 export function factoresRiesgo(d) {
@@ -84,10 +86,8 @@ export function orientacionGeneral(d, dx) {
 export function evaluarOsea(paciente, datos) {
   const dem = paciente.demografia, sig = paciente.signos;
   let imcBajo = datos.imcBajo;
-  if (v(sig.peso) && v(sig.talla)) {
-    const imc = sig.peso / Math.pow(sig.talla / 100, 2);
-    imcBajo = imc < 19;
-  }
+  const imc = imcSeguro(sig.peso, sig.talla);
+  if (imc != null) imcBajo = imc < 19;
   const posmenopausica = datos.posmenopausica || v(dem.edadMenopausia);
   const menopausiaPrecoz = datos.menopausiaPrecoz || (v(dem.edadMenopausia) && dem.edadMenopausia < 45);
   const d = { ...datos, edad: dem.edad, imcBajo, posmenopausica, menopausiaPrecoz };

@@ -93,7 +93,7 @@ export default function Hemorragia() {
           )}
 
           {posmeno && (
-            <Seccion indice="III" titulo="Sangrado posmenopáusico" nota="ACOG, actualización de abril de 2026">
+            <Seccion indice="III" titulo="Sangrado posmenopáusico" nota="Colegio Americano de Obstetras y Ginecólogos, actualización de abril de 2026">
               <CampoNumero etiqueta="Grosor endometrial" unidad="milímetros" valor={d.grosorEndometrial} onChange={(v) => set('grosorEndometrial', v)} step={0.1} />
               <ToggleSiNo etiqueta="Endometrio completamente visualizado" valor={d.endometrioVisualizado} onChange={(v) => set('endometrioVisualizado', v)} />
               <div className="hua-checks">
@@ -206,7 +206,7 @@ export default function Hemorragia() {
           )}
           <BaseEvidencia evidencia={evidenciaDe('hemorragia')} />
           <div className="inst-disclaimer">
-            Instrumento de apoyo a la decisión basado en los sistemas FIGO y en las recomendaciones vigentes de ACOG, incluida la actualización de abril de 2026 para el sangrado posmenopáusico. El diagnóstico y el tratamiento corresponden al juicio clínico.
+            Instrumento de apoyo a la decisión basado en los sistemas FIGO y en las recomendaciones vigentes del Colegio Americano de Obstetras y Ginecólogos, incluida la actualización de abril de 2026 para el sangrado posmenopáusico. El diagnóstico y el tratamiento corresponden al juicio clínico.
           </div>
         </div>
       </div>

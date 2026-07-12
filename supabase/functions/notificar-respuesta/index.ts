@@ -12,14 +12,18 @@
 //   DESTINO_CORREO   correo del médico que recibe el aviso
 //   ORIGEN_CORREO    remitente verificado (por ejemplo avisos@tudominio.com);
 //                    si no tienes dominio, usa onboarding@resend.dev para pruebas.
-//   WEBHOOK_SECRET   cadena secreta compartida con el webhook (recomendado).
+//   WEBHOOK_SECRET   cadena secreta compartida con el webhook (OBLIGATORIO: sin él,
+//                    la función rechaza todo, para no aceptar peticiones anónimas).
 //
 // La credencial vive aquí, en el entorno seguro de Supabase, nunca en el navegador.
 
 Deno.serve(async (req) => {
   // Verifica que la petición provenga del webhook de Supabase (secreto compartido).
+  // Falla cerrado: si el secreto no está configurado, se rechaza todo. Antes, un
+  // secreto vacío dejaba pasar cualquier POST (podía disparar correos con datos
+  // arbitrarios); ahora la ausencia del secreto bloquea en lugar de abrir.
   const secreto = Deno.env.get("WEBHOOK_SECRET");
-  if (secreto && req.headers.get("x-webhook-secret") !== secreto) {
+  if (!secreto || req.headers.get("x-webhook-secret") !== secreto) {
     return new Response("No autorizado", { status: 401 });
   }
 

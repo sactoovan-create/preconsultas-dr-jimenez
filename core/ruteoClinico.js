@@ -20,7 +20,7 @@ const NOMBRE = {
   cardiometabolico: 'Riesgo cardiovascular-renal-metabólico',
   mama: 'Salud y riesgo mamario',
   osea: 'Salud ósea / osteoporosis',
-  sop: 'Síndrome ovárico metabólico poliendocrino',
+  sop: 'Síndrome poliendocrino metabólico ovárico',
   hemorragia: 'Sangrado uterino anormal',
   'dolor-pelvico': 'Dolor pélvico',
   endometriosis: 'Endometriosis',
@@ -136,7 +136,7 @@ export function instrumentosPara(pre) {
   // Ósea por factor de riesgo
   if (hc.famOsteoporosis) add('osea', 'media', 'Antecedente familiar de osteoporosis.', ['antecedente_familiar'], {}, 'completar_datos');
 
-  // Síndrome ovárico metabólico poliendocrino (ciclos irregulares + androgénico nuevo)
+  // Síndrome poliendocrino metabólico ovárico (ciclos irregulares + androgénico nuevo)
   const androgenico = hc.acne || hc.hirsutismo || hc.caidaCabello;
   if (hc.reglasRegulares === false || androgenico) {
     const motivo = hc.reglasRegulares === false

@@ -11,6 +11,8 @@
  * suprarrenal congénita no clásica antes de confirmarlo.
  */
 
+import { imcSeguro } from '../../core/antropometria.js';
+
 const v = (x) => x !== null && x !== undefined && !isNaN(x);
 const TESTO_NG_ML_A_NMOL_L = 3.467; // testosterona total
 
@@ -43,6 +45,13 @@ export function clasificarCiclo(d) {
   if (adolescente && v(apm) && apm >= 1 && apm < 3) {
     const irr = v(longitudCiclo) && (longitudCiclo < 21 || longitudCiclo > 45);
     return { irregular: irr, detalle: irr ? 'Ciclos fuera de veintiuno a cuarenta y cinco días (uno a tres años posmenarca).' : 'Ciclos dentro de rango para el tramo de uno a tres años posmenarca.' };
+  }
+
+  // Adolescente sin años posmenarca capturados: no aplica ni el tramo adolescente
+  // ni la regla adulta. No se clasifica el ciclo para no fabricar el criterio; se
+  // pide el dato. El rango normal cambia con los años desde la primera regla.
+  if (adolescente && !v(apm)) {
+    return { irregular: false, indeterminado: true, detalle: 'Falta capturar los años posmenarca para clasificar el ciclo en la adolescencia.' };
   }
 
   // Más de 3 años posmenarca o adulta establecida
@@ -164,7 +173,7 @@ export function determinarFenotipo(criterios) {
 export function evaluarCribado(p, d) {
   const items = [];
   const peso = p.signos.peso, talla = p.signos.talla;
-  const imc = (v(peso) && v(talla)) ? peso / Math.pow(talla / 100, 2) : null;
+  const imc = imcSeguro(peso, talla);
   const estado = (hecho, alterado) => hecho ? (alterado ? 'alterado' : 'normal') : 'pendiente';
 
   const glu = p.labs.glu, hba1c = p.labs.hba1c;

@@ -21,6 +21,7 @@
 const v = (x) => x !== null && x !== undefined && !isNaN(x);
 
 import { recomendacionesMenopausia } from '../../core/recomendaciones.js';
+import { imcSeguro } from '../../core/antropometria.js';
 
 export const MRS_ITEMS = [
   { id: 'mrs_bochornos', dominio: 'somatico', texto: 'Bochornos y sudoración' },
@@ -51,8 +52,10 @@ export function evaluarMrs(d) {
   const psicologico = suma('psicologico');
   const urogenital = suma('urogenital');
   const total = somatico + psicologico + urogenital;
+  // Cuántos reactivos se contestaron: distingue "todo en cero" de "nada capturado".
+  const respondidos = MRS_ITEMS.filter((i) => v(d[i.id])).length;
   return {
-    total, somatico, psicologico, urogenital,
+    total, somatico, psicologico, urogenital, respondidos,
     sevTotal: severidad(total, [4, 8, 16]),
     sevSomatico: severidad(somatico, [2, 4, 8]),
     sevPsicologico: severidad(psicologico, [1, 3, 6]),
@@ -69,11 +72,13 @@ export function clasificarTipo(d) {
       precoz: { tipo: 'precoz', etiqueta: 'Menopausia precoz o temprana', nota: 'Menopausia entre los cuarenta y los cuarenta y cuatro años.' },
       habitual: { tipo: 'habitual', etiqueta: 'Menopausia habitual', nota: '' },
     };
-    return mapa[d.tipo];
+    return { ...mapa[d.tipo], determinado: true };
   }
-  if (v(e) && e < 40) return { tipo: 'insuficiencia', etiqueta: 'Insuficiencia ovárica primaria', nota: 'Menopausia antes de los cuarenta años.' };
-  if (v(e) && e < 45) return { tipo: 'precoz', etiqueta: 'Menopausia precoz o temprana', nota: 'Menopausia entre los cuarenta y los cuarenta y cuatro años.' };
-  return { tipo: 'habitual', etiqueta: 'Menopausia habitual', nota: '' };
+  if (v(e) && e < 40) return { tipo: 'insuficiencia', etiqueta: 'Insuficiencia ovárica primaria', nota: 'Menopausia antes de los cuarenta años.', determinado: true };
+  if (v(e) && e < 45) return { tipo: 'precoz', etiqueta: 'Menopausia precoz o temprana', nota: 'Menopausia entre los cuarenta y los cuarenta y cuatro años.', determinado: true };
+  // Por defecto, sin tipo ni edad de menopausia: no hay dato que sustente el
+  // diagnóstico. `determinado: false` evita que la hoja lo afirme sin base.
+  return { tipo: 'habitual', etiqueta: 'Menopausia habitual', nota: '', determinado: v(e) };
 }
 
 /** Candidatura a terapia hormonal sistémica. */
@@ -124,10 +129,9 @@ export function evaluarCandidatura(paciente, d, tipo) {
 
 /** Vía de administración sugerida según factores de riesgo. */
 export function evaluarVia(paciente, d) {
-  const peso = paciente.signos.peso, talla = paciente.signos.talla;
-  const imc = (v(peso) && v(talla)) ? peso / Math.pow(talla / 100, 2) : null;
+  const imc = imcSeguro(paciente.signos.peso, paciente.signos.talla);
   const factores = [];
-  if (v(imc) && imc >= 30) factores.push('índice de masa corporal de treinta o más');
+  if (imc != null && imc >= 30) factores.push('índice de masa corporal de treinta o más');
   if (d.tabaquismo) factores.push('tabaquismo');
   if (d.hipertension) factores.push('hipertensión');
   if (d.sindromeMetabolico) factores.push('síndrome metabólico');

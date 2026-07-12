@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { usePaciente } from './core/PacienteContext.jsx';
 import './PreConsulta.css';
 
@@ -104,6 +104,14 @@ export default function PreConsulta({
   // mínimo de llenado. No estorban a una persona; frenan envíos automáticos.
   const trampaRef = useRef(null);
   const inicioRef = useRef(Date.now());
+  const botonRef = useRef(null);
+
+  // Persiste el auto-reporte en el paciente compartido en cada cambio, igual que el
+  // nombre y la edad. Así, en el consultorio, cambiar de apartado no borra lo
+  // capturado (síntomas e historia); al volver, se recupera desde el contexto.
+  useEffect(() => {
+    guardarAutoReporte({ mrs, dolor, hc });
+  }, [mrs, dolor, hc, guardarAutoReporte]);
 
   const setSintoma = (id, n) => { setMrs((p) => ({ ...p, [id]: n })); setGuardado(false); };
   const setH = (k, val) => { setHc((p) => ({ ...p, [k]: val })); setGuardado(false); };
@@ -138,6 +146,12 @@ export default function PreConsulta({
       setEnviando(true);
       try {
         await onEnviar({ mrs, dolor, hc, contacto: { telefono: hc.telefono || null, correo: hc.correo || null }, demografia: { nombre: dem.nombre, edad: dem.edad }, consentimiento: acepto, consentimientoFecha: new Date().toISOString() });
+      } catch (e) {
+        // El envío falló. Se muestra el motivo junto al botón (el aviso superior
+        // queda fuera de vista al final del cuestionario) y se lleva la vista aquí,
+        // para que la paciente no crea que envió cuando no fue así.
+        setBloqueo((e && e.message) || 'No se pudieron enviar tus respuestas. Inténtalo de nuevo.');
+        if (botonRef.current && botonRef.current.scrollIntoView) botonRef.current.scrollIntoView({ block: 'center', behavior: 'smooth' });
       } finally { setEnviando(false); }
       return;
     }
@@ -295,7 +309,7 @@ export default function PreConsulta({
               Consulta el aviso de privacidad
             </a>
           )}
-          <button className="pc-guardar" onClick={guardar} disabled={enviando} aria-busy={enviando ? 'true' : 'false'}>
+          <button ref={botonRef} className="pc-guardar" onClick={guardar} disabled={enviando} aria-busy={enviando ? 'true' : 'false'}>
             {onEnviar ? (enviando ? 'Enviando…' : 'Enviar mis respuestas a mi médico') : 'Guardar mis respuestas'}
           </button>
           <div className="pc-acciones-nota">Puedes enviar aunque hayas dejado en blanco la parte opcional.</div>

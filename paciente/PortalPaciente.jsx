@@ -83,16 +83,26 @@ function PortalInterno() {
       const guardado = await guardarRespuesta(construirRegistro(datos, estudiosFolder));
       setEnviado(guardado);
     } catch (e) {
-      setError('No se pudieron enviar tus respuestas. Revisa tu conexión e inténtalo de nuevo.');
-      throw e;
+      // Un problema de configuración del consultorio no se resuelve reintentando:
+      // se distingue del fallo de red para no mandar a la paciente a reintentar en
+      // vano. El error se lanza con un mensaje claro que PreConsulta muestra junto
+      // al botón (no se relanza el error crudo, que quedaba sin capturar).
+      const config = e && e.message && /no est[aá] configurada|not configured/i.test(e.message);
+      const msg = config
+        ? 'No pudimos enviar tus respuestas por un problema del consultorio, no por tu conexión. Por favor avísale a la clínica.'
+        : 'No se pudieron enviar tus respuestas. Revisa tu conexión e inténtalo de nuevo.';
+      setError(msg);
+      throw new Error(msg);
     }
   };
 
   if (enviado) {
     const primerNombre = enviado.paciente?.nombre ? enviado.paciente.nombre.trim().split(/\s+/)[0] : '';
-    const estudiosTexto = estudiosEstado.listos > 0
-      ? ` También recibimos ${estudiosEstado.listos === 1 ? 'el estudio que subiste' : `los ${estudiosEstado.listos} estudios que subiste`}.`
-      : '';
+    const partesEstudios = [];
+    if (estudiosEstado.listos > 0) partesEstudios.push(`También recibimos ${estudiosEstado.listos === 1 ? 'el estudio que subiste' : `los ${estudiosEstado.listos} estudios que subiste`}.`);
+    // No callar los estudios que fallaron: la paciente podría creer que llegaron.
+    if (estudiosEstado.errores > 0) partesEstudios.push(`No pudimos recibir ${estudiosEstado.errores === 1 ? 'uno de tus estudios' : `${estudiosEstado.errores} de tus estudios`}; si quieres, llévalos impresos a tu consulta.`);
+    const estudiosTexto = partesEstudios.length ? ' ' + partesEstudios.join(' ') : '';
     return (
       <div className="portal portal-centro">
         <Grano />

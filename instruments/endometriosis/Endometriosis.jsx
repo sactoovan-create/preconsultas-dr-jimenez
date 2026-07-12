@@ -48,7 +48,7 @@ export default function Endometriosis() {
     <div className="inst">
       <header className="inst-cab">
         <div>
-          <div className="inst-eyebrow">Instrumento diagnóstico · Guía ESHRE 2022</div>
+          <div className="inst-eyebrow">Instrumento diagnóstico · Guía europea de endometriosis 2022</div>
           <h1>Endometriosis<small>diagnóstico clínico, estadificación y orientación a tratamiento</small></h1>
         </div>
         <div className="inst-mono">IJ</div>

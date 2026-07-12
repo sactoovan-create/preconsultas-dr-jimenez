@@ -1,4 +1,4 @@
-/* Específico del instrumento de síndrome poliendocrino ovárico. */
+/* Específico del instrumento de síndrome poliendocrino metabólico ovárico. */
 
 .sop-checks { grid-column: 1 / -1; }
 .sop-eval { grid-column: 1 / -1; font-size: 11.5px; line-height: 1.45; color: rgba(31,58,46,.78); background: rgba(168,139,92,.08); border-left: 2px solid var(--dorado); border-radius: 3px; padding: 8px 11px; margin-top: 4px; }

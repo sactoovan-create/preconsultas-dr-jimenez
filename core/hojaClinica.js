@@ -26,16 +26,16 @@ function bMenopausia(r, p) {
   const nh = r.noHormonales, tipo = r.tipo || {};
   const bloques = [];
 
-  if (tipo.etiqueta) bloques.push({ tipo: 'conclusion', encabezado: 'Diagnóstico', titular: tipo.etiqueta, detalle: tipo.nota || null, tono: (tipo.tipo === 'insuficiencia' || tipo.tipo === 'precoz') ? 'alerta' : 'neutro' });
+  if (tipo.etiqueta && tipo.determinado) bloques.push({ tipo: 'conclusion', encabezado: 'Diagnóstico', titular: tipo.etiqueta, detalle: tipo.nota || null, tono: (tipo.tipo === 'insuficiencia' || tipo.tipo === 'precoz') ? 'alerta' : 'neutro' });
 
-  if (mrs.total != null) bloques.push({ tipo: 'tabla', encabezado: 'Escala de síntomas (Menopause Rating Scale)', columnas: ['Dominio', 'Puntaje', 'Severidad'], filas: [
+  if (mrs.total != null && mrs.respondidos > 0) bloques.push({ tipo: 'tabla', encabezado: 'Escala de síntomas (Menopause Rating Scale)', columnas: ['Dominio', 'Puntaje', 'Severidad'], filas: [
     { celdas: ['Total', `${mrs.total} / 44`, mrs.sevTotal || '—'] },
     { celdas: ['Somático', `${mrs.somatico} / 16`, mrs.sevSomatico || '—'] },
     { celdas: ['Psicológico', `${mrs.psicologico} / 16`, mrs.sevPsicologico || '—'] },
     { celdas: ['Urogenital', `${mrs.urogenital} / 12`, mrs.sevUrogenital || '—'] },
   ] });
 
-  if (cand.titulo) bloques.push({ tipo: 'conclusion', encabezado: 'Candidatura a terapia hormonal', titular: cand.titulo, detalle: cand.detalle || null, tono: cand.recomienda ? 'ok' : (cand.tipo === 'contraindicada' ? 'alerta' : 'aviso') });
+  if (cand.titulo && p && p.demografia && p.demografia.edad != null) bloques.push({ tipo: 'conclusion', encabezado: 'Candidatura a terapia hormonal', titular: cand.titulo, detalle: cand.detalle || null, tono: cand.recomienda ? 'ok' : (cand.tipo === 'contraindicada' ? 'alerta' : 'aviso') });
   if (cand.progestageno) bloques.push({ tipo: 'parrafo', encabezado: 'Progestágeno (útero presente)', texto: 'Añadir progestágeno: progesterona micronizada o norgestimato (metabólicamente neutro), o la combinación estrógeno conjugado + bazedoxifeno.' });
 
   if (via && via.via) bloques.push({ tipo: 'lineas', encabezado: 'Vía de administración sugerida', lineas: [
@@ -71,7 +71,7 @@ function bCardiometabolico(r) {
   ] });
 
   if (cond.texto || cond.etiqueta) bloques.push({ tipo: 'conclusion', encabezado: 'Conducta y derivación', titular: cond.etiqueta || 'Conducta', detalle: cond.texto || null, tono: est.numero >= 3 ? 'alerta' : (est.numero >= 2 ? 'aviso' : 'ok') });
-  if (th.titulo) bloques.push({ tipo: 'conclusion', encabezado: 'Terapia hormonal de la menopausia', titular: th.titulo, detalle: th.detalle || null, tono: th.tipo === 'contraindicada' ? 'alerta' : 'neutro' });
+  if (th.titulo) bloques.push({ tipo: 'conclusion', encabezado: 'Terapia hormonal de la menopausia', titular: th.titulo, detalle: th.detalle || null, tono: th.tipo === 'contra' ? 'alerta' : 'neutro' });
 
   const banderas = [];
   if (flags.ercMuyAlto) banderas.push('Enfermedad renal de muy alto riesgo (filtración baja o albuminuria elevada).');
@@ -157,7 +157,7 @@ function bSop(r, p) {
   if (exclu.alteradas && exclu.alteradas.length) banderas.push('Estudio de exclusión alterado (' + exclu.alteradas.join(', ') + '): no etiquetar como síndrome hasta resolver la causa diferencial.');
   if (banderas.length) bloques.push({ tipo: 'banderas', items: banderas });
 
-  return { titulo: 'Síndrome ovárico metabólico poliendocrino', bloques };
+  return { titulo: 'Síndrome poliendocrino metabólico ovárico', bloques };
 }
 
 // ----- hemorragia -----
@@ -208,7 +208,7 @@ function bHemorragia(r, p) {
 
   // 6. Vía diagnóstica posmenopáusica (ACOG 2026)
   if (posmeno && posmeno.texto) {
-    bloques.push({ tipo: 'conclusion', encabezado: 'Vía del sangrado posmenopáusico (ACOG)', titular: posmeno.via === 'eco_sola' ? 'Vigilancia con ecografía aislada' : 'Muestreo endometrial indicado', detalle: posmeno.texto, tono: posmeno.via === 'biopsia' ? 'aviso' : 'neutro' });
+    bloques.push({ tipo: 'conclusion', encabezado: 'Vía del sangrado posmenopáusico', titular: posmeno.via === 'eco_sola' ? 'Vigilancia con ecografía aislada' : 'Muestreo endometrial indicado', detalle: posmeno.texto, tono: posmeno.via === 'biopsia' ? 'aviso' : 'neutro' });
   }
 
   // 7. Orientación a estudio
@@ -260,7 +260,9 @@ function bDolorPelvico(r, p) {
     bloques.push({
       tipo: 'conclusion',
       encabezado: 'Caracterización del dolor',
-      titular: dolor.cronico ? 'Dolor pélvico crónico' : 'Dolor pélvico aún no crónico',
+      titular: (dolor.duracionMeses == null || isNaN(dolor.duracionMeses))
+        ? 'Duración no capturada'
+        : (dolor.cronico ? 'Dolor pélvico crónico' : 'Dolor pélvico aún no crónico'),
       detalle,
       tono: dolor.cronico ? 'aviso' : 'neutro',
     });
@@ -325,7 +327,7 @@ function bEndometriosis(r, p) {
     baja: 'Sin síntomas cardinales',
   };
   const NIVEL_TONO = {
-    confirmado_imagen: 'ok', alta: 'alerta', intermedia: 'aviso', baja: 'neutro',
+    confirmado_imagen: 'alerta', alta: 'alerta', intermedia: 'aviso', baja: 'neutro',
   };
   if (c.nivel) bloques.push({
     tipo: 'conclusion',
@@ -424,12 +426,6 @@ function bAnticoncepcion(r, p) {
   }
 
   // --- Condiciones detectadas automáticamente de los datos ---
-  const autoNombres = [];
-  Object.keys(auto).forEach((id) => {
-    metodos.forEach((m) => {
-      (m.causas || []).forEach((c) => { if (autoNombres.indexOf(c) === -1) autoNombres.push(c); });
-    });
-  });
   const nAuto = Object.keys(auto).length;
   if (nAuto) {
     bloques.push({ tipo: 'lineas', encabezado: 'Detectado de los datos de la paciente', lineas: [
@@ -440,7 +436,7 @@ function bAnticoncepcion(r, p) {
 
   // --- Tabla de elegibilidad por método (categoría OMS interpretada) ---
   if (metodos.length) {
-    bloques.push({ tipo: 'tabla', encabezado: 'Elegibilidad por método (categorías de inicio, OMS)', columnas: ['Método', 'Categoría', 'Recomendación'], filas: metodos.map((m) => ({
+    bloques.push({ tipo: 'tabla', encabezado: 'Elegibilidad por método (categorías de inicio, Organización Mundial de la Salud)', columnas: ['Método', 'Categoría', 'Recomendación'], filas: metodos.map((m) => ({
       celdas: [m.detalle ? `${m.nombre} (${m.detalle})` : m.nombre, String(m.categoria), m.recomendacion || '—'],
     })) });
   }

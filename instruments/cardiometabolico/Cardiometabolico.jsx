@@ -143,7 +143,7 @@ export default function Cardiometabolico() {
             <div className="cm-checks">
               <Casilla etiqueta="Preeclampsia o hipertensión gestacional" valor={ant.preeclampsia} onChange={(v) => setAnt('preeclampsia', v)} />
               <Casilla etiqueta="Diabetes gestacional" valor={ant.diabetesGestacional} onChange={(v) => setAnt('diabetesGestacional', v)} />
-              <Casilla etiqueta="Síndrome poliendocrino ovárico" valor={ant.sindromePoliendocrino} onChange={(v) => setAnt('sindromePoliendocrino', v)} />
+              <Casilla etiqueta="Síndrome poliendocrino metabólico ovárico" valor={ant.sindromePoliendocrino} onChange={(v) => setAnt('sindromePoliendocrino', v)} />
             </div>
           </Seccion>
 

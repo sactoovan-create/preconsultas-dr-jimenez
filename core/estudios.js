@@ -72,24 +72,39 @@ export async function subirEstudio(folder, archivo) {
   return { path, nombre: archivo.name, size: f.size };
 }
 
-/** Lista los estudios de una carpeta con enlaces firmados (solo médico autenticado). */
+/** Lista los estudios de una carpeta (solo médico autenticado). El enlace firmado se
+ *  genera al momento de abrir cada archivo (ver firmarEstudio), no aquí, para que no
+ *  caduque si el médico deja la pestaña abierta más de una hora. */
 export async function listarEstudios(folder) {
   if (!folder) return [];
   const sb = await clienteSupabase();
   const { data, error } = await sb.storage.from(bucket()).list(folder, { limit: 50, sortBy: { column: 'name', order: 'asc' } });
   if (error) throw error;
   const archivos = (data || []).filter((o) => o.name && !o.name.startsWith('.'));
-  const salida = [];
-  for (const o of archivos) {
-    const ruta = `${folder}/${o.name}`;
-    let url = null;
-    try {
-      const { data: firmado } = await sb.storage.from(bucket()).createSignedUrl(ruta, 3600);
-      url = firmado ? firmado.signedUrl : null;
-    } catch (_) {
-      url = null; // un enlace que falle no debe tumbar toda la lista
-    }
-    salida.push({ nombre: o.name, url, size: o.metadata && o.metadata.size });
+  return archivos.map((o) => ({ nombre: o.name, ruta: `${folder}/${o.name}`, size: o.metadata && o.metadata.size }));
+}
+
+/** Genera un enlace firmado vigente para abrir un archivo. Se llama al hacer clic,
+ *  no al listar, para evitar enlaces caducados. Lanza error si la firma falla. */
+export async function firmarEstudio(ruta, expiraSegundos = 3600) {
+  const sb = await clienteSupabase();
+  const { data, error } = await sb.storage.from(bucket()).createSignedUrl(ruta, expiraSegundos);
+  if (error) throw error;
+  if (!data || !data.signedUrl) throw new Error('No se pudo generar el enlace del estudio.');
+  return data.signedUrl;
+}
+
+/** Borra todos los archivos de una carpeta de estudios. Se usa al eliminar una
+ *  respuesta para no dejar datos de salud huérfanos (e irrecuperables, pues el
+ *  identificador de la carpeta vive solo en la fila). Mejor esfuerzo. */
+export async function eliminarCarpeta(folder) {
+  if (!folder || !buzonActivo()) return;
+  const sb = await clienteSupabase();
+  const { data, error } = await sb.storage.from(bucket()).list(folder, { limit: 100 });
+  if (error) throw error;
+  const rutas = (data || []).filter((o) => o.name && !o.name.startsWith('.')).map((o) => `${folder}/${o.name}`);
+  if (rutas.length) {
+    const { error: err2 } = await sb.storage.from(bucket()).remove(rutas);
+    if (err2) throw err2;
   }
-  return salida;
 }

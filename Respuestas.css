@@ -139,3 +139,12 @@
   background: var(--terracota); color: var(--crema); border: none; border-radius: 999px; padding: 8px 16px;
 }
 .resp-error button:hover { filter: brightness(.94); }
+
+/* Botón para abrir un estudio (firma el enlace al hacer clic). */
+.resp-abrir-estudio {
+  font-family: var(--sans, 'Inter', sans-serif); font-size: 12px; font-weight: 700; cursor: pointer;
+  background: transparent; color: var(--verde, #1F3A2E); border: none; padding: 0;
+}
+.resp-abrir-estudio:hover:not(:disabled) b { text-decoration: underline; }
+.resp-abrir-estudio:disabled { opacity: .6; cursor: default; }
+.resp-abrir-estudio.error { color: var(--terracota, #B85042); }

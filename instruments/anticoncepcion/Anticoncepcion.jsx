@@ -8,7 +8,7 @@ import { evidenciaDe } from '../../core/evidencia.js';
 import '../../core/instrumentLayout.css';
 import './Anticoncepcion.css';
 
-const AUTO_IDS = ['edad40', 'tabaco35menos', 'tabaco35mas', 'tabacoMenor35', 'htaModerada', 'htaSevera', 'obesidad'];
+const AUTO_IDS = ['edad40', 'tabaco35menos', 'tabaco35mas', 'tabacoMenor35', 'tabacoEdadDesconocida', 'htaModerada', 'htaSevera', 'obesidad'];
 const MANUALES = CONDICIONES.filter((c) => !AUTO_IDS.includes(c.id));
 const GRUPOS = [...new Set(MANUALES.map((c) => c.grupo))];
 const NOMBRE_AUTO = Object.fromEntries(CONDICIONES.map((c) => [c.id, c.nombre]));

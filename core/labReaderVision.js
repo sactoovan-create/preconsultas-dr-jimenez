@@ -116,11 +116,18 @@ export async function extraerLabsPorVision(imagenBase64, mediaType, enviar) {
   const respuesta = await enviar(peticion);
   const valores = parsearRespuesta(respuesta);
   if (!valores) return null;
-  // Conserva solo claves del esquema con valor numérico.
+  // Conserva solo claves del esquema con valor numérico real. Se excluyen la
+  // cadena vacía, los espacios y los booleanos: Number('') y Number(false) dan 0,
+  // y un analito ausente que el modelo devuelva como "" o false no debe registrar
+  // un cero clínico (un colesterol de alta densidad en cero marcaría riesgo falso).
   const limpio = {};
   for (const k of Object.keys(ESQUEMA_LABS)) {
     const val = valores[k];
-    if (val !== null && val !== undefined && !isNaN(Number(val))) limpio[k] = Number(val);
+    if (typeof val === 'number' && Number.isFinite(val)) {
+      limpio[k] = val;
+    } else if (typeof val === 'string' && val.trim() !== '' && Number.isFinite(Number(val))) {
+      limpio[k] = Number(val);
+    }
   }
   return limpio;
 }

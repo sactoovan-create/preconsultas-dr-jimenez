@@ -1,4 +1,5 @@
 import { calcularPrevent, egfrCkdEpi2021Mujer } from '../../core/prevent.js';
+import { imcSeguro } from '../../core/antropometria.js';
 
 /**
  * Lógica clínica de la calculadora cardiometabólica. Funciones puras: reciben el
@@ -15,7 +16,7 @@ const v = (x) => x !== null && x !== undefined && !isNaN(x);
 
 export function calcularDerivados(p) {
   const { peso, talla } = p.signos;
-  const imc = (v(peso) && v(talla)) ? peso / Math.pow(talla / 100, 2) : null;
+  const imc = imcSeguro(peso, talla);
   const { creat, egfr } = p.labs;
   const { edad } = p.demografia;
   // Usar la filtración que el laboratorio ya reporta (por ejemplo OLAB) si está
@@ -109,7 +110,7 @@ export function conductaPorEstadio(estadio, flags, p, derivados) {
     const obeso = v(derivados.imc) && derivados.imc >= 30;
     const sop = p.antecedentes.sindromePoliendocrino;
     let t = 'Estilo de vida estructurado: actividad física y nutrición. Reevaluación anual con la batería completa.';
-    if (obeso || sop) t += ' Ante obesidad o síndrome poliendocrino ovárico, considerar agonistas del receptor del péptido similar al glucagón tipo 1, iniciar o derivar para iniciar.';
+    if (obeso || sop) t += ' Ante obesidad o síndrome poliendocrino metabólico ovárico, considerar agonistas del receptor del péptido similar al glucagón tipo 1, iniciar o derivar para iniciar.';
     return { nivel: 'manejo', etiqueta: 'Manejo en tu consulta', texto: t };
   }
   if (e === 2) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { listarRespuestas, eliminarRespuesta, modoAlmacenamiento, sesion, iniciarSesion, cerrarSesion } from './core/respuestas.js';
-import { listarEstudios } from './core/estudios.js';
+import { listarEstudios, firmarEstudio, eliminarCarpeta } from './core/estudios.js';
 import { ruteoDesdeRespuesta } from './core/precarga.js';
 import { agendaDeHoy, cruzarAgenda } from './core/agenda.js';
 import { usePaciente } from './core/PacienteContext.jsx';
@@ -93,9 +93,15 @@ function Panel() {
 
   const sel = (lista || []).find((r) => r.id === selId) || null;
 
-  const eliminar = async (id) => {
-    if (!window.confirm('¿Eliminar esta respuesta de forma permanente? No se puede deshacer.')) return;
+  const eliminar = async (id, estudiosFolder) => {
+    const aviso = estudiosFolder
+      ? '¿Eliminar esta respuesta y los estudios que subió la paciente de forma permanente? No se puede deshacer.'
+      : '¿Eliminar esta respuesta de forma permanente? No se puede deshacer.';
+    if (!window.confirm(aviso)) return;
     try {
+      // Primero los estudios: si la fila se borra antes, se pierde el identificador
+      // de la carpeta y los archivos quedarían huérfanos e irrecuperables.
+      if (estudiosFolder) await eliminarCarpeta(estudiosFolder);
       await eliminarRespuesta(id);
       setLista((l) => l.filter((r) => r.id !== id));
       setSelId((s) => (s === id ? null : s));
@@ -247,7 +253,7 @@ function Detalle({ r, onEliminar }) {
           {r.paciente?.correo && <span>{r.paciente.correo}</span>}
           <span>{fmtFecha(r.creado)}</span>
         </div>
-        {onEliminar && <button className="resp-eliminar" onClick={() => onEliminar(r.id)}>Eliminar respuesta</button>}
+        {onEliminar && <button className="resp-eliminar" onClick={() => onEliminar(r.id, r.estudiosFolder)}>Eliminar respuesta</button>}
       </div>
 
       <div className="resp-abrir-zona">
@@ -315,15 +321,38 @@ function EstudiosAdjuntos({ folder }) {
           {archivos.map((a) => (
             <li key={a.nombre}>
               <span>{a.nombre}</span>
-              {a.url
-                ? <a href={a.url} target="_blank" rel="noopener noreferrer"><b>Abrir</b></a>
-                : <b>—</b>}
+              <AbrirEstudio ruta={a.ruta} />
             </li>
           ))}
         </ul>
       ) : <p className="resp-nada">No subió estudios.</p>)}
     </section>
   );
+}
+
+// Genera el enlace firmado al hacer clic (no al listar), para que no caduque si la
+// pestaña queda abierta mucho tiempo. Si la firma falla, avisa y permite reintentar.
+function AbrirEstudio({ ruta }) {
+  const [estado, setEstado] = useState('listo'); // 'listo' | 'abriendo' | 'error'
+
+  const abrir = async () => {
+    setEstado('abriendo');
+    // Se abre la pestaña de forma síncrona dentro del gesto del clic (Safari bloquea
+    // window.open que ocurre después de un await) y luego se le asigna el enlace ya
+    // firmado. Si el navegador la bloqueó (devuelve null), se avisa con estado error.
+    const win = window.open('', '_blank', 'noopener,noreferrer');
+    try {
+      const url = await firmarEstudio(ruta);
+      if (win) { win.location = url; setEstado('listo'); }
+      else { setEstado('error'); }
+    } catch (_) {
+      if (win) win.close();
+      setEstado('error');
+    }
+  };
+
+  if (estado === 'error') return <button className="resp-abrir-estudio error" onClick={abrir}><b>No disponible, reintentar</b></button>;
+  return <button className="resp-abrir-estudio" onClick={abrir} disabled={estado === 'abriendo'}><b>{estado === 'abriendo' ? 'Abriendo…' : 'Abrir'}</b></button>;
 }
 
 /**
@@ -354,7 +383,15 @@ function Login({ onEntrar }) {
     setError('');
     setEntrando(true);
     try { await iniciarSesion(correo, clave); onEntrar(); }
-    catch (_) { setError('Correo o contraseña incorrectos.'); }
+    catch (e) {
+      // Un 400 de Supabase es credencial inválida; cualquier otra cosa (sin red,
+      // servicio caído) no es culpa de la contraseña y no debe mandar a resetearla.
+      const status = e && (e.status || (e.originalError && e.originalError.status));
+      const credenciales = status === 400 || /invalid login|credentials|password/i.test((e && e.message) || '');
+      setError(credenciales
+        ? 'Correo o contraseña incorrectos.'
+        : 'No hay conexión con el consultorio. Inténtalo de nuevo en un momento.');
+    }
     finally { setEntrando(false); }
   };
 

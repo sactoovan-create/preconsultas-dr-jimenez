@@ -86,7 +86,7 @@ export default function Sop() {
       <header className="inst-cab">
         <div>
           <div className="inst-eyebrow">Instrumento diagnóstico · Guía internacional 2023</div>
-          <h1>Síndrome Poliendocrino Metabólico Ovárico<small>antes síndrome de ovario poliquístico</small></h1>
+          <h1>Síndrome poliendocrino metabólico ovárico<small>antes síndrome de ovario poliquístico</small></h1>
         </div>
         <div className="inst-mono">IJ</div>
       </header>
