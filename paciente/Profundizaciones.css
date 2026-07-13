@@ -1,0 +1,49 @@
+/* Profundizaciones adaptativas del cuestionario. Heredan los tokens de marca y el
+   lenguaje visual de la pre-consulta (.pc-*). */
+
+/* Tarjeta de oferta: se ofrece con calidez, no se impone. Acento salvia. */
+.pf-oferta { border-left: 3px solid var(--salvia, #7E9C8B); }
+.pf-oferta-t { font-family: var(--display, 'Fraunces', serif); font-size: 19px; color: var(--verde, #1F3A2E); line-height: 1.25; }
+.pf-oferta-d { margin-top: 8px; font-size: 14px; line-height: 1.55; color: var(--texto-2, rgba(31,58,46,.72)); }
+.pf-oferta-btn {
+  margin-top: 16px; font-family: var(--sans, 'Inter', sans-serif); font-size: 14px; font-weight: 600; cursor: pointer;
+  background: var(--salvia, #7E9C8B); color: #fff; border: none; border-radius: 999px; padding: 12px 22px;
+}
+.pf-oferta-btn:hover { filter: brightness(.96); }
+
+.pf-preguntas { display: grid; gap: 22px; margin-top: 4px; }
+.pf-pregunta-t { font-size: 15px; font-weight: 600; color: var(--verde, #1F3A2E); line-height: 1.4; }
+.pf-pregunta-ayuda { margin-top: 3px; font-size: 12.5px; color: var(--texto-3, rgba(31,58,46,.55)); }
+
+/* Opciones (una sola respuesta): botones apilados, cómodos en móvil. */
+.pf-opciones { margin-top: 10px; display: grid; gap: 8px; }
+.pf-op {
+  text-align: left; font-family: var(--sans, 'Inter', sans-serif); font-size: 14px; cursor: pointer;
+  background: var(--campo-fondo, #FBF8F1); color: var(--verde, #1F3A2E);
+  border: 1px solid var(--linea, rgba(31,58,46,.16)); border-radius: 12px; padding: 13px 16px; min-height: 44px;
+}
+.pf-op:hover { border-color: var(--salvia, #7E9C8B); }
+.pf-op.on { background: var(--verde, #1F3A2E); color: var(--crema, #F1EADB); border-color: var(--verde, #1F3A2E); }
+
+/* Escala 0-10: fila de números que hace wrap en móvil. */
+.pf-escala { margin-top: 10px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pf-escala-et { font-size: 11.5px; color: var(--texto-3, rgba(31,58,46,.55)); }
+.pf-escala-nums { display: flex; gap: 6px; flex-wrap: wrap; }
+.pf-num {
+  width: 44px; height: 44px; font-family: var(--sans, 'Inter', sans-serif); font-size: 14px; cursor: pointer;
+  background: var(--campo-fondo, #FBF8F1); color: var(--verde, #1F3A2E);
+  border: 1px solid var(--linea, rgba(31,58,46,.16)); border-radius: 10px;
+}
+.pf-num:hover { border-color: var(--salvia, #7E9C8B); }
+.pf-num.on { background: var(--verde, #1F3A2E); color: var(--crema, #F1EADB); border-color: var(--verde, #1F3A2E); }
+
+/* Múltiple (marca todas): casillas grandes. */
+.pf-multiple { margin-top: 10px; display: grid; gap: 8px; }
+.pf-check {
+  display: flex; align-items: center; gap: 12px; text-align: left; cursor: pointer; min-height: 44px;
+  font-family: var(--sans, 'Inter', sans-serif); font-size: 14px; color: var(--verde, #1F3A2E);
+  background: var(--campo-fondo, #FBF8F1); border: 1px solid var(--linea, rgba(31,58,46,.16)); border-radius: 12px; padding: 11px 15px;
+}
+.pf-check-caja { width: 20px; height: 20px; flex-shrink: 0; border: 1.5px solid var(--linea-fuerte, rgba(31,58,46,.4)); border-radius: 6px; }
+.pf-check.on { border-color: var(--salvia, #7E9C8B); }
+.pf-check.on .pf-check-caja { background: var(--salvia, #7E9C8B); border-color: var(--salvia, #7E9C8B); box-shadow: inset 0 0 0 3px var(--campo-fondo, #FBF8F1); }

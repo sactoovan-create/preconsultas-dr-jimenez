@@ -148,3 +148,10 @@
 .resp-abrir-estudio:hover:not(:disabled) b { text-decoration: underline; }
 .resp-abrir-estudio:disabled { opacity: .6; cursor: default; }
 .resp-abrir-estudio.error { color: var(--terracota, #B85042); }
+
+/* Valoración dirigida: resultado de las profundizaciones adaptativas. */
+.resp-profundos { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.resp-profundos li { border-left: 3px solid var(--salvia, #7E9C8B); padding: 4px 0 4px 14px; }
+.resp-prof-t { font-size: 13px; font-weight: 700; color: var(--verde, #1F3A2E); display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.resp-prof-fuente { font-size: 10.5px; font-weight: 500; letter-spacing: .04em; color: var(--oro-texto, #6D5730); text-transform: uppercase; }
+.resp-prof-r { margin-top: 3px; font-size: 13px; line-height: 1.5; color: rgba(31,58,46,.75); }

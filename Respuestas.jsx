@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { listarRespuestas, eliminarRespuesta, modoAlmacenamiento, sesion, iniciarSesion, cerrarSesion } from './core/respuestas.js';
 import { listarEstudios, firmarEstudio, eliminarCarpeta } from './core/estudios.js';
 import { ruteoDesdeRespuesta } from './core/precarga.js';
+import { evaluarProfundizacion, MODULOS as PROFUNDOS } from './core/profundos/index.js';
 import { agendaDeHoy, cruzarAgenda } from './core/agenda.js';
 import { usePaciente } from './core/PacienteContext.jsx';
 import { INSTRUMENTOS } from './registry.js';
@@ -266,6 +267,8 @@ function Detalle({ r, onEliminar }) {
         </p>
       </div>
 
+      <Profundos profundos={r.autoReporte?.profundos} />
+
       <section className="resp-sec">
         <h3>Síntomas reportados</h3>
         {sintomas.length ? (
@@ -295,6 +298,35 @@ function Detalle({ r, onEliminar }) {
 
       {r.estudiosFolder && <EstudiosAdjuntos folder={r.estudiosFolder} />}
     </div>
+  );
+}
+
+// Resultado de las profundizaciones adaptativas que contestó la paciente
+// (instrumentos validados como el ICIQ-SF). Orientativo, con su fuente citada.
+function Profundos({ profundos }) {
+  const p = profundos || {};
+  const filas = Object.keys(p)
+    .map((id) => {
+      const modulo = PROFUNDOS.find((m) => m.ID === id);
+      const res = evaluarProfundizacion(id, p[id]);
+      if (!modulo || !res || !res.resumen) return null;
+      return { id, titulo: modulo.TITULO, fuente: modulo.FUENTE, resumen: res.resumen };
+    })
+    .filter(Boolean);
+  if (!filas.length) return null;
+
+  return (
+    <section className="resp-sec">
+      <h3>Valoración dirigida</h3>
+      <ul className="resp-profundos">
+        {filas.map((f) => (
+          <li key={f.id}>
+            <div className="resp-prof-t">{f.titulo}<span className="resp-prof-fuente">{f.fuente}</span></div>
+            <div className="resp-prof-r">{f.resumen}</div>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

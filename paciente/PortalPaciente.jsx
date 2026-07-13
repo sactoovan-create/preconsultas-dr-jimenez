@@ -50,7 +50,7 @@ function construirRegistro(datos, estudiosFolder) {
       telefono: datos.contacto?.telefono || null,
       correo: datos.contacto?.correo || null,
     },
-    autoReporte: { mrs: datos.mrs, dolor: datos.dolor, hc: datos.hc },
+    autoReporte: { mrs: datos.mrs, dolor: datos.dolor, hc: datos.hc, profundos: datos.profundos || {} },
     resumen: construirResumen(datos),
     consentimiento: true,
     // Carpeta de estudios adjuntos (opcional; campo aditivo del contrato).

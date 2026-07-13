@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { usePaciente } from './core/PacienteContext.jsx';
+import Profundizaciones from './paciente/Profundizaciones.jsx';
 import './PreConsulta.css';
 
 /**
@@ -95,6 +96,9 @@ export default function PreConsulta({
   const [mrs, setMrs] = useState(() => ({ ...(ar.mrs) }));
   const [dolor, setDolor] = useState(() => ar.dolor || { tiene: false, intensidad: null, meses: null });
   const [hc, setHc] = useState(() => ar.hc || {});
+  // Respuestas de las profundizaciones adaptativas (instrumentos validados que se
+  // ofrecen según el tamizaje). Por id de rama: { incontinencia: {...}, ... }.
+  const [profundos, setProfundos] = useState(() => ar.profundos || {});
   const [guardado, setGuardado] = useState(false);
   const [acepto, setAcepto] = useState(false);
   const [enviando, setEnviando] = useState(false);
@@ -110,8 +114,8 @@ export default function PreConsulta({
   // nombre y la edad. Así, en el consultorio, cambiar de apartado no borra lo
   // capturado (síntomas e historia); al volver, se recupera desde el contexto.
   useEffect(() => {
-    guardarAutoReporte({ mrs, dolor, hc });
-  }, [mrs, dolor, hc, guardarAutoReporte]);
+    guardarAutoReporte({ mrs, dolor, hc, profundos });
+  }, [mrs, dolor, hc, profundos, guardarAutoReporte]);
 
   const setSintoma = (id, n) => { setMrs((p) => ({ ...p, [id]: n })); setGuardado(false); };
   const setH = (k, val) => { setHc((p) => ({ ...p, [k]: val })); setGuardado(false); };
@@ -141,11 +145,11 @@ export default function PreConsulta({
       return;
     }
     setBloqueo('');
-    guardarAutoReporte({ mrs, dolor, hc });
+    guardarAutoReporte({ mrs, dolor, hc, profundos });
     if (onEnviar) {
       setEnviando(true);
       try {
-        await onEnviar({ mrs, dolor, hc, contacto: { telefono: hc.telefono || null, correo: hc.correo || null }, demografia: { nombre: dem.nombre, edad: dem.edad }, consentimiento: acepto, consentimientoFecha: new Date().toISOString() });
+        await onEnviar({ mrs, dolor, hc, profundos, contacto: { telefono: hc.telefono || null, correo: hc.correo || null }, demografia: { nombre: dem.nombre, edad: dem.edad }, consentimiento: acepto, consentimientoFecha: new Date().toISOString() });
       } catch (e) {
         // El envío falló. Se muestra el motivo junto al botón (el aviso superior
         // queda fuera de vista al final del cuestionario) y se lleva la vista aquí,
@@ -228,6 +232,12 @@ export default function PreConsulta({
         </div>
 
         {/* ---------------- PARTE OPCIONAL ---------------- */}
+        <Profundizaciones
+          tamizaje={{ mrs, dolor, hc }}
+          valor={profundos}
+          onChange={(p) => { setProfundos(p); setGuardado(false); }}
+        />
+
         <div className="pc-opcional-sep">
           <div className="pc-opcional-t">Lo siguiente es opcional</div>
           <div className="pc-opcional-d">Si tienes unos minutos más, completar esta parte hace que tu consulta rinda mucho mejor, porque tu doctor llega ya con tu historia. Pero si tienes prisa, puedes dejarla en blanco y enviar de una vez. Tú decides.</div>

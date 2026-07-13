@@ -16,6 +16,7 @@
   --dorado: #A88B5C;        /* oro decorativo: filetes, puntos, bordes, y texto sobre verde */
   --oro-texto: #6D5730;     /* oro legible: texto sobre fondo claro (pasa contraste AA) */
   --terracota: #B85042;
+  --salvia: #7E9C8B;        /* verde salvia: relleno/borde/acento (no texto sobre claro) */
 
   /* escala de riesgo / estadiaje */
   --s0: #1F3A2E;
