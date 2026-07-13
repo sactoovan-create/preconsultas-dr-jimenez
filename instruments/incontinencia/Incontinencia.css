@@ -6,19 +6,19 @@
 .iu-item-txt { font-size: 12px; color: rgba(31,58,46,.84); flex: 1; }
 .iu-item-btns { display: flex; gap: 4px; flex-shrink: 0; }
 .iu-item-btns button { width: 27px; height: 27px; border-radius: 4px; border: 1px solid var(--linea-fuerte); background: #FDFBF6; color: rgba(31,58,46,.6); font-family: var(--sans); font-size: 12px; font-weight: 600; cursor: pointer; transition: .12s; }
-.iu-item-btns button:hover { border-color: var(--dorado); }
+.iu-item-btns button:hover { border-color: var(--oro-texto); }
 .iu-item-btns button.on { background: var(--verde); color: var(--crema-papel); border-color: var(--verde); }
 
 .iu-botones { display: flex; gap: 8px; margin-bottom: 14px; }
 .iu-botones .inst-btn { flex: 1; }
 .inst-btn.diario { background: var(--crema-papel); color: var(--verde); border: 1px solid var(--linea-fuerte); }
-.inst-btn.diario:hover { border-color: var(--dorado); background: #fff; }
+.inst-btn.diario:hover { border-color: var(--oro-texto); background: #fff; }
 
 .iu-detalle { font-size: 12px; line-height: 1.5; color: rgba(31,58,46,.82); margin-top: 5px; }
 .iu-puntajes { font-size: 11.5px; color: rgba(31,58,46,.62); margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--hair-dorada); }
 .iu-alerta { font-size: 11.5px; line-height: 1.45; padding: 9px 12px; border-radius: 4px; margin-bottom: 7px; background: rgba(184,80,66,.1); border-left: 2px solid var(--terracota); color: rgba(31,58,46,.85); }
 
 .iu-tx { margin-bottom: 12px; }
-.iu-tx-t { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--dorado); margin-bottom: 6px; }
+.iu-tx-t { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--oro-texto); margin-bottom: 6px; }
 .iu-tx ul, .iu-lista { margin: 0; padding-left: 18px; }
 .iu-tx li, .iu-lista li { font-size: 12px; line-height: 1.5; color: rgba(31,58,46,.86); margin-bottom: 5px; }

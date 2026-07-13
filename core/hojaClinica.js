@@ -10,7 +10,7 @@
  */
 import { escaparHtml } from './htmlSeguro.js';
 
-const TONO = { ok: '#3A6B4C', aviso: '#A88B5C', alerta: '#B85042', neutro: 'rgba(31,58,46,.45)' };
+const TONO = { ok: '#3A6B4C', aviso: '#C16A3A', alerta: '#B85042', neutro: 'rgba(31,58,46,.45)' };
 
 const ANTECEDENTES = {
   cancerMama: 'Cáncer de mama', ecvEstablecida: 'Enfermedad cardiovascular establecida',
@@ -710,8 +710,8 @@ export function construirHojaClinica(id, r, paciente) {
 <style>
   :root{--verde:#1F3A2E;--dorado:#A88B5C;--terracota:#B85042;--linea:rgba(31,58,46,.14);--hair:rgba(168,139,92,.55);}
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'Inter',system-ui,sans-serif;color:var(--verde);padding:14mm;line-height:1.5;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .cab{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;border-bottom:2px solid var(--verde);padding-bottom:16px;}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--verde);padding:0;line-height:1.5;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .cab{background:#F6F1E6;padding:16px 18px;border-radius:11px;display:flex;align-items:flex-start;justify-content:space-between;gap:24px;border-bottom:2px solid var(--verde);padding-bottom:16px;}
   .marca{font-size:22px;}.marca small{display:block;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dorado);margin-top:4px;font-weight:700;}
   .mono{width:54px;height:54px;border:1.5px solid var(--verde);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:21px;flex-shrink:0;}
   .ident{display:flex;gap:28px;flex-wrap:wrap;font-size:12px;margin:14px 0 8px;}
@@ -739,7 +739,7 @@ export function construirHojaClinica(id, r, paciente) {
   .hc-flags{margin-top:18px;background:rgba(184,80,66,.08);border-left:3px solid var(--terracota);border-radius:8px;padding:12px 14px;}
   .hc-flags-t{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--terracota);margin-bottom:7px;}
   .hc-flags ul{list-style-position:inside;font-size:12px;line-height:1.55;color:#7d2f24;} .hc-flags li{margin-bottom:4px;}
-  .pie{margin-top:26px;padding-top:14px;border-top:1px solid var(--linea);font-size:10px;color:rgba(31,58,46,.55);line-height:1.5;}
+  .pie{background:#F6F1E6;padding:13px 18px;border-radius:9px;margin-top:26px;padding-top:14px;border-top:1px solid var(--linea);font-size:10px;color:rgba(31,58,46,.55);line-height:1.5;}
   @page{size:letter;margin:14mm;}
 </style></head>
 <body>

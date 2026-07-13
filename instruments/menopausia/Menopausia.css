@@ -5,13 +5,13 @@
 
 /* Escala de síntomas (captura) */
 .men-dominio { grid-column: 1 / -1; margin-bottom: 12px; }
-.men-dom-cab { display: flex; justify-content: space-between; align-items: baseline; font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--dorado); padding: 7px 0 5px; border-bottom: 1px solid var(--linea); margin-bottom: 7px; }
+.men-dom-cab { display: flex; justify-content: space-between; align-items: baseline; font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--oro-texto); padding: 7px 0 5px; border-bottom: 1px solid var(--linea); margin-bottom: 7px; }
 .men-dom-pt { font-family: var(--display); font-size: 17px; font-weight: 300; font-variation-settings: 'opsz' 144; color: var(--verde); letter-spacing: 0; }
 .men-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0; }
 .men-item-txt { font-size: 12px; color: rgba(31,58,46,.84); flex: 1; }
 .men-item-btns { display: flex; gap: 4px; flex-shrink: 0; }
 .men-item-btns button { width: 28px; height: 28px; border-radius: 4px; border: 1px solid var(--linea-fuerte); background: #FDFBF6; color: rgba(31,58,46,.6); font-family: var(--sans); font-size: 12px; font-weight: 600; cursor: pointer; transition: .12s; }
-.men-item-btns button:hover { border-color: var(--dorado); }
+.men-item-btns button:hover { border-color: var(--oro-texto); }
 .men-item-btns button.on { background: var(--verde); color: var(--crema-papel); border-color: var(--verde); }
 
 /* Resultados de la escala */
@@ -42,6 +42,6 @@
 
 .men-recos { display: flex; flex-direction: column; gap: 10px; }
 .men-reco { background: rgba(168,139,92,.08); border-left: 2px solid var(--dorado); border-radius: 4px; padding: 10px 13px; }
-.men-reco-t { font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--dorado); margin-bottom: 4px; }
+.men-reco-t { font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--oro-texto); margin-bottom: 4px; }
 .men-reco-x { font-size: 12.5px; line-height: 1.5; color: rgba(31,58,46,.86); }
 .men-recos-pie { margin-top: 10px; font-size: 11px; font-style: italic; color: rgba(31,58,46,.6); }

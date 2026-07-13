@@ -73,8 +73,8 @@ export function construirHojaPaciente(cfg) {
 <style>
   :root{--verde:#1F3A2E;--crema:#F6F1E6;--dorado:#A88B5C;--terracota:#B85042;--ok:#3A6B4C;--linea:rgba(31,58,46,.16);--linea2:rgba(31,58,46,.4);--hair-dorada:rgba(168,139,92,.55);}
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'Inter',system-ui,sans-serif;color:var(--verde);padding:14mm;line-height:1.5;background:#FFFFFF;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .cab{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;border-bottom:2px solid var(--verde);padding-bottom:16px;}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--verde);padding:0;line-height:1.5;background:#FFFFFF;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .cab{background:#F6F1E6;padding:16px 18px;border-radius:11px;display:flex;align-items:flex-start;justify-content:space-between;gap:24px;border-bottom:2px solid var(--verde);padding-bottom:16px;}
   .marca{font-family:'Inter',serif;font-size:22px;}
   .marca small{display:block;font-family:'Inter';font-style:normal;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dorado);margin-top:4px;font-weight:700;}
   .mono{width:54px;height:54px;border:1.5px solid var(--verde);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Inter',serif;font-weight:600;font-size:21px;flex-shrink:0;}
@@ -98,7 +98,7 @@ export function construirHojaPaciente(cfg) {
   .est.rev{color:var(--terracota);} .est.rev .pt{background:var(--terracota);}
   .reco{font-size:12px;line-height:1.6;list-style-position:inside;}
   .reco li{margin-bottom:6px;}
-  .pie{margin-top:26px;padding-top:14px;border-top:1px solid var(--linea);font-size:10.5px;color:rgba(31,58,46,.6);line-height:1.5;}
+  .pie{background:#F6F1E6;padding:13px 18px;border-radius:9px;margin-top:26px;padding-top:14px;border-top:1px solid var(--linea);font-size:10.5px;color:rgba(31,58,46,.6);line-height:1.5;}
   @page{size:letter;margin:14mm;}
 </style></head>
 <body>

@@ -48,6 +48,6 @@
 
 /* Tratamiento */
 .sop-tx { margin-bottom: 13px; }
-.sop-tx-obj { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--dorado); margin-bottom: 6px; }
+.sop-tx-obj { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--oro-texto); margin-bottom: 6px; }
 .sop-tx ul { margin: 0; padding-left: 18px; }
 .sop-tx li { font-size: 12px; line-height: 1.5; color: rgba(31,58,46,.86); margin-bottom: 5px; }

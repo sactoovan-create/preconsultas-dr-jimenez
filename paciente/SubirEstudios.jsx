@@ -13,8 +13,8 @@ const TINTA = '#2D2A26';
 
 const ICONO = {
   subiendo: { t: 'Subiendo…', c: DORADO },
-  listo: { t: 'Listo', c: '#1d7a52' },
-  error: { t: 'No se pudo', c: '#9a3412' },
+  listo: { t: 'Listo', c: 'var(--ok)' },
+  error: { t: 'No se pudo', c: 'var(--terracota)' },
 };
 
 export default function SubirEstudios({ folder, onEstadoCambio }) {
@@ -96,9 +96,9 @@ export default function SubirEstudios({ folder, onEstadoCambio }) {
         </ul>
       )}
 
-      {aviso && <div style={{ marginTop: 12, color: '#9a3412', fontSize: '0.88rem' }}>{aviso}</div>}
+      {aviso && <div style={{ marginTop: 12, color: 'var(--terracota)', fontSize: '0.88rem' }}>{aviso}</div>}
       {listos > 0 && !subiendo && (
-        <div style={{ marginTop: 14, color: '#1d7a52', fontWeight: 600, fontSize: '0.92rem' }}>
+        <div style={{ marginTop: 14, color: 'var(--ok)', fontWeight: 600, fontSize: '0.92rem' }}>
           {listos === 1 ? 'Tu estudio llegó al consultorio.' : `Tus ${listos} estudios llegaron al consultorio.`}
         </div>
       )}

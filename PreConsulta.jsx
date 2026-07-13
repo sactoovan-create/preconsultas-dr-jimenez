@@ -313,7 +313,7 @@ export default function PreConsulta({
             {onEnviar ? (enviando ? 'Enviando…' : 'Enviar mis respuestas a mi médico') : 'Guardar mis respuestas'}
           </button>
           <div className="pc-acciones-nota">Puedes enviar aunque hayas dejado en blanco la parte opcional.</div>
-          {bloqueo && <div className="pc-bloqueo" style={{ marginTop: '12px', color: '#9a3412', fontWeight: 600 }}>{bloqueo}</div>}
+          {bloqueo && <div className="pc-bloqueo" style={{ marginTop: '12px', color: 'var(--terracota)', fontWeight: 600 }}>{bloqueo}</div>}
           {guardado && !onEnviar && <div className="pc-ok">Gracias. Tus respuestas quedaron guardadas para tu consulta.</div>}
         </div>
       </div>

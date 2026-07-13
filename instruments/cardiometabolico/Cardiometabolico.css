@@ -43,7 +43,7 @@
 .cm-importador::before { content: ''; position: absolute; top: 0; left: 20px; right: 20px; height: 1px; background: linear-gradient(90deg, transparent, rgba(168,139,92,.5) 18%, rgba(168,139,92,.5) 82%, transparent); }
 .cm-imp-titulo { font-family: var(--serif); font-size: 18px; font-weight: 500; letter-spacing: -.01em; color: var(--verde); margin-bottom: 4px; }
 .cm-imp-sub { font-size: 11.5px; color: rgba(31,58,46,.66); line-height: 1.5; margin-bottom: 12px; }
-.cm-estatus { font-size: 11.5px; font-weight: 600; color: var(--dorado); margin-top: 10px; }
+.cm-estatus { font-size: 11.5px; font-weight: 600; color: var(--oro-texto); margin-top: 10px; }
 .cm-detectados { margin-top: 12px; border-top: 1px solid var(--linea-suave); padding-top: 10px; }
 .cm-dt { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 5px 0; border-bottom: 1px dashed var(--linea-suave); }
 .cm-dt span { color: rgba(31,58,46,.78); }
@@ -85,7 +85,7 @@
 .cm-celda .et { font-size: 9.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: rgba(31,58,46,.55); margin-bottom: 9px; min-height: 24px; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
 .cm-celda .v10 { font-family: var(--display); font-weight: 300; font-variation-settings: 'opsz' 144; font-size: 36px; color: var(--verde); line-height: 1; }
 .cm-celda .v10 span, .cm-celda .v30 span { font-size: .42em; font-weight: 400; }
-.cm-celda .v30 { font-family: var(--display); font-weight: 300; font-variation-settings: 'opsz' 144; font-size: 25px; color: var(--dorado); line-height: 1; margin-top: 8px; }
+.cm-celda .v30 { font-family: var(--display); font-weight: 300; font-variation-settings: 'opsz' 144; font-size: 25px; color: var(--oro-texto); line-height: 1; margin-top: 8px; }
 .cm-celda .l { font-size: 9px; color: rgba(31,58,46,.5); font-weight: 600; letter-spacing: .04em; margin-top: 4px; }
 .cm-celda-na { font-size: 11px; color: rgba(31,58,46,.5); padding: 14px 4px; line-height: 1.4; }
 .cm-nota { font-size: 11px; line-height: 1.5; color: rgba(31,58,46,.72); margin-top: 12px; padding: 10px 12px; background: rgba(168,139,92,.08); border-radius: 10px; border-left: 2px solid var(--dorado); }

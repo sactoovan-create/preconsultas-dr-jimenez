@@ -36,8 +36,8 @@ export function construirHojaDiario(cfg) {
 <style>
   :root{--verde:#1F3A2E;--dorado:#A88B5C;--linea:rgba(31,58,46,.22);--linea2:rgba(31,58,46,.45);--hair-dorada:rgba(168,139,92,.55);}
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'Inter',system-ui,sans-serif;color:var(--verde);padding:14mm;line-height:1.5;background:#FFFFFF;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .cab{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;border-bottom:2px solid var(--verde);padding-bottom:14px;}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--verde);padding:0;line-height:1.5;background:#FFFFFF;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .cab{background:#F6F1E6;padding:16px 18px;border-radius:11px;display:flex;align-items:flex-start;justify-content:space-between;gap:24px;border-bottom:2px solid var(--verde);padding-bottom:14px;}
   .marca{font-family:'Inter',serif;font-size:21px;}
   .marca small{display:block;font-family:'Inter';font-style:normal;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dorado);margin-top:3px;font-weight:700;}
   .mono{width:50px;height:50px;border:1.5px solid var(--verde);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Inter',serif;font-weight:600;font-size:20px;flex-shrink:0;}
@@ -53,7 +53,7 @@ export function construirHojaDiario(cfg) {
   table{width:100%;border-collapse:collapse;font-size:11px;}
   th{background:rgba(31,58,46,.06);text-align:left;font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--verde);padding:7px 6px;border:1px solid var(--linea2);}
   td{border:1px solid var(--linea);height:26px;}
-  .pie{margin-top:18px;padding-top:12px;border-top:1px solid var(--linea);font-size:10px;color:rgba(31,58,46,.6);}
+  .pie{background:#F6F1E6;padding:13px 18px;border-radius:9px;margin-top:18px;padding-top:12px;border-top:1px solid var(--linea);font-size:10px;color:rgba(31,58,46,.6);}
   .dia, table{page-break-inside:avoid;}
   @page{size:letter;margin:13mm;}
 </style></head>
