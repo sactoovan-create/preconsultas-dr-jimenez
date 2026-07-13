@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { profundizacionesSugeridas } from '../core/profundos/index.js';
 import './Profundizaciones.css';
 
@@ -29,11 +29,44 @@ export default function Profundizaciones({ tamizaje, valor, onChange }) {
   );
 }
 
+/**
+ * ¿Se muestra esta pregunta u opción con lo ya contestado dentro del módulo?
+ * Hace el cuestionario adaptativo: no pregunta lo que no aplica (dolor menstrual a
+ * quien ya no menstrúa, dolor en relaciones a quien no las tiene) ni ofrece como
+ * "lo que más te molesta" un síntoma que la paciente no reportó.
+ *   { campo, en: [valores] } | { campo, min } | { campo, igual }
+ */
+function cumple(cond, resp) {
+  if (!cond) return true;
+  const r = resp || {};
+  // { campos: [...], min }: se cumple si cualquiera de esos campos llega al mínimo.
+  if (cond.campos) return cond.campos.some((c) => { const n = Number(r[c]); return Number.isFinite(n) && n >= (cond.min == null ? 1 : cond.min); });
+  const v = r[cond.campo];
+  const n = Number(v);
+  if (cond.en) return cond.en.includes(v) || cond.en.includes(n);
+  if (cond.min != null) return Number.isFinite(n) && n >= cond.min;
+  if (cond.igual !== undefined) return v === cond.igual;
+  return true;
+}
+
 function Bloque({ def, respuestas, onRespuestas }) {
   const yaEmpezo = Object.keys(respuestas).length > 0;
   const [abierto, setAbierto] = useState(yaEmpezo);
 
   const set = (id, val) => onRespuestas({ ...respuestas, [id]: val });
+
+  // Limpia las respuestas de preguntas que dejaron de aplicar (la paciente se
+  // retractó de una compuerta). Así no queda un dato viejo colgado que reaparezca
+  // como opción de "lo que más te molesta".
+  useEffect(() => {
+    const visibles = new Set(def.preguntas.filter((q) => cumple(q.mostrarSi, respuestas)).map((q) => q.id));
+    const sobrantes = Object.keys(respuestas).filter((id) => !visibles.has(id));
+    if (sobrantes.length) {
+      const limpio = { ...respuestas };
+      sobrantes.forEach((id) => delete limpio[id]);
+      onRespuestas(limpio);
+    }
+  }, [respuestas, def]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!abierto) {
     return (
@@ -50,15 +83,16 @@ function Bloque({ def, respuestas, onRespuestas }) {
       <div className="pc-seccion-t">{def.titulo}</div>
       <div className="pc-seccion-d">Contesta con calma. Nada de esto es un diagnóstico; le ayuda a tu doctor a entenderte mejor.</div>
       <div className="pf-preguntas">
-        {def.preguntas.map((q) => (
-          <Pregunta key={q.id} q={q} valor={respuestas[q.id]} onChange={(v) => set(q.id, v)} />
+        {def.preguntas.filter((q) => cumple(q.mostrarSi, respuestas)).map((q) => (
+          <Pregunta key={q.id} q={q} respuestas={respuestas} valor={respuestas[q.id]} onChange={(v) => set(q.id, v)} />
         ))}
       </div>
     </div>
   );
 }
 
-function Pregunta({ q, valor, onChange }) {
+function Pregunta({ q, respuestas, valor, onChange }) {
+  const opciones = (q.opciones || []).filter((o) => cumple(o.mostrarSi, respuestas));
   return (
     <div className="pf-pregunta">
       <div className="pf-pregunta-t">{q.texto}</div>
@@ -66,7 +100,7 @@ function Pregunta({ q, valor, onChange }) {
 
       {q.tipo === 'opcion' && (
         <div className="pf-opciones">
-          {q.opciones.map((o) => (
+          {opciones.map((o) => (
             <button
               type="button"
               key={o.valor}
@@ -96,7 +130,7 @@ function Pregunta({ q, valor, onChange }) {
 
       {q.tipo === 'multiple' && (
         <div className="pf-multiple">
-          {q.opciones.map((o) => {
+          {opciones.map((o) => {
             const marcadas = Array.isArray(valor) ? valor : [];
             const on = marcadas.includes(o.id);
             return (

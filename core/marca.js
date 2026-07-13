@@ -8,10 +8,11 @@
 export const MEDICO = {
   nombre: 'Dr. Iván Jiménez Martínez',
   especialidad: 'Ginecología',
-  cedulaProfesional: '7771863',
-  cedulaEspecialidad: '11504573',
+  cedulaMedicoGeneral: '7771863',
+  cedulaEspecialista: '11504573',
   sitio: 'drivanjimenezginecologo.com',
 };
 
-/** Cinta de crédito de una línea. Texto estático (sin datos de la paciente). */
-export const CREDITO = `${MEDICO.nombre} · ${MEDICO.especialidad} · Cédula profesional ${MEDICO.cedulaProfesional} · Cédula de especialidad ${MEDICO.cedulaEspecialidad}`;
+/** Cinta de crédito de una línea. Texto estático (sin datos de la paciente).
+ *  Ambas cédulas: la de médico general y la de especialista. */
+export const CREDITO = `${MEDICO.nombre} · ${MEDICO.especialidad} · Cédula de médico general ${MEDICO.cedulaMedicoGeneral} · Cédula de especialista ${MEDICO.cedulaEspecialista}`;

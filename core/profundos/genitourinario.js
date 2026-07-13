@@ -198,30 +198,50 @@ export const PREGUNTAS = [
         "id": "mbs_sequedad",
         "etiqueta": "La sequedad vaginal",
         "patron": "sequedad",
+        "mostrarSi": {
+          "campo": "sequedad",
+          "min": 1
+        },
         "valor": 0
       },
       {
         "id": "mbs_comezon",
         "etiqueta": "La comezón o irritación",
         "patron": "comezon",
+        "mostrarSi": {
+          "campo": "comezon",
+          "min": 1
+        },
         "valor": 1
       },
       {
         "id": "mbs_ardor",
         "etiqueta": "El ardor o dolor en la zona íntima",
         "patron": "ardor",
+        "mostrarSi": {
+          "campo": "ardor",
+          "min": 1
+        },
         "valor": 2
       },
       {
         "id": "mbs_dolor_sexo",
         "etiqueta": "El dolor en las relaciones sexuales",
         "patron": "dolor_sexo",
+        "mostrarSi": {
+          "campo": "dolor_sexo",
+          "min": 1
+        },
         "valor": 3
       },
       {
         "id": "mbs_urinario",
         "etiqueta": "Las molestias al orinar (ardor, urgencia o frecuencia)",
         "patron": "urinario",
+        "mostrarSi": {
+          "campo": "urinario",
+          "min": 1
+        },
         "valor": 4
       },
       {
@@ -230,7 +250,17 @@ export const PREGUNTAS = [
         "patron": "ninguna",
         "valor": 5
       }
-    ]
+    ],
+    "mostrarSi": {
+      "campos": [
+        "sequedad",
+        "comezon",
+        "ardor",
+        "dolor_sexo",
+        "urinario"
+      ],
+      "min": 1
+    }
   },
   {
     "id": "impacto_dia",

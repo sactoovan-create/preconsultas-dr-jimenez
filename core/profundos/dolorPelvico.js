@@ -44,7 +44,13 @@ export const PREGUNTAS = [
     "max": 10,
     "etiquetaMin": "Sin dolor",
     "etiquetaMax": "El peor dolor imaginable",
-    "ayuda": "Piensa en tus últimas reglas. Si ya no menstrúas, deja esta en cero y sigue."
+    "ayuda": "Piensa en tus últimas reglas. Si ya no menstrúas, deja esta en cero y sigue.",
+    "mostrarSi": {
+      "campo": "dismenorrea_aplica",
+      "en": [
+        1
+      ]
+    }
   },
   {
     "id": "no_menstrual_int",
@@ -87,7 +93,13 @@ export const PREGUNTAS = [
     "max": 10,
     "etiquetaMin": "Sin dolor",
     "etiquetaMax": "El peor dolor imaginable",
-    "ayuda": "Nos interesa el dolor de adentro, en el fondo, no la molestia en la entrada. Si no aplica, deja en cero."
+    "ayuda": "Nos interesa el dolor de adentro, en el fondo, no la molestia en la entrada. Si no aplica, deja en cero.",
+    "mostrarSi": {
+      "campo": "dispareunia_aplica",
+      "en": [
+        1
+      ]
+    }
   },
   {
     "id": "disquecia_int",
@@ -128,25 +140,44 @@ export const PREGUNTAS = [
         "id": "mm_dismenorrea",
         "etiqueta": "El cólico de la regla",
         "valor": 1,
-        "patron": "dismenorrea"
+        "patron": "dismenorrea",
+        "mostrarSi": {
+          "campo": "dismenorrea_int",
+          "min": 1
+        }
       },
       {
         "id": "mm_no_menstrual",
         "etiqueta": "El dolor de todos los días",
         "valor": 2,
-        "patron": "no_menstrual"
+        "patron": "no_menstrual",
+        "mostrarSi": {
+          "campo": "no_menstrual_int",
+          "min": 1
+        }
       },
       {
         "id": "mm_dispareunia",
         "etiqueta": "El dolor en las relaciones",
         "valor": 3,
-        "patron": "dispareunia"
+        "patron": "dispareunia",
+        "mostrarSi": {
+          "campo": "dispareunia_int",
+          "min": 1
+        }
       },
       {
         "id": "mm_genitourinario",
         "etiqueta": "El dolor al obrar o al orinar",
         "valor": 4,
-        "patron": "genitourinario"
+        "patron": "genitourinario",
+        "mostrarSi": {
+          "campos": [
+            "disquecia_int",
+            "disuria_int"
+          ],
+          "min": 1
+        }
       },
       {
         "id": "mm_mixto",
@@ -154,7 +185,17 @@ export const PREGUNTAS = [
         "valor": 5,
         "patron": "mixto"
       }
-    ]
+    ],
+    "mostrarSi": {
+      "campos": [
+        "dismenorrea_int",
+        "no_menstrual_int",
+        "dispareunia_int",
+        "disquecia_int",
+        "disuria_int"
+      ],
+      "min": 1
+    }
   },
   {
     "id": "banderas",
