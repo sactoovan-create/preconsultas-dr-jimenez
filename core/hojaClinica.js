@@ -1,3 +1,4 @@
+import { CREDITO } from './marca.js';
 /**
  * Hoja clínica para el MÉDICO (distinta de la hoja de la paciente). Reúne en una
  * cuartilla lo que cada motor ya calcula y que la hoja de paciente omite a propósito:
@@ -739,6 +740,7 @@ export function construirHojaClinica(id, r, paciente) {
   .hc-flags{margin-top:18px;background:rgba(184,80,66,.08);border-left:3px solid var(--terracota);border-radius:8px;padding:12px 14px;}
   .hc-flags-t{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--terracota);margin-bottom:7px;}
   .hc-flags ul{list-style-position:inside;font-size:12px;line-height:1.55;color:#7d2f24;} .hc-flags li{margin-bottom:4px;}
+  .credito{margin-top:14px;text-align:center;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:#6D5730;}
   .pie{background:#F6F1E6;padding:13px 18px;border-radius:9px;margin-top:26px;padding-top:14px;border-top:1px solid var(--linea);font-size:10px;color:rgba(31,58,46,.55);line-height:1.5;}
   @page{size:letter;margin:14mm;}
 </style></head>
@@ -750,6 +752,7 @@ export function construirHojaClinica(id, r, paciente) {
   <div class="nota">Documento de apoyo a la decisión para el médico. No sustituye el juicio clínico ni se entrega a la paciente.</div>
   ${cuerpo}
   <div class="pie">Generado a partir de los instrumentos clínicos del consultorio del Dr. Iván Jiménez Martínez. Las orientaciones se individualizan al caso.</div>
+<div class="credito">${CREDITO}</div>
 </body></html>`;
 }
 

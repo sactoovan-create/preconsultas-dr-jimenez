@@ -86,6 +86,9 @@
 .portal-colofon { text-align: center; padding: 46px 0 10px; }
 .portal-colofon .portal-sello { width: 38px; height: 38px; margin: 0 auto 16px; }
 .portal-firma { font-size: 11px; letter-spacing: .12em; color: rgba(31,58,46,.5); font-weight: 500; }
+/* Cinta de crédito: identidad profesional y cédula. Dato de confianza y legalmente
+   esperado en un documento médico. Oro legible, discreto. */
+.portal-credito { margin-top: 10px; font-size: 10px; letter-spacing: .06em; line-height: 1.5; color: var(--oro-texto); max-width: 30rem; margin-left: auto; margin-right: auto; }
 
 /* ---- Pantalla de confirmación ---- */
 .portal-centro { display: flex; align-items: center; justify-content: center; padding: 24px; }

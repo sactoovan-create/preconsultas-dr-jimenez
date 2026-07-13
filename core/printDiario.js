@@ -1,3 +1,4 @@
+import { CREDITO } from './marca.js';
 /**
  * Hoja de diario miccional en blanco, para imprimir y entregar a la paciente.
  * Genera una tabla vacía por día (tres días), con las columnas indicadas, para
@@ -53,6 +54,7 @@ export function construirHojaDiario(cfg) {
   table{width:100%;border-collapse:collapse;font-size:11px;}
   th{background:rgba(31,58,46,.06);text-align:left;font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--verde);padding:7px 6px;border:1px solid var(--linea2);}
   td{border:1px solid var(--linea);height:26px;}
+  .credito{margin-top:14px;text-align:center;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:#6D5730;}
   .pie{background:#F6F1E6;padding:13px 18px;border-radius:9px;margin-top:18px;padding-top:12px;border-top:1px solid var(--linea);font-size:10px;color:rgba(31,58,46,.6);}
   .dia, table{page-break-inside:avoid;}
   @page{size:letter;margin:13mm;}
@@ -65,6 +67,7 @@ export function construirHojaDiario(cfg) {
   ${intro ? `<div class="intro">${escaparHtml(intro)}</div>` : ''}
   ${dias}
   ${pie ? `<div class="pie">${escaparHtml(pie)}</div>` : ''}
+<div class="credito">${CREDITO}</div>
 </body></html>`;
 }
 

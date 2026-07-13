@@ -5,6 +5,7 @@ import { guardarRespuesta } from '../core/respuestas.js';
 import { construirResumen } from '../core/resumenPaciente.js';
 import { buzonActivo, nuevaCarpeta } from '../core/estudios.js';
 import { instrumentosPara } from '../core/ruteoClinico.js';
+import { MEDICO } from '../core/marca.js';
 import SubirEstudios from './SubirEstudios.jsx';
 import './PortalPaciente.css';
 
@@ -112,6 +113,7 @@ function PortalInterno() {
           <h1>Gracias{primerNombre ? `, ${primerNombre}` : ''}.</h1>
           <p>Tus respuestas llegaron al consultorio del Dr. Iván Jiménez Martínez.{estudiosTexto} Las revisará antes de tu consulta para dedicarle el tiempo a lo que más te importa.</p>
           <p className="portal-fin-nota">Ya puedes cerrar esta ventana.</p>
+          <div className="portal-credito">{MEDICO.nombre} · {MEDICO.especialidad} · Cédula profesional {MEDICO.cedulaProfesional} · Cédula de especialidad {MEDICO.cedulaEspecialidad}</div>
         </div>
       </div>
     );
@@ -135,9 +137,10 @@ function PortalInterno() {
           envioBloqueado={estudiosEstado.subiendo}
           envioBloqueadoMensaje="Espera a que terminen de subir tus estudios para enviar tus respuestas."
         />
-        <footer className="portal-colofon" aria-hidden="true">
-          <div className="portal-sello" />
+        <footer className="portal-colofon">
+          <div className="portal-sello" aria-hidden="true" />
           <div className="portal-firma">dr. jiménez · ginecología</div>
+          <div className="portal-credito">{MEDICO.nombre} · {MEDICO.especialidad} · Cédula profesional {MEDICO.cedulaProfesional} · Cédula de especialidad {MEDICO.cedulaEspecialidad}</div>
         </footer>
       </div>
     </div>

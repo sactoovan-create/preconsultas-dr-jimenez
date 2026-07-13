@@ -1,3 +1,4 @@
+import { CREDITO } from './marca.js';
 /**
  * Hoja imprimible para la paciente. Patrón común a todos los instrumentos.
  *
@@ -98,6 +99,7 @@ export function construirHojaPaciente(cfg) {
   .est.rev{color:var(--terracota);} .est.rev .pt{background:var(--terracota);}
   .reco{font-size:12px;line-height:1.6;list-style-position:inside;}
   .reco li{margin-bottom:6px;}
+  .credito{margin-top:14px;text-align:center;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:#6D5730;}
   .pie{background:#F6F1E6;padding:13px 18px;border-radius:9px;margin-top:26px;padding-top:14px;border-top:1px solid var(--linea);font-size:10.5px;color:rgba(31,58,46,.6);line-height:1.5;}
   @page{size:letter;margin:14mm;}
 </style></head>
@@ -111,6 +113,7 @@ export function construirHojaPaciente(cfg) {
   ${listasHtml}
   ${reco}
   ${pie ? `<div class="pie">${escaparHtml(pie)}</div>` : ''}
+<div class="credito">${CREDITO}</div>
 </body></html>`;
 }
 
