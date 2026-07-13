@@ -18,8 +18,13 @@
  */
 
 import * as incontinencia from './incontinencia.js';
+import * as genitourinario from './genitourinario.js';
+import * as saludSexual from './saludSexual.js';
+import * as dolorPelvico from './dolorPelvico.js';
+import * as sop from './sop.js';
 
-const MODULOS = [incontinencia];
+// Orden en que se ofrecen si varias ramas disparan a la vez.
+const MODULOS = [incontinencia, genitourinario, saludSexual, dolorPelvico, sop];
 
 /** Módulos cuya condición de disparo se cumple con el tamizaje actual. */
 export function profundizacionesSugeridas(autoReporte) {
