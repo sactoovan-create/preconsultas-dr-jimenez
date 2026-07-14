@@ -91,3 +91,8 @@
 .nav-guardado-punto { width: 7px; height: 7px; border-radius: 50%; background: #6FBF8B; flex-shrink: 0; box-shadow: 0 0 0 3px rgba(111,191,139,.18); }
 .nav-guardar { margin-top: 9px; width: 100%; font-family: var(--sans, 'Inter', sans-serif); font-size: 11.5px; font-weight: 600; cursor: pointer; background: transparent; color: var(--crema, #F1EADB); border: 1px solid rgba(241,234,219,.3); border-radius: 999px; padding: 7px 12px; }
 .nav-guardar:hover { background: rgba(241,234,219,.1); }
+
+/* Estado de guardado: color según destino (nube, guardando, este equipo). */
+.nav-guardado-estado.nube .nav-guardado-punto { background: #6FBF8B; box-shadow: 0 0 0 3px rgba(111,191,139,.18); }
+.nav-guardado-estado.guardando .nav-guardado-punto { background: var(--dorado, #A88B5C); box-shadow: 0 0 0 3px rgba(168,139,92,.2); }
+.nav-guardado-estado.local .nav-guardado-punto { background: var(--dorado, #A88B5C); }

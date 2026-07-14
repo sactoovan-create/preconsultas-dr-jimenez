@@ -7,7 +7,7 @@ import { INSTRUMENTOS } from './registry.js';
  * visible y ofrece un botón para forzar el guardado (tranquilidad del médico).
  */
 function IndicadorGuardado() {
-  const { guardar, guardadoEn } = usePaciente();
+  const { guardar, guardadoEn, estadoNube } = usePaciente();
   const hace = (() => {
     if (!guardadoEn) return null;
     try {
@@ -18,11 +18,19 @@ function IndicadorGuardado() {
       return new Date(guardadoEn).toLocaleString('es-MX', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
     } catch (_) { return null; }
   })();
+  // El texto refleja dónde quedó guardado: en la nube (se ve desde cualquier equipo),
+  // o solo en este equipo (sin sesión o sin conexión).
+  let texto, clase;
+  if (estadoNube === 'guardando') { texto = 'Guardando en la nube…'; clase = 'guardando'; }
+  else if (estadoNube === 'nube') { texto = `Guardado en la nube${hace ? ' ' + hace : ''}`; clase = 'nube'; }
+  else if (estadoNube === 'local') { texto = `Guardado en este equipo${hace ? ' ' + hace : ''}`; clase = 'local'; }
+  else if (guardadoEn) { texto = `Guardado ${hace}`; clase = 'nube'; }
+  else { texto = 'El trabajo se guarda solo'; clase = ''; }
   return (
     <div className="nav-guardado">
-      <div className="nav-guardado-estado">
+      <div className={'nav-guardado-estado' + (clase ? ' ' + clase : '')}>
         <span className="nav-guardado-punto" aria-hidden="true" />
-        {guardadoEn ? `Guardado ${hace}` : 'Se guarda solo en este equipo'}
+        {texto}
       </div>
       <button className="nav-guardar" onClick={guardar}>Guardar ahora</button>
     </div>

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { pacienteDesdeRespuesta, ruteoDesdeRespuesta } from './precarga.js';
+import { nubeActiva, cargarTrabajoNube, guardarTrabajoNube, borrarTrabajoNube } from './trabajo.js';
 
 /**
  * Estado del paciente compartido por todos los instrumentos del módulo.
@@ -43,6 +44,13 @@ function borrarTrabajo(clave) {
   try { localStorage.removeItem(PREFIJO + clave); if (localStorage.getItem(CLAVE_ACTIVA) === clave) localStorage.removeItem(CLAVE_ACTIVA); } catch (_) { /* sin almacenamiento */ }
 }
 function claveActiva() { try { return localStorage.getItem(CLAVE_ACTIVA); } catch (_) { return null; } }
+// ¿La fecha a es más nueva que b? (b nulo = a gana). Para preferir el trabajo más
+// reciente entre el local y el de la nube.
+function esMasNuevo(a, b) {
+  if (!a) return false;
+  if (!b) return true;
+  try { return new Date(a).getTime() > new Date(b).getTime(); } catch (_) { return false; }
+}
 
 const PacienteContext = createContext(null);
 
@@ -61,13 +69,31 @@ export function PacienteProvider({ children, pacienteInicial, onGuardarResultado
   const [descartados, setDescartados] = useState([]);
   // Momento del último guardado (para el indicador "Guardado").
   const [guardadoEn, setGuardadoEn] = useState(null);
+  // Estado de la nube: null (sin nube) | 'guardando' | 'nube' (guardado en la nube)
+  // | 'local' (solo se pudo guardar en este equipo).
+  const [estadoNube, setEstadoNube] = useState(null);
 
   const claveRef = useRef('manual');       // clave de almacenamiento del paciente activo
   const restaurandoRef = useRef(false);    // evita auto-guardar mientras se restaura
   const montadoRef = useRef(false);
+  const nubeTimerRef = useRef(null);       // espera breve antes de subir a la nube
 
   const setDatosInstrumento = useCallback((id, d) => {
     setDatosInstrumentos((prev) => ({ ...prev, [id]: d }));
+  }, []);
+
+  // Aplica un trabajo (local o de la nube) al estado, sin disparar auto-guardado.
+  const aplicarTrabajo = useCallback((t) => {
+    if (!t || !t.paciente) return;
+    restaurandoRef.current = true;
+    setPaciente(t.paciente);
+    setResumenes(t.resumenes || {});
+    setDatosInstrumentos(t.datosInstrumentos || {});
+    if (t.origen !== undefined) setOrigen(t.origen);
+    if (t.ruteo !== undefined) setRuteo(t.ruteo);
+    setDescartados(t.descartados || []);
+    setGuardadoEn(t.guardadoEn || null);
+    setTimeout(() => { restaurandoRef.current = false; }, 0);
   }, []);
 
   // Restaura el trabajo activo al montar (recarga de página o reapertura de pestaña).
@@ -75,18 +101,15 @@ export function PacienteProvider({ children, pacienteInicial, onGuardarResultado
   useEffect(() => {
     if (!pacienteInicial) {
       const clave = claveActiva();
-      const t = clave ? leerTrabajo(clave) : null;
-      if (t && t.paciente) {
-        restaurandoRef.current = true;
-        claveRef.current = clave;
-        setPaciente(t.paciente);
-        setResumenes(t.resumenes || {});
-        setDatosInstrumentos(t.datosInstrumentos || {});
-        setOrigen(t.origen || null);
-        setRuteo(t.ruteo || null);
-        setDescartados(t.descartados || []);
-        setGuardadoEn(t.guardadoEn || null);
-        setTimeout(() => { restaurandoRef.current = false; }, 0);
+      const local = clave ? leerTrabajo(clave) : null;
+      if (local && local.paciente) { claveRef.current = clave; aplicarTrabajo(local); }
+      // Refresca desde la nube si hay algo más reciente para esta paciente.
+      if (nubeActiva() && clave && clave !== 'manual') {
+        cargarTrabajoNube(clave).then((nube) => {
+          if (nube && nube.paciente && esMasNuevo(nube.guardadoEn, local && local.guardadoEn)) {
+            claveRef.current = clave; aplicarTrabajo(nube); setEstadoNube('nube');
+          }
+        });
       }
     }
     montadoRef.current = true;
@@ -102,16 +125,33 @@ export function PacienteProvider({ children, pacienteInicial, onGuardarResultado
     const clave = origen && origen.id != null ? String(origen.id) : 'manual';
     claveRef.current = clave;
     const cuando = new Date().toISOString();
-    escribirTrabajo(clave, { paciente, resumenes, datosInstrumentos, origen, ruteo, descartados, guardadoEn: cuando });
+    const contenido = { paciente, resumenes, datosInstrumentos, origen, ruteo, descartados, guardadoEn: cuando };
+    escribirTrabajo(clave, contenido);
     setGuardadoEn(cuando);
+    // Sube a la nube tras una breve espera (no en cada tecla). Solo con paciente real.
+    if (nubeActiva() && origen && origen.id != null) {
+      setEstadoNube('guardando');
+      if (nubeTimerRef.current) clearTimeout(nubeTimerRef.current);
+      nubeTimerRef.current = setTimeout(async () => {
+        const ok = await guardarTrabajoNube(clave, contenido);
+        setEstadoNube(ok ? 'nube' : 'local');
+      }, 2000);
+    }
   }, [paciente, resumenes, datosInstrumentos, origen, ruteo, descartados]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Guardado manual (el botón "Guardar"). Fuerza la escritura y actualiza el sello.
+  // Guardado manual (el botón "Guardar"). Fuerza la escritura local y, de inmediato,
+  // la subida a la nube.
   const guardar = useCallback(() => {
     const clave = origen && origen.id != null ? String(origen.id) : 'manual';
     const cuando = new Date().toISOString();
-    escribirTrabajo(clave, { paciente, resumenes, datosInstrumentos, origen, ruteo, descartados, guardadoEn: cuando });
+    const contenido = { paciente, resumenes, datosInstrumentos, origen, ruteo, descartados, guardadoEn: cuando };
+    escribirTrabajo(clave, contenido);
     setGuardadoEn(cuando);
+    if (nubeActiva() && origen && origen.id != null) {
+      setEstadoNube('guardando');
+      if (nubeTimerRef.current) clearTimeout(nubeTimerRef.current);
+      guardarTrabajoNube(clave, contenido).then((ok) => setEstadoNube(ok ? 'nube' : 'local'));
+    }
   }, [paciente, resumenes, datosInstrumentos, origen, ruteo, descartados]);
 
   const guardarAutoReporte = useCallback((parcial) => {
@@ -123,43 +163,46 @@ export function PacienteProvider({ children, pacienteInicial, onGuardarResultado
   // arma desde la respuesta (demografía, antecedentes afirmados, auto-reporte, ruteo).
   const cargarRespuesta = useCallback((registro) => {
     const clave = registro && registro.id != null ? String(registro.id) : 'manual';
-    const guardado = leerTrabajo(clave);
-    if (guardado && guardado.paciente) {
-      restaurandoRef.current = true;
-      claveRef.current = clave;
-      setPaciente(guardado.paciente);
-      setResumenes(guardado.resumenes || {});
-      setDatosInstrumentos(guardado.datosInstrumentos || {});
-      setOrigen(guardado.origen || { id: registro.id, nombre: (registro.paciente && registro.paciente.nombre) || null, fecha: registro.creado || null });
-      setRuteo(guardado.ruteo || ruteoDesdeRespuesta(registro));
-      setDescartados(guardado.descartados || []);
-      setGuardadoEn(guardado.guardadoEn || null);
-      try { localStorage.setItem(CLAVE_ACTIVA, clave); } catch (_) { /* sin almacenamiento */ }
-      setTimeout(() => { restaurandoRef.current = false; }, 0);
-      return;
-    }
-    const parcial = pacienteDesdeRespuesta(registro);
     claveRef.current = clave;
-    setPaciente(() => {
-      const v = formaVacia();
-      return {
-        ...v,
-        demografia: { ...v.demografia, ...parcial.demografia },
-        antecedentes: { ...v.antecedentes, ...parcial.antecedentes },
-        autoReporte: parcial.autoReporte,
-      };
-    });
-    setResumenes({});
-    setDatosInstrumentos({});
-    setRuteo(ruteoDesdeRespuesta(registro));
-    setDescartados([]);
-    setGuardadoEn(null);
-    setOrigen({
-      id: registro && registro.id,
-      nombre: (registro && registro.paciente && registro.paciente.nombre) || null,
-      fecha: (registro && registro.creado) || null,
-    });
-  }, []);
+    const local = leerTrabajo(clave);
+    const baseGuardadoEn = local && local.paciente ? (local.guardadoEn || null) : null;
+    if (local && local.paciente) {
+      aplicarTrabajo(local);
+    } else {
+      // Sin trabajo previo local: armar desde la respuesta.
+      const parcial = pacienteDesdeRespuesta(registro);
+      restaurandoRef.current = true;
+      setPaciente(() => {
+        const v = formaVacia();
+        return {
+          ...v,
+          demografia: { ...v.demografia, ...parcial.demografia },
+          antecedentes: { ...v.antecedentes, ...parcial.antecedentes },
+          autoReporte: parcial.autoReporte,
+        };
+      });
+      setResumenes({});
+      setDatosInstrumentos({});
+      setRuteo(ruteoDesdeRespuesta(registro));
+      setDescartados([]);
+      setGuardadoEn(null);
+      setOrigen({
+        id: registro && registro.id,
+        nombre: (registro && registro.paciente && registro.paciente.nombre) || null,
+        fecha: (registro && registro.creado) || null,
+      });
+      setTimeout(() => { restaurandoRef.current = false; }, 0);
+    }
+    try { localStorage.setItem(CLAVE_ACTIVA, clave); } catch (_) { /* sin almacenamiento */ }
+    // La nube manda si tiene algo más reciente (trabajo desde otro equipo).
+    if (nubeActiva() && clave !== 'manual') {
+      cargarTrabajoNube(clave).then((nube) => {
+        if (nube && nube.paciente && esMasNuevo(nube.guardadoEn, baseGuardadoEn)) {
+          aplicarTrabajo(nube); setEstadoNube('nube');
+        }
+      });
+    }
+  }, [aplicarTrabajo]);
 
   const descartarSugerencia = useCallback((instrumento) => {
     setDescartados((d) => (d.includes(instrumento) ? d : [...d, instrumento]));
@@ -178,10 +221,12 @@ export function PacienteProvider({ children, pacienteInicial, onGuardarResultado
 
   // Vacía el lienzo y borra el trabajo guardado de esta paciente.
   const reiniciar = useCallback(() => {
-    borrarTrabajo(claveRef.current);
+    const clave = claveRef.current;
+    borrarTrabajo(clave);
+    if (nubeActiva() && clave && clave !== 'manual') borrarTrabajoNube(clave);
     claveRef.current = 'manual';
     setPaciente(formaVacia()); setResumenes({}); setDatosInstrumentos({});
-    setOrigen(null); setRuteo(null); setDescartados([]); setGuardadoEn(null);
+    setOrigen(null); setRuteo(null); setDescartados([]); setGuardadoEn(null); setEstadoNube(null);
   }, []);
 
   const guardarResultado = useCallback((instrumentoId, resultado) => {
@@ -201,10 +246,10 @@ export function PacienteProvider({ children, pacienteInicial, onGuardarResultado
     resumenes, publicarResumen, irA: irA || (() => {}),
     autoReporte: paciente.autoReporte || {}, guardarAutoReporte,
     origen, ruteo, descartados, cargarRespuesta, descartarSugerencia, restaurarSugerencia,
-    datosInstrumentos, setDatosInstrumento, guardar, guardadoEn,
+    datosInstrumentos, setDatosInstrumento, guardar, guardadoEn, estadoNube,
   }), [paciente, actualizar, mezclar, reiniciar, guardarResultado, resumenes, publicarResumen, irA,
     guardarAutoReporte, origen, ruteo, descartados, cargarRespuesta, descartarSugerencia, restaurarSugerencia,
-    datosInstrumentos, setDatosInstrumento, guardar, guardadoEn]);
+    datosInstrumentos, setDatosInstrumento, guardar, guardadoEn, estadoNube]);
 
   return <PacienteContext.Provider value={valor}>{children}</PacienteContext.Provider>;
 }
