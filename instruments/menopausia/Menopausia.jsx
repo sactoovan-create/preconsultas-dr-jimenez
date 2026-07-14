@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { usePaciente } from '../../core/PacienteContext.jsx';
+import { usePaciente, useInstrumento } from '../../core/PacienteContext.jsx';
 import { evaluarMenopausia, MRS_ITEMS } from './engine.js';
 import { imprimirHoja } from '../../core/printSheet.js';
 import { imprimirHojaClinica } from '../../core/hojaClinica.js';
@@ -29,7 +29,7 @@ export default function Menopausia() {
   const { paciente, actualizar, publicarResumen, irA } = usePaciente();
   const dem = paciente.demografia, sig = paciente.signos;
 
-  const [d, setD] = useState(() => ({
+  const [d, setD] = useInstrumento('menopausia', () => ({
     tipo: '',
     tabaquismo: false, hipertension: false, sindromeMetabolico: false, riesgoTev: false,
     gsmSintomas: false, prefiereNoHormonal: false,

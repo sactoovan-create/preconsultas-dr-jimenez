@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { usePaciente } from '../../core/PacienteContext.jsx';
+import { usePaciente, useInstrumento } from '../../core/PacienteContext.jsx';
 import { evaluarEndometriosis } from './engine.js';
 import { imprimirHoja } from '../../core/printSheet.js';
 import { imprimirHojaClinica } from '../../core/hojaClinica.js';
@@ -16,7 +16,7 @@ export default function Endometriosis() {
   const { paciente, actualizar, publicarResumen, irA } = usePaciente();
   const dem = paciente.demografia;
 
-  const [d, setD] = useState(() => ({
+  const [d, setD] = useInstrumento('endometriosis', () => ({
     poblacion: (dem.edad && dem.edad < 18) ? 'adolescente' : 'adulta',
     dismenorreaSevera: false, dispareunia: false, dolorPelvicoCronico: false, dischezia: false, sintomasUrinarios: false, infertilidad: false,
     nodularidad: false, masaAnexial: false, uteroFijo: false,

@@ -1,6 +1,33 @@
 import React, { useState } from 'react';
-import { PacienteProvider } from './core/PacienteContext.jsx';
+import { PacienteProvider, usePaciente } from './core/PacienteContext.jsx';
 import { INSTRUMENTOS } from './registry.js';
+
+/**
+ * Indicador de guardado. El trabajo se guarda solo en este navegador; esto lo hace
+ * visible y ofrece un botón para forzar el guardado (tranquilidad del médico).
+ */
+function IndicadorGuardado() {
+  const { guardar, guardadoEn } = usePaciente();
+  const hace = (() => {
+    if (!guardadoEn) return null;
+    try {
+      const seg = Math.round((Date.now() - new Date(guardadoEn).getTime()) / 1000);
+      if (seg < 60) return 'hace un momento';
+      const min = Math.round(seg / 60);
+      if (min < 60) return `hace ${min} ${min === 1 ? 'minuto' : 'minutos'}`;
+      return new Date(guardadoEn).toLocaleString('es-MX', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    } catch (_) { return null; }
+  })();
+  return (
+    <div className="nav-guardado">
+      <div className="nav-guardado-estado">
+        <span className="nav-guardado-punto" aria-hidden="true" />
+        {guardadoEn ? `Guardado ${hace}` : 'Se guarda solo en este equipo'}
+      </div>
+      <button className="nav-guardar" onClick={guardar}>Guardar ahora</button>
+    </div>
+  );
+}
 import ResumenPaciente from './ResumenPaciente.jsx';
 import PreConsulta from './PreConsulta.jsx';
 import Respuestas from './Respuestas.jsx';
@@ -38,6 +65,7 @@ export default function InstrumentosModule({ pacienteInicial, onGuardarResultado
               <img className="nav-logo" src="/marca/logo_invertido_transparente.svg" alt="dr. jiménez, ginecología" />
               <div className="nav-eyebrow">Instrumentos clínicos</div>
             </div>
+            <IndicadorGuardado />
             <button className={'nav-resumen' + (esResumen ? ' activo' : '')} onClick={() => setActivoId('resumen')}>
               Resumen del paciente
             </button>

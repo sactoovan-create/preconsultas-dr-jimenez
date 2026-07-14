@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { usePaciente } from '../../core/PacienteContext.jsx';
+import { usePaciente, useInstrumento } from '../../core/PacienteContext.jsx';
 import { evaluarMama } from './engine.js';
 import { imprimirHoja } from '../../core/printSheet.js';
 import { imprimirHojaClinica } from '../../core/hojaClinica.js';
@@ -40,7 +40,7 @@ export default function Mama() {
   const { paciente, actualizar, publicarResumen } = usePaciente();
   const dem = paciente.demografia;
 
-  const [d, setD] = useState({});
+  const [d, setD] = useInstrumento('mama', () => ({}));
   const set = (k, val) => setD((p) => ({ ...p, [k]: val }));
   const setDem = (c, val) => actualizar('demografia', c, val);
 

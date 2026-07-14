@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { usePaciente } from '../../core/PacienteContext.jsx';
+import { usePaciente, useInstrumento } from '../../core/PacienteContext.jsx';
 import { evaluarIncontinencia, ITEMS_ESFUERZO, ITEMS_URGENCIA } from './engine.js';
 import { imprimirHoja } from '../../core/printSheet.js';
 import { imprimirHojaClinica } from '../../core/hojaClinica.js';
@@ -30,7 +30,7 @@ export default function Incontinencia() {
   const { paciente, actualizar, publicarResumen } = usePaciente();
   const dem = paciente.demografia;
 
-  const [d, setD] = useState({ tieneEscapes: false, usaProteccion: false, tieneDiario: false });
+  const [d, setD] = useInstrumento('incontinencia', () => ({ tieneEscapes: false, usaProteccion: false, tieneDiario: false }));
   const set = (k, val) => setD((p) => ({ ...p, [k]: val }));
   const setDem = (c, val) => actualizar('demografia', c, val);
 

@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { usePaciente } from '../../core/PacienteContext.jsx';
+import { usePaciente, useInstrumento } from '../../core/PacienteContext.jsx';
 import { evaluarAnticoncepcion, CONDICIONES, condicionesAutomaticas } from './engine.js';
 import { imprimirHoja } from '../../core/printSheet.js';
 import { imprimirHojaClinica } from '../../core/hojaClinica.js';
@@ -17,7 +17,7 @@ export default function Anticoncepcion() {
   const { paciente, actualizar, publicarResumen, irA } = usePaciente();
   const dem = paciente.demografia, sig = paciente.signos;
 
-  const [d, setD] = useState({ fuma: false, fumaIntenso: false, condiciones: {} });
+  const [d, setD] = useInstrumento('anticoncepcion', () => ({ fuma: false, fumaIntenso: false, condiciones: {} }));
   const setCond = (id, val) => setD((p) => ({ ...p, condiciones: { ...p.condiciones, [id]: val } }));
   const setDem = (c, val) => actualizar('demografia', c, val);
   const setSig = (c, val) => actualizar('signos', c, val);

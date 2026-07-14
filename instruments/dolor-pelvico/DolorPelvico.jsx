@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { usePaciente } from '../../core/PacienteContext.jsx';
+import { usePaciente, useInstrumento } from '../../core/PacienteContext.jsx';
 import { evaluarDpc } from './engine.js';
 import { imprimirHoja } from '../../core/printSheet.js';
 import { imprimirHojaClinica } from '../../core/hojaClinica.js';
@@ -45,7 +45,7 @@ export default function DolorPelvico() {
   const { paciente, actualizar, publicarResumen, irA } = usePaciente();
   const dem = paciente.demografia;
 
-  const [d, setD] = useState(() => ({
+  const [d, setD] = useInstrumento('dolor-pelvico', () => ({
     poblacion: (dem.edad && dem.edad < 18) ? 'adolescente' : 'adulta',
     duracionMeses: (paciente.autoReporte && paciente.autoReporte.dolor && paciente.autoReporte.dolor.meses) ?? null,
     intensidadEVA: (paciente.autoReporte && paciente.autoReporte.dolor && paciente.autoReporte.dolor.intensidad) ?? null, patron: 'ciclico',

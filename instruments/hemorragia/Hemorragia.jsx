@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { usePaciente } from '../../core/PacienteContext.jsx';
+import { usePaciente, useInstrumento } from '../../core/PacienteContext.jsx';
 import { evaluarHua } from './engine.js';
 import { imprimirHoja } from '../../core/printSheet.js';
 import { imprimirHojaClinica } from '../../core/hojaClinica.js';
@@ -12,7 +12,7 @@ export default function Hemorragia() {
   const { paciente, actualizar, publicarResumen, irA } = usePaciente();
   const dem = paciente.demografia;
 
-  const [d, setD] = useState(() => ({
+  const [d, setD] = useInstrumento('hemorragia', () => ({
     contexto: (dem.edad && dem.edad >= 52) ? 'posmenopausica' : (dem.edad && dem.edad < 18 ? 'adolescente' : 'reproductiva'),
     agudo: false,
     taquicardia: false, ortostatismo: false, hipotension: false, saturacionAlta: false,
