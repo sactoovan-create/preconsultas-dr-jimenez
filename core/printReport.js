@@ -51,10 +51,13 @@ export function construirInforme(cfg) {
   :root{--verde:#1F3A2E;--dorado:#A88B5C;--linea:rgba(31,58,46,.16);--linea2:rgba(31,58,46,.4);--hair-dorada:rgba(168,139,92,.55);}
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:'Inter',system-ui,sans-serif;color:var(--verde);padding:0;line-height:1.5;background:#FFFFFF;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .cab{background:#F6F1E6;padding:16px 18px;border-radius:11px;display:flex;align-items:flex-start;justify-content:space-between;gap:24px;border-bottom:2px solid var(--verde);padding-bottom:16px;}
-  .marca{font-family:'Inter',serif;font-size:22px;}
-  .marca small{display:block;font-family:'Inter';font-style:normal;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dorado);margin-top:4px;font-weight:700;}
-  .mono{width:54px;height:54px;border:1.5px solid var(--verde);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Inter',serif;font-weight:600;font-size:21px;flex-shrink:0;}
+  .cab{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding-bottom:14px;border-bottom:2px solid var(--verde);}
+  .marca-wm{font-family:'Inter',sans-serif;font-weight:600;font-size:26px;letter-spacing:-.03em;color:var(--verde);line-height:1;display:flex;align-items:flex-end;}
+  .marca-wm .pt{width:7px;height:7px;border-radius:50%;background:var(--dorado);margin:0 3px 4px 5px;display:inline-block;}
+  .marca-desc{font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;color:#6D5730;font-weight:500;margin-top:8px;}
+  .cab-der{text-align:right;font-size:9.5px;line-height:1.7;color:rgba(31,58,46,.66);}
+  .cab-der .nom{font-weight:700;font-size:11px;color:var(--verde);}
+  .cab-der .ced{color:#6D5730;}
   .ident{display:flex;gap:28px;flex-wrap:wrap;font-size:12px;margin:14px 0 6px;}
   .ident b{display:block;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--dorado);margin-bottom:3px;}
   .ident .v{font-size:14px;font-weight:600;}
@@ -79,7 +82,17 @@ export function construirInforme(cfg) {
   @page{size:letter;margin:14mm;}
 </style></head>
 <body>
-  <div class="cab"><div class="marca">dr. iván jiménez martínez<small>Ginecología</small></div><div class="mono">IJ</div></div>
+  <div class="cab">
+    <div>
+      <div class="marca-wm">dr<span class="pt"></span>jiménez</div>
+      <div class="marca-desc">Ginecología</div>
+    </div>
+    <div class="cab-der">
+      <div class="nom">Dr. Iván Jiménez Martínez</div>
+      <div class="ced">Cédula de médico general 7771863</div>
+      <div class="ced">Cédula de especialista 11504573</div>
+    </div>
+  </div>
   <div class="ident">${ident}</div>
   <div class="eyebrow">Documento clínico</div>
   <div class="titulo">Resumen de valoración integral</div>
