@@ -81,6 +81,7 @@ const CODIGO_LABEL = {
   dolor_hombro: 'Dolor de hombro con dolor abdominal o sangrado',
   dificultad_respirar: 'Dificultad respiratoria o dolor torácico',
   fiebre_dolor: 'Fiebre con dolor pélvico intenso',
+  sangrado_embarazo: 'Sangrado mayor que manchado durante el embarazo',
   hemorragia_posparto: 'Hemorragia posparto',
   fiebre_materna: 'Fiebre de 38 °C o más en embarazo o posparto',
   cefalea_vision: 'Cefalea intensa o alteraciones visuales',

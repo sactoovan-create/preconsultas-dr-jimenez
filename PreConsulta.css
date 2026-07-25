@@ -20,7 +20,7 @@
 .pc-paso {
   background: var(--papel); border: 1px solid var(--linea-suave);
   border-radius: var(--radio); padding: 34px 38px 30px;
-  box-shadow: var(--sombra-2); outline: none;
+  box-shadow: var(--sombra-2); outline: none; scroll-margin-top: 84px;
 }
 .pc-paso-cab { display: grid; grid-template-columns: 48px 1fr; align-items: end; gap: 14px; padding-bottom: 22px; margin-bottom: 24px; border-bottom: 1px solid var(--linea); }
 .pc-paso-cab > span { font-family: var(--display); font-size: 32px; font-weight: 300; color: var(--oro-texto); line-height: 1; }
@@ -29,6 +29,7 @@
 .pc-requerido { color: var(--terracota); }
 
 .pc-datos { display: grid; grid-template-columns: minmax(0, 2fr) minmax(120px, 1fr); gap: 16px; margin-bottom: 18px; }
+.pc-datos-obstetricos { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .pc-campo { display: flex; flex-direction: column; gap: 6px; min-width: 0; margin: 0 0 18px; }
 .pc-campo.pc-full { grid-column: 1 / -1; }
 .pc-campo > span { font-size: 13px; font-weight: 700; color: var(--verde); }
@@ -159,6 +160,7 @@
   .pc-paso-cab > span { font-size: 27px; }
   .pc-paso-cab h1 { font-size: 25px; }
   .pc-datos { grid-template-columns: 1fr; gap: 0; }
+  .pc-datos-obstetricos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .pc-opciones-lista,
   .pc-multiple-lista { grid-template-columns: 1fr; }
   .pc-eleccion { min-height: 50px; }

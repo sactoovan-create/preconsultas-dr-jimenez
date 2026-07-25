@@ -13,8 +13,9 @@ del bucket.
 ## Cómo se ve
 
 - **Paciente:** al final de la pre-consulta, antes del botón de enviar, aparece
-  "¿Tienes estudios? Súbelos aquí (opcional)". Sube y sigue, con estado por archivo.
-  Después del envío recibe una confirmación clara de que sus respuestas llegaron.
+  "¿Tienes estudios? Súbelos aquí (opcional)". Los selecciona y puede quitarlos;
+  la transferencia al bucket ocurre únicamente al enviar el cuestionario. Después
+  recibe una confirmación clara de que respuestas y estudios llegaron.
 - **Tú:** en el panel del médico (`/consultorio`), cada respuesta muestra "Estudios
   adjuntos" con un botón **Abrir** por archivo (enlace firmado que caduca en 1 hora).
 
@@ -37,7 +38,9 @@ Para usar otro bucket, agrega `VITE_ESTUDIOS_BUCKET=<nombre>`.
 - **Compresión en el navegador:** las imágenes se reducen a 1600 px de lado y se
   recomprimen (una foto de laboratorio de 5 MB baja a unos cientos de kilobytes) antes
   de subir. Los PDF se suben tal cual.
-- **Límites:** máximo 10 archivos por paciente; 15 MB por archivo. Solo PDF e imágenes.
+- **Límites:** máximo 10 archivos por paciente; 15 MB por archivo. Solo PDF, JPG,
+  PNG y WebP. HEIC se bloquea antes de transmitir y explica cómo usar una captura
+  de pantalla, JPG o PDF.
 
 Con eso, el primer giga gratis de Supabase dura muchísimo (cientos de pacientes).
 
@@ -57,6 +60,11 @@ hasta entonces.
   autenticado, abres los archivos con enlaces firmados que caducan en una hora.
 - **Consentimiento antes de cargar (cubierto):** el selector de archivos permanece
   deshabilitado hasta que la paciente acepte la autorización clínica.
+- **Sin archivos huérfanos por abandono (cubierto):** seleccionar un archivo no lo
+  transmite. La subida se inicia al presionar el envío final. Un rechazo confirmado
+  retira los objetos recién creados; además, el cron del ERP compara el bucket
+  contra las respuestas y elimina después de 24 horas cualquier objeto que haya
+  quedado sin cuestionario por cierre del navegador o corte de red.
 - **El tope de tamaño (15 MB) y los tipos permitidos se hacen cumplir en el servidor**
   (en el bucket), no solo en el navegador.
 - **Lo que NO cubre todavía:** una persona puede crear su propia sesión anónima y

@@ -13,6 +13,19 @@
 
 const CLAVE_LOCAL = 'drj_respuestas_v1';
 
+/** UUID estable durante los reintentos de un mismo envío. Evita duplicados si
+ * Supabase guardó la fila pero la respuesta de red no alcanzó al teléfono. */
+export function nuevaRespuestaId() {
+  try {
+    if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+  } catch (_) { /* usa el fallback */ }
+  const hex = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+  return hex.replace(/[xy]/g, (marca) => {
+    const aleatorio = Math.floor(Math.random() * 16);
+    return (marca === 'x' ? aleatorio : ((aleatorio & 0x3) | 0x8)).toString(16);
+  });
+}
+
 function hayBackend() {
   return !!(import.meta.env && import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
 }
@@ -84,17 +97,22 @@ export async function clienteSupabase() { return cliente(); }
 
 async function guardarEnSupabase(registro) {
   const sb = await cliente();
+  const { id: idSolicitado, creado: _creadoLocal, ...contenido } = registro;
+  const id = idSolicitado || nuevaRespuestaId();
   const { error } = await sb
     .from('respuestas')
     // `creado` usa el default `now()` de PostgreSQL. El reloj del teléfono queda
     // solo como `submittedAtClient` dentro del contenido y no gobierna auditoría
     // ni el cruce temporal con la agenda.
-    .insert({ contenido: registro, nombre: registro.paciente?.nombre || null });
-  if (error) throw error;
+    .insert({ id, contenido, nombre: contenido.paciente?.nombre || null });
+  // Si el primer INSERT sí llegó pero se perdió la respuesta de red, el reintento
+  // usa el mismo UUID. La colisión de la llave primaria confirma que ya se guardó.
+  const yaGuardada = error?.code === '23505'
+    && /respuestas_pkey|duplicate key/i.test(`${error.message || ''} ${error.details || ''}`);
+  if (error && !yaGuardada) throw error;
   // La clave anon solo puede insertar; no puede leer la fila insertada. El id
-  // devuelto aqui es solo para el estado visual de confirmacion de la paciente.
-  const idLocal = registro.id || `supabase_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-  return { ...registro, id: idLocal };
+  // estable permite reintentar sin fabricar respuestas duplicadas.
+  return { ...contenido, id };
 }
 
 async function listarDeSupabase() {

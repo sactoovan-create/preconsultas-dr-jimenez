@@ -6,6 +6,7 @@ import {
   normalizarTelefonoMexicano,
   pasosPara,
   porcentajePaso,
+  reconciliarPosibleEmbarazo,
   telefonoValido,
   validarPaso,
 } from '../core/preconsultaFlow.js';
@@ -43,6 +44,22 @@ t('anticoncepción agrega plan reproductivo', pasosPara({ ...base, hc: { ...base
 t('elegir temas no hace retroceder el progreso del paso motivo',
   porcentajePaso('motivo', pasosPara({ ...base, hc: { ...base.hc, temasConsulta: ['control'] } }))
   === porcentajePaso('motivo', pasosPara({ ...base, hc: { ...base.hc, temasConsulta: ['sangrado', 'dolor', 'climaterio', 'mama'] } })));
+const rutaClimaterioSimple = pasosPara({
+  ...base,
+  hc: { ...base.hc, temasConsulta: ['climaterio'] },
+  mrs: {},
+});
+const rutaClimaterioProfunda = pasosPara({
+  ...base,
+  hc: { ...base.hc, temasConsulta: ['climaterio'] },
+  mrs: { mrs_sequedad: 4 },
+});
+t('abrir preguntas específicas no hace retroceder el progreso en climaterio',
+  rutaClimaterioProfunda.some((p) => p.id === 'profundizaciones')
+  && porcentajePaso('climaterio', rutaClimaterioSimple) === porcentajePaso('climaterio', rutaClimaterioProfunda));
+t('salud general e historia viven en pasos separados y consecutivos',
+  rutaClimaterioSimple.findIndex((p) => p.id === 'historia')
+  === rutaClimaterioSimple.findIndex((p) => p.id === 'antecedentes') + 1);
 t('dolor urgente abre su módulo aunque no se haya elegido como tema',
   pasosPara({ ...base, hc: { ...base.hc, temasConsulta: ['control'], senalesUrgencia: ['dolor_subito_intenso'] } })
     .some((p) => p.id === 'dolor'));
@@ -95,6 +112,39 @@ const alertaMaterna = alertaUrgente({
   hc: { posibleEmbarazo: 'confirmado', senalesUrgencia: ['ninguna'], senalesMaternas: ['cefalea_vision'] },
 });
 t('señal materna muestra orientación urgente', alertaMaterna.urgente && alertaMaterna.senalesMaternas.includes('cefalea_vision'));
+const alertaSangradoEmbarazo = alertaUrgente({
+  hc: { posibleEmbarazo: 'confirmado', senalesUrgencia: ['ninguna'], senalesMaternas: ['sangrado_embarazo'] },
+});
+t('sangrado mayor que manchado durante embarazo muestra orientación urgente',
+  alertaSangradoEmbarazo.urgente && alertaSangradoEmbarazo.senalesMaternas.includes('sangrado_embarazo'));
+const embarazoConfirmado = reconciliarPosibleEmbarazo({
+  etapaReproductiva: 'posparto',
+  semanasPosparto: 6,
+  lactancia: true,
+}, 'confirmado');
+t('embarazo confirmado normaliza la etapa y limpia datos posparto',
+  embarazoConfirmado.etapaReproductiva === 'embarazada'
+  && embarazoConfirmado.semanasPosparto == null
+  && embarazoConfirmado.lactancia == null);
+const embarazoDescartado = reconciliarPosibleEmbarazo({
+  etapaReproductiva: 'embarazada',
+  semanasEmbarazo: 10,
+  senalesMaternas: ['cefalea_vision'],
+}, 'no');
+t('descartar embarazo limpia la etapa incompatible y sus señales ocultas',
+  embarazoDescartado.etapaReproductiva == null
+  && embarazoDescartado.semanasEmbarazo == null
+  && embarazoDescartado.senalesMaternas.length === 0);
+t('validación rechaza etapa embarazada cuando la posibilidad se marcó como no',
+  !validarPaso('contexto', {
+    ...base,
+    hc: { ...base.hc, etapaReproductiva: 'embarazada', posibleEmbarazo: 'no' },
+  }).ok);
+t('validación rechaza embarazo confirmado con una etapa distinta',
+  !validarPaso('contexto', {
+    ...base,
+    hc: { ...base.hc, etapaReproductiva: 'menstrua_regular', posibleEmbarazo: 'confirmado' },
+  }).ok);
 t('ruta de embarazo exige revisar señales maternas',
   !validarPaso('seguridad', {
     ...base,

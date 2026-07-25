@@ -18,7 +18,12 @@ import { construirHojaPaciente } from '../core/printSheet.js';
 import { construirInforme } from '../core/printReport.js';
 import { construirHojaDiario } from '../core/printDiario.js';
 import { construirResumen } from '../core/resumenPaciente.js';
-import { guardarRespuesta, listarRespuestas, eliminarRespuesta } from '../core/respuestas.js';
+import {
+  guardarRespuesta,
+  listarRespuestas,
+  eliminarRespuesta,
+  nuevaRespuestaId,
+} from '../core/respuestas.js';
 
 let ok = 0, fail = 0;
 function check(nombre, cond) {
@@ -142,8 +147,11 @@ console.log('Resumen de la paciente · contrato portal hacia panel');
 console.log('Almacenamiento de respuestas · modo local');
 {
   globalThis.localStorage.clear();
-  const guardado = await guardarRespuesta({ paciente: { nombre: 'Prueba Uno' }, resumen: { menopausia: { total: 3, intensidad: 'mínima' } } });
+  const idEstable = nuevaRespuestaId();
+  check('el identificador de envío tiene formato UUID', /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idEstable));
+  const guardado = await guardarRespuesta({ id: idEstable, paciente: { nombre: 'Prueba Uno' }, resumen: { menopausia: { total: 3, intensidad: 'mínima' } } });
   check('guardar devuelve id y fecha', !!guardado.id && !!guardado.creado);
+  check('un reintento conserva el mismo identificador', guardado.id === idEstable);
   const lista1 = await listarRespuestas();
   check('listar incluye la respuesta guardada', lista1.length === 1 && lista1[0].paciente.nombre === 'Prueba Uno');
   await guardarRespuesta({ paciente: { nombre: 'Prueba Dos' } });

@@ -3,11 +3,16 @@ import { PacienteProvider } from '../core/PacienteContext.jsx';
 import PreConsulta from '../PreConsulta.jsx';
 import { guardarRespuesta } from '../core/respuestas.js';
 import { construirResumen } from '../core/resumenPaciente.js';
-import { buzonActivo, nuevaCarpeta } from '../core/estudios.js';
+import { eliminarEstudioPaciente } from '../core/estudios.js';
 import { instrumentosPara } from '../core/ruteoClinico.js';
 import { CREDITO } from '../core/marca.js';
 import SubirEstudios from './SubirEstudios.jsx';
 import { FORMULARIO_VERSION } from '../core/preconsultaFlow.js';
+import {
+  borrarIntentoEnvio,
+  cargarIntentoEnvio,
+  guardarAdjuntosIntento,
+} from '../core/intentoEnvio.js';
 import './PortalPaciente.css';
 
 /**
@@ -40,12 +45,13 @@ function RamaBotanica() {
   );
 }
 
-export function construirRegistro(datos, estudiosFolder, archivos = []) {
+export function construirRegistro(datos, estudiosFolder, archivos = [], respuestaId = null) {
   const submittedAtClient = datos.consentimientoFecha || new Date().toISOString();
   const registro = {
     // v2 conserva los campos canónicos de v1 para una migración gradual, pero
     // distingue respuesta parcial, consentimiento, reloj del cliente y adjuntos.
     version: 2,
+    id: respuestaId,
     formularioVersion: datos.formularioVersion || FORMULARIO_VERSION,
     submittedAtClient,
     paciente: {
@@ -91,12 +97,15 @@ export default function PortalPaciente() {
 }
 
 function PortalInterno() {
+  const [intentoEnvio] = useState(cargarIntentoEnvio);
   const [enviado, setEnviado] = useState(null);
   const [error, setError] = useState('');
-  const [estudiosFolder] = useState(() => (buzonActivo() ? nuevaCarpeta() : null));
+  const estudiosFolder = intentoEnvio.estudiosFolder;
+  const respuestaId = intentoEnvio.respuestaId;
   const [estudiosEstado, setEstudiosEstado] = useState({
     total: 0, subiendo: false, listos: 0, errores: 0, archivos: [],
   });
+  const estudiosRef = useRef(null);
   const confirmacionRef = useRef(null);
 
   useEffect(() => {
@@ -106,24 +115,47 @@ function PortalInterno() {
 
   const onEstudiosEstado = useCallback((estado) => {
     setEstudiosEstado(estado);
+    guardarAdjuntosIntento(estado.archivos);
   }, []);
 
   const onEnviar = async (datos) => {
     setError('');
+    let archivos = [];
     try {
+      archivos = estudiosFolder && estudiosRef.current
+        ? await estudiosRef.current.subirPendientes()
+        : [];
+      guardarAdjuntosIntento(archivos);
       const guardado = await guardarRespuesta(construirRegistro(
         datos,
         estudiosFolder,
-        estudiosEstado.archivos || [],
+        archivos,
+        respuestaId,
       ));
+      borrarIntentoEnvio();
       setEnviado(guardado);
     } catch (e) {
+      // Un error estructurado de Supabase confirma que el INSERT fue rechazado y
+      // permite retirar los objetos. Un fallo puro de red es ambiguo: se conservan
+      // los mismos archivos y UUID para que el reintento sea idempotente.
+      const insercionRechazada = e?.code && e.code !== 'estudios';
+      if (archivos.length && insercionRechazada) {
+        await Promise.allSettled(
+          archivos.map((archivo) => eliminarEstudioPaciente(archivo.path)),
+        );
+        guardarAdjuntosIntento([]);
+        estudiosRef.current?.restablecerPendientes();
+      }
       // Un problema de configuración del consultorio no se resuelve reintentando:
       // se distingue del fallo de red para no mandar a la paciente a reintentar en
       // vano. El error se lanza con un mensaje claro que PreConsulta muestra junto
       // al botón (no se relanza el error crudo, que quedaba sin capturar).
       const config = e && e.message && /no est[aá] configurada|not configured/i.test(e.message);
-      const msg = config
+      const msg = e?.code === 'estudios'
+        ? `No pudimos enviar uno de tus estudios. ${e.message || 'Quítalo o inténtalo de nuevo.'}`
+        : archivos.length && !e?.code
+        ? 'No pudimos confirmar el envío por un corte de conexión. Tus estudios siguen listos: presiona Enviar nuevamente.'
+        : config
         ? 'No pudimos enviar tus respuestas por un problema del consultorio, no por tu conexión. Por favor avísale a la clínica.'
         : 'No se pudieron enviar tus respuestas. Revisa tu conexión e inténtalo de nuevo.';
       setError(msg);
@@ -134,7 +166,8 @@ function PortalInterno() {
   if (enviado) {
     const primerNombre = enviado.paciente?.nombre ? enviado.paciente.nombre.trim().split(/\s+/)[0] : '';
     const partesEstudios = [];
-    if (estudiosEstado.listos > 0) partesEstudios.push(`También recibimos ${estudiosEstado.listos === 1 ? 'el estudio que subiste' : `los ${estudiosEstado.listos} estudios que subiste`}.`);
+    const estudiosRecibidos = enviado.adjuntos?.length || 0;
+    if (estudiosRecibidos > 0) partesEstudios.push(`También recibimos ${estudiosRecibidos === 1 ? 'el estudio que subiste' : `los ${estudiosRecibidos} estudios que subiste`}.`);
     // No callar los estudios que fallaron: la paciente podría creer que llegaron.
     if (estudiosEstado.errores > 0) partesEstudios.push(`No pudimos recibir ${estudiosEstado.errores === 1 ? 'uno de tus estudios' : `${estudiosEstado.errores} de tus estudios`}; si quieres, llévalos impresos a tu consulta.`);
     const estudiosTexto = partesEstudios.length ? ' ' + partesEstudios.join(' ') : '';
@@ -175,9 +208,18 @@ function PortalInterno() {
       <div className="portal-form">
         <PreConsulta
           onEnviar={onEnviar}
-          extraAntesDeEnviar={({ consentimientoAceptado }) => (
+          extraAntesDeEnviar={({ consentimientoAceptado, enviando }) => (
             estudiosFolder
-              ? <SubirEstudios folder={estudiosFolder} habilitado={consentimientoAceptado} onEstadoCambio={onEstudiosEstado} />
+              ? (
+                <SubirEstudios
+                  ref={estudiosRef}
+                  folder={estudiosFolder}
+                  habilitado={consentimientoAceptado}
+                  bloqueado={enviando}
+                  archivosIniciales={intentoEnvio.adjuntos}
+                  onEstadoCambio={onEstudiosEstado}
+                />
+              )
               : null
           )}
           envioBloqueado={estudiosEstado.subiendo}

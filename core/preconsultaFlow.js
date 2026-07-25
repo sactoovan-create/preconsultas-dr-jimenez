@@ -55,6 +55,25 @@ export function contextoMaterno(hc = {}) {
     || hc.posibleEmbarazo === 'confirmado';
 }
 
+/** Mantiene consistentes la respuesta de seguridad y la etapa reproductiva.
+ * Una confirmación selecciona embarazo; cualquier respuesta posterior que lo
+ * descarte obliga a elegir de nuevo la etapa en vez de enviar datos opuestos. */
+export function reconciliarPosibleEmbarazo(hc = {}, valor) {
+  const siguiente = { ...hc, posibleEmbarazo: valor };
+
+  if (valor === 'confirmado') {
+    siguiente.etapaReproductiva = 'embarazada';
+    siguiente.semanasPosparto = null;
+    siguiente.lactancia = null;
+  } else if (siguiente.etapaReproductiva === 'embarazada') {
+    siguiente.etapaReproductiva = null;
+    siguiente.semanasEmbarazo = null;
+  }
+
+  if (!contextoMaterno(siguiente)) siguiente.senalesMaternas = [];
+  return siguiente;
+}
+
 export function senalFuerzaDolor(hc = {}) {
   return lista(hc.senalesUrgencia).some((id) => [
     'dolor_subito_intenso', 'dolor_hombro', 'fiebre_dolor',
@@ -197,31 +216,36 @@ export function pasosPara({ hc, mrs, dolor } = {}) {
 
   pasos.push(
     { id: 'antecedentes', titulo: 'Tu salud general' },
+    { id: 'historia', titulo: 'Historia y medicamentos' },
     { id: 'prevencion', titulo: 'Estudios preventivos' },
     { id: 'envio', titulo: 'Revisar y enviar' },
   );
   return pasos;
 }
 
-/** Avance por etapa, estable aunque elegir temas agregue módulos adaptativos. */
-export function porcentajePaso(id, pasos = []) {
-  const fijos = {
+/** Avance fijo por etapa. Una respuesta puede abrir módulos posteriores, pero
+ * nunca hace retroceder la barra del paso donde ya está la paciente. */
+export function porcentajePaso(id) {
+  const porcentaje = {
     inicio: 8,
     motivo: 18,
     seguridad: 30,
     contexto: 40,
+    sangrado: 47,
+    dolor: 50,
+    ciclos: 53,
+    climaterio: 56,
+    urinario: 59,
+    intimidad: 62,
+    mama: 65,
+    'plan-reproductivo': 68,
+    profundizaciones: 72,
     antecedentes: 76,
-    prevencion: 88,
+    historia: 82,
+    prevencion: 90,
     envio: 100,
   };
-  if (Object.prototype.hasOwnProperty.call(fijos, id)) return fijos[id];
-  const inicioClinico = pasos.findIndex((p) => p.id === 'contexto') + 1;
-  const finClinico = pasos.findIndex((p) => p.id === 'antecedentes');
-  const actual = pasos.findIndex((p) => p.id === id);
-  if (actual < inicioClinico || finClinico <= inicioClinico) return 40;
-  const posicion = actual - inicioClinico + 1;
-  const cantidad = Math.max(1, finClinico - inicioClinico);
-  return Math.round(40 + (posicion / cantidad) * 32);
+  return porcentaje[id] ?? 40;
 }
 
 function error(mensaje, campo) {
@@ -261,6 +285,11 @@ export function validarPaso(id, { demografia, hc, mrs, dolor } = {}) {
   if (id === 'contexto') {
     if (!historia.etapaReproductiva) return error('Elige la opción que mejor describe tu etapa actual.', 'etapaReproductiva');
     if (!historia.posibleEmbarazo) return error('Indica si existe posibilidad de embarazo.', 'posibleEmbarazo');
+    const etapaEmbarazo = historia.etapaReproductiva === 'embarazada';
+    const embarazoConfirmado = historia.posibleEmbarazo === 'confirmado';
+    if (etapaEmbarazo !== embarazoConfirmado) {
+      return error('Revisa la etapa actual y la respuesta sobre embarazo para que sean consistentes.', 'etapaReproductiva');
+    }
   }
 
   if (id === 'sangrado' && !lista(historia.sangradoTipos).length) {

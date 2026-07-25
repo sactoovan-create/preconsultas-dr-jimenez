@@ -14,6 +14,19 @@ import { clienteSupabase } from './respuestas.js';
 export const MAX_ARCHIVOS = 10;
 export const MAX_BYTES = 15 * 1024 * 1024; // 15 MB por archivo (tras comprimir imágenes)
 const MAX_LADO = 1600; // px: lado mayor al que se reduce una imagen
+const MIME_EXTENSION = {
+  'application/pdf': 'pdf',
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+};
+const MIME_POR_EXTENSION = {
+  pdf: 'application/pdf',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+};
 
 export function buzonActivo() {
   return !!(import.meta.env && import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
@@ -59,7 +72,37 @@ function nombreSeguro(nombre) {
     .replace(/[^\w.\-]+/g, '_').slice(0, 80);
 }
 
-/** Comprime una imagen en el navegador. Si no es imagen o no mejora, deja el original. */
+export function validarArchivoEstudio(file = {}) {
+  const nombre = String(file.name || '');
+  const extension = (nombre.match(/\.([^.]+)$/)?.[1] || '').toLowerCase();
+  const mimeDeclarado = String(file.type || '').toLowerCase();
+  const mime = MIME_EXTENSION[mimeDeclarado] ? mimeDeclarado : MIME_POR_EXTENSION[extension];
+
+  if (['heic', 'heif'].includes(extension) || ['image/heic', 'image/heif'].includes(mimeDeclarado)) {
+    return {
+      ok: false,
+      code: 'formato',
+      mensaje: 'La foto está en formato HEIC. En iPhone, envía una captura de pantalla o guárdala como JPG o PDF.',
+    };
+  }
+  if (!mime) {
+    return {
+      ok: false,
+      code: 'formato',
+      mensaje: 'Solo se aceptan archivos PDF o imágenes JPG, PNG y WebP.',
+    };
+  }
+  if (mime === 'application/pdf' && Number(file.size || 0) > MAX_BYTES) {
+    return {
+      ok: false,
+      code: 'grande',
+      mensaje: 'El PDF pesa más de 15 MB. Comprímelo o divídelo antes de adjuntarlo.',
+    };
+  }
+  return { ok: true, mime };
+}
+
+/** Comprime una imagen en el navegador. Si no mejora, deja el original. */
 async function comprimirImagen(file) {
   if (!file.type || !file.type.startsWith('image/')) return file;
   try {
@@ -81,18 +124,30 @@ async function comprimirImagen(file) {
     const base = nombreSeguro(file.name).replace(/\.[^.]+$/i, '');
     return new File([blob], `${base}.jpg`, { type: 'image/jpeg' });
   } catch (_) {
-    return file; // formatos que el navegador no decodifica (p. ej. HEIC): se sube tal cual
+    return file;
   }
 }
 
 /** Sube un archivo al buzón. Devuelve {path, nombre, size}. Lanza error con code='grande' si excede el tope. */
 export async function subirEstudio(folder, archivo) {
+  const validacion = validarArchivoEstudio(archivo);
+  if (!validacion.ok) {
+    const error = new Error(validacion.mensaje);
+    error.code = validacion.code;
+    throw error;
+  }
   const sb = await clientePacienteEstudios();
   let f = archivo;
   try { f = await comprimirImagen(archivo); } catch (_) { f = archivo; }
+  if (!f.type && validacion.mime) {
+    f = new File([f], f.name, { type: validacion.mime });
+  }
   if (f.size > MAX_BYTES) { const e = new Error('Archivo demasiado grande'); e.code = 'grande'; throw e; }
-  const path = `${folder}/${Date.now()}-${nombreSeguro(archivo.name)}`;
-  const { error } = await sb.storage.from(bucket()).upload(path, f, { contentType: f.type, upsert: false });
+  const mime = f.type || validacion.mime;
+  const base = nombreSeguro(f.name).replace(/\.[^.]+$/i, '') || 'archivo';
+  const extension = MIME_EXTENSION[mime] || 'bin';
+  const path = `${folder}/${Date.now()}-${base}.${extension}`;
+  const { error } = await sb.storage.from(bucket()).upload(path, f, { contentType: mime, upsert: false });
   if (error) throw error;
   return { path, nombre: archivo.name, size: f.size };
 }
@@ -119,8 +174,16 @@ export async function firmarEstudio(ruta, expiraSegundos = 3600) {
   return data.signedUrl;
 }
 
-/** Borra un estudio individual sin tocar la respuesta ni los demás archivos. */
+/** Borra un estudio desde el panel médico autenticado. */
 export async function eliminarEstudio(ruta) {
+  if (!ruta || !buzonActivo()) return;
+  const sb = await clienteSupabase();
+  const { error } = await sb.storage.from(bucket()).remove([ruta]);
+  if (error) throw error;
+}
+
+/** Borra un estudio con la sesión anónima que lo subió. */
+export async function eliminarEstudioPaciente(ruta) {
   if (!ruta || !buzonActivo()) return;
   const sb = await clientePacienteEstudios();
   const { data, error } = await sb.storage.from(bucket()).remove([ruta]);

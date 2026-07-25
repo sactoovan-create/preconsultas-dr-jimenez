@@ -8,7 +8,7 @@ y reglas clínicas `ruteoClinico.version: 2`.
 - El motivo de consulta y los temas elegidos gobiernan el flujo. La escala MRS ya
   no se pregunta a todas las pacientes.
 - El camino mínimo es identificación, motivo, seguridad, contexto reproductivo,
-  antecedentes, prevención opcional, estudios y envío.
+  antecedentes, historia y medicamentos, prevención opcional, estudios y envío.
 - Sangrado, dolor, ciclos, climaterio, salud urinaria, salud íntima, mama y plan
   reproductivo abren pasos propios solo cuando la paciente los elige.
 - Las profundizaciones son opcionales. El portal conserva tanto las respuestas
@@ -34,10 +34,11 @@ Antes de las preguntas clínicas se registra:
 
 Cuando la paciente elige embarazo/posparto, reporta embarazo confirmado o ya
 consta esa etapa, también se revisan cefalea persistente o cambios visuales,
-disminución de movimientos fetales, salida de líquido, edema marcado, síntomas
-unilaterales de trombosis, fiebre de 38 °C o más, hemorragia posparto y
-pensamientos de hacerse daño o dañar al bebé. Se registra además la edad
-gestacional o el tiempo desde el parto cuando se conoce.
+disminución de movimientos fetales, salida de líquido, sangrado mayor que un
+manchado leve durante el embarazo, edema marcado, síntomas unilaterales de
+trombosis, fiebre de 38 °C o más, hemorragia posparto y pensamientos de hacerse
+daño o dañar al bebé. Se registra además la edad gestacional o el tiempo desde el
+parto cuando se conoce.
 
 Una combinación de alarma muestra que el formulario no se revisa continuamente y
 que la paciente no debe esperar una respuesta del consultorio para acudir a
@@ -78,7 +79,7 @@ atención urgente de inmediato.
 - opción “ninguna” mutuamente exclusiva;
 - borrador de sesión y limpieza después de enviar;
 - error de red sin pérdida de respuestas;
-- archivo listo, fallido, reintento y eliminación;
+- archivo preparado, envío conjunto, rollback ante fallo y eliminación;
 - hora de recepción del servidor;
 - contrato v1 y v2;
 - teléfono duplicado sin asociación automática;
@@ -88,6 +89,14 @@ atención urgente de inmediato.
 ## Buzón privado de estudios
 
 - La paciente debe aceptar la autorización antes de que se suba el primer archivo.
+- La selección permanece local hasta el envío final, para que recargar o cerrar
+  antes de enviar no deje estudios huérfanos en el bucket.
+- Cada envío conserva UUID, carpeta y manifiesto de archivos ya recibidos durante
+  los reintentos y las recargas del borrador. Si el servidor guardó la respuesta
+  pero se perdió la confirmación, el segundo intento no la duplica ni vuelve a
+  subir los estudios.
+- El cron del ERP elimina objetos con más de 24 horas que no estén referenciados
+  por ninguna respuesta de Supabase.
 - El navegador abre una sesión anónima aislada de Supabase Auth, sin pedir cuenta
   ni contraseña.
 - Cada sesión solo puede subir, consultar metadatos y retirar sus propios objetos.

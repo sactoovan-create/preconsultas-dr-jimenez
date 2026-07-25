@@ -8,6 +8,7 @@ import {
   normalizarTelefonoMexicano,
   pasosPara,
   porcentajePaso,
+  reconciliarPosibleEmbarazo,
   senalFuerzaDolor,
   senalFuerzaSangrado,
   TEMAS_CONSULTA,
@@ -69,6 +70,7 @@ const SENALES_URGENCIA = [
 ];
 
 const SENALES_MATERNAS = [
+  { id: 'sangrado_embarazo', etiqueta: 'Durante el embarazo: sangrado vaginal mayor que un manchado leve' },
   { id: 'hemorragia_posparto', etiqueta: 'Después del parto: sangrado que empapa una toalla o más en una hora, o coágulos grandes' },
   { id: 'fiebre_materna', etiqueta: 'Durante el embarazo o posparto: fiebre de 38 °C o más' },
   { id: 'cefalea_vision', etiqueta: 'Dolor de cabeza intenso que no cede, visión borrosa, luces o manchas' },
@@ -353,11 +355,7 @@ export default function PreConsulta({
     if (valor === 'embarazada') cambio.posibleEmbarazo = 'confirmado';
     if (['menopausia', 'histerectomia'].includes(valor)) cambio.posibleEmbarazo = 'no_aplica';
     setHc((p) => {
-      if (
-        p.etapaReproductiva === 'embarazada'
-        && valor !== 'embarazada'
-        && p.posibleEmbarazo === 'confirmado'
-      ) {
+      if (valor !== 'embarazada' && p.posibleEmbarazo === 'confirmado') {
         cambio.posibleEmbarazo = null;
       }
       if (
@@ -375,11 +373,7 @@ export default function PreConsulta({
   };
 
   const setPosibleEmbarazo = (valor) => {
-    setHc((p) => {
-      const siguiente = { ...p, posibleEmbarazo: valor };
-      if (!contextoMaterno(siguiente)) siguiente.senalesMaternas = [];
-      return siguiente;
-    });
+    setHc((p) => reconciliarPosibleEmbarazo(p, valor));
     setGuardado(false);
     limpiarError();
   };
@@ -754,7 +748,13 @@ export default function PreConsulta({
           valor={hc.antecedentesSeleccionados}
           onChange={setAntecedentes}
         />
-        <div className="pc-datos">
+      </>
+    );
+
+    if (paso.id === 'historia') return (
+      <>
+        <p className="pc-paso-intro">Completa solo lo que recuerdes. Los campos de esta sección son opcionales y el doctor los verificará contigo.</p>
+        <div className="pc-datos pc-datos-obstetricos">
           <CampoNumero etiqueta="Embarazos" valor={hc.embarazos} onChange={(v) => setH('embarazos', v)} max={30} />
           <CampoNumero etiqueta="Partos" valor={hc.partos} onChange={(v) => setH('partos', v)} max={30} />
           <CampoNumero etiqueta="Cesáreas" valor={hc.cesareas} onChange={(v) => setH('cesareas', v)} max={30} />
@@ -833,7 +833,6 @@ export default function PreConsulta({
               <input
                 type="checkbox"
                 checked={acepto}
-                disabled={Boolean(estudiosEstado?.total)}
                 onChange={(e) => { setAcepto(e.target.checked); limpiarError(); }}
               />
               <span>Autorizo que mis respuestas y los estudios que adjunte se compartan con el consultorio del Dr. Iván Jiménez Martínez para mi atención médica.</span>
@@ -843,7 +842,7 @@ export default function PreConsulta({
         )}
         <div id="estudios">
           {typeof extraAntesDeEnviar === 'function'
-            ? extraAntesDeEnviar({ consentimientoAceptado: acepto })
+            ? extraAntesDeEnviar({ consentimientoAceptado: acepto, enviando })
             : extraAntesDeEnviar}
         </div>
         <button type="button" className="pc-guardar pc-enviar" onClick={enviar} disabled={enviando} aria-busy={enviando}>

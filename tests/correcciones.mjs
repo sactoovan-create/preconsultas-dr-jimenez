@@ -10,6 +10,14 @@ import { condicionesAutomaticas } from '../instruments/anticoncepcion/engine.js'
 import { clasificarCiclo } from '../instruments/sop/engine.js';
 import { evaluarVia } from '../instruments/menopausia/engine.js';
 import { extraerLabsPorVision } from '../core/labReaderVision.js';
+import { validarArchivoEstudio } from '../core/estudios.js';
+import {
+  borrarIntentoEnvio,
+  cargarIntentoEnvio,
+  CLAVE_INTENTO_ENVIO,
+  guardarAdjuntosIntento,
+  VIGENCIA_INTENTO_MS,
+} from '../core/intentoEnvio.js';
 
 let ok = 0, fail = 0;
 function check(nombre, cond) {
@@ -58,6 +66,77 @@ const labs = await extraerLabsPorVision('imagen', 'image/jpeg', async () => resp
 check('el valor real sí se conserva', labs.colesterolTotal === 180);
 check('cadena vacía no se vuelve cero', labs.colesterolHdl === undefined);
 check('booleano no se vuelve cero', labs.glucosa === undefined);
+
+console.log('\nBuzón de estudios: formatos compatibles');
+check('PDF y JPEG son aceptados',
+  validarArchivoEstudio({ name: 'laboratorio.pdf', type: 'application/pdf' }).ok
+  && validarArchivoEstudio({ name: 'ultrasonido.jpg', type: 'image/jpeg' }).ok);
+check('HEIC se bloquea con orientación específica',
+  !validarArchivoEstudio({ name: 'IMG_1234.HEIC', type: 'image/heic' }).ok
+  && /HEIC/.test(validarArchivoEstudio({ name: 'IMG_1234.HEIC', type: 'image/heic' }).mensaje));
+check('un formato ajeno no llega al bucket',
+  !validarArchivoEstudio({ name: 'archivo.exe', type: 'application/octet-stream' }).ok);
+check('un PDF mayor de 15 MB se rechaza antes de mostrarlo como listo',
+  !validarArchivoEstudio({
+    name: 'laboratorio-pesado.pdf',
+    type: 'application/pdf',
+    size: (15 * 1024 * 1024) + 1,
+  }).ok);
+
+console.log('\nEnvío idempotente al recargar');
+const memoria = (() => {
+  const datos = new Map();
+  return {
+    getItem: (clave) => datos.get(clave) || null,
+    setItem: (clave, valor) => datos.set(clave, String(valor)),
+    removeItem: (clave) => datos.delete(clave),
+  };
+})();
+const intentoInicial = cargarIntentoEnvio({
+  storage: memoria,
+  backendActivo: true,
+  ahora: 1000,
+  crearId: () => '11111111-1111-4111-8111-111111111111',
+  crearCarpeta: () => 'folder-estable',
+});
+const intentoRecargado = cargarIntentoEnvio({
+  storage: memoria,
+  backendActivo: true,
+  ahora: 2000,
+  crearId: () => '22222222-2222-4222-8222-222222222222',
+  crearCarpeta: () => 'folder-nueva',
+});
+check('recargar conserva UUID y carpeta del mismo borrador',
+  intentoRecargado.respuestaId === intentoInicial.respuestaId
+  && intentoRecargado.estudiosFolder === intentoInicial.estudiosFolder);
+guardarAdjuntosIntento([{
+  path: 'folder-estable/1700000000000-laboratorio.pdf',
+  nombre: 'laboratorio.pdf',
+  size: 12345,
+}], memoria);
+const intentoConAdjunto = cargarIntentoEnvio({
+  storage: memoria,
+  backendActivo: true,
+  ahora: 3000,
+  crearId: () => '22222222-2222-4222-8222-222222222222',
+  crearCarpeta: () => 'folder-nueva',
+});
+check('recargar conserva el manifiesto sin volver a seleccionar archivos',
+  intentoConAdjunto.adjuntos.length === 1
+  && intentoConAdjunto.adjuntos[0].path === 'folder-estable/1700000000000-laboratorio.pdf');
+const intentoVencido = cargarIntentoEnvio({
+  storage: memoria,
+  backendActivo: true,
+  ahora: 1000 + VIGENCIA_INTENTO_MS + 1,
+  crearId: () => '33333333-3333-4333-8333-333333333333',
+  crearCarpeta: () => 'folder-renovada',
+});
+check('un borrador vencido recibe un intento nuevo',
+  intentoVencido.respuestaId !== intentoInicial.respuestaId
+  && intentoVencido.estudiosFolder === 'folder-renovada');
+borrarIntentoEnvio(memoria);
+check('el envío confirmado limpia el intento persistido',
+  memoria.getItem(CLAVE_INTENTO_ENVIO) === null);
 
 console.log(`\nResultado correcciones: ${ok} pasan, ${fail} fallan.`);
 if (fail > 0) process.exit(1);

@@ -26,7 +26,7 @@ Cada envío de una paciente es **un objeto JSON** con esta forma:
   "version": 2,
   "formularioVersion": "2026.08",
   "submittedAtClient": "2026-08-01T20:10:50.000Z",
-  "id": "uuid|loc_...",         // id único de la respuesta (lo asigna el almacén)
+  "id": "uuid|loc_...",         // id único estable del envío
   "creado": "2026-06-23T20:11:05.123Z",  // ISO 8601 UTC, lo asigna el almacén
 
   "paciente": {
@@ -109,10 +109,13 @@ Cada envío de una paciente es **un objeto JSON** con esta forma:
 }
 ```
 
-`id` y `creado` viven en la fila del almacén, no dentro de `contenido`. El lector
-los mezcla en el objeto al mostrarlo en el panel. En modo local se generan en el
-navegador solo para desarrollo. `submittedAtClient` conserva el reloj del teléfono;
-la columna `creado` de PostgreSQL es siempre la hora autoritativa de recepción.
+`id` y `creado` viven en la fila del almacén, no dentro de `contenido`. El portal
+preasigna el UUID para que un reintento por corte de red conserve la misma llave;
+el UUID y la carpeta se conservan junto al borrador durante cuatro horas, incluso
+si la pestaña se recarga. PostgreSQL lo usa como `id` de la fila. El lector mezcla
+ambos campos en el objeto al mostrarlo en el panel. `submittedAtClient` conserva
+el reloj del teléfono; la columna `creado` de PostgreSQL es siempre la hora
+autoritativa de recepción.
 
 `estudiosFolder`, `adjuntos` y `ruteoClinico` son campos opcionales.
 `alertaSeguridad` congela la orientación mostrada a la paciente. Si `urgente` es
