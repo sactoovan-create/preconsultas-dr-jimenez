@@ -94,6 +94,14 @@ export async function firmarEstudio(ruta, expiraSegundos = 3600) {
   return data.signedUrl;
 }
 
+/** Borra un estudio individual sin tocar la respuesta ni los demás archivos. */
+export async function eliminarEstudio(ruta) {
+  if (!ruta || !buzonActivo()) return;
+  const sb = await clienteSupabase();
+  const { error } = await sb.storage.from(bucket()).remove([ruta]);
+  if (error) throw error;
+}
+
 /** Borra todos los archivos de una carpeta de estudios. Se usa al eliminar una
  *  respuesta para no dejar datos de salud huérfanos (e irrecuperables, pues el
  *  identificador de la carpeta vive solo en la fila). Mejor esfuerzo. */

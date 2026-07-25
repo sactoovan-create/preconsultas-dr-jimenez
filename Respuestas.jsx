@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { listarRespuestas, eliminarRespuesta, modoAlmacenamiento, sesion, iniciarSesion, cerrarSesion } from './core/respuestas.js';
-import { listarEstudios, firmarEstudio, eliminarCarpeta } from './core/estudios.js';
+import { listarEstudios, firmarEstudio, eliminarEstudio, eliminarCarpeta } from './core/estudios.js';
 import { ruteoDesdeRespuesta } from './core/precarga.js';
 import { evaluarProfundizacion, MODULOS as PROFUNDOS } from './core/profundos/index.js';
 import { agendaDeHoy, cruzarAgenda } from './core/agenda.js';
@@ -333,31 +333,70 @@ function Profundos({ profundos }) {
 function EstudiosAdjuntos({ folder }) {
   const [estado, setEstado] = useState('cargando'); // 'cargando' | 'listo' | 'error'
   const [archivos, setArchivos] = useState([]);
+  const [eliminando, setEliminando] = useState('');
+  const [aviso, setAviso] = useState(null);
 
   useEffect(() => {
     let vivo = true;
     setEstado('cargando');
+    setAviso(null);
+    setEliminando('');
     listarEstudios(folder)
       .then((a) => { if (vivo) { setArchivos(a); setEstado('listo'); } })
       .catch(() => { if (vivo) setEstado('error'); });
     return () => { vivo = false; };
   }, [folder]);
 
+  const descartar = async (archivo) => {
+    const nombre = archivo.nombre.replace(/^\d{10,}-/, '');
+    if (!window.confirm(`¿Descartar "${nombre}" de forma permanente? La preconsulta y los demás estudios se conservarán.`)) return;
+    setAviso(null);
+    setEliminando(archivo.ruta);
+    try {
+      await eliminarEstudio(archivo.ruta);
+      setArchivos((actuales) => actuales.filter((a) => a.ruta !== archivo.ruta));
+      setAviso({ tipo: 'exito', texto: `Se descartó "${nombre}".` });
+    } catch (_) {
+      setAviso({ tipo: 'error', texto: `No se pudo descartar "${nombre}". Inténtalo de nuevo.` });
+    } finally {
+      setEliminando('');
+    }
+  };
+
   return (
     <section className="resp-sec">
       <h3>Estudios adjuntos</h3>
       {estado === 'cargando' && <p className="resp-nada">Cargando estudios…</p>}
       {estado === 'error' && <p className="resp-nada">No se pudieron cargar los estudios.</p>}
+      {aviso && (
+        <p
+          className={`resp-estudio-aviso ${aviso.tipo}`}
+          role={aviso.tipo === 'error' ? 'alert' : 'status'}
+        >
+          {aviso.texto}
+        </p>
+      )}
       {estado === 'listo' && (archivos.length ? (
         <ul className="resp-hc">
           {archivos.map((a) => (
-            <li key={a.nombre}>
-              <span>{a.nombre}</span>
-              <AbrirEstudio ruta={a.ruta} />
+            <li key={a.ruta} className="resp-estudio-fila">
+              <span className="resp-estudio-nombre">{a.nombre.replace(/^\d{10,}-/, '')}</span>
+              <span className="resp-estudio-acciones">
+                <AbrirEstudio ruta={a.ruta} />
+                <button
+                  type="button"
+                  className="resp-descartar-estudio"
+                  onClick={() => descartar(a)}
+                  disabled={!!eliminando}
+                  aria-label={`Descartar ${a.nombre.replace(/^\d{10,}-/, '')}`}
+                >
+                  {eliminando === a.ruta ? 'Descartando…' : 'Descartar'}
+                </button>
+              </span>
             </li>
           ))}
         </ul>
-      ) : <p className="resp-nada">No subió estudios.</p>)}
+      ) : <p className="resp-nada">{aviso?.tipo === 'exito' ? 'No quedan estudios adjuntos.' : 'No subió estudios.'}</p>)}
     </section>
   );
 }
