@@ -1,10 +1,21 @@
-import { profundizacionesSugeridas, evaluarProfundizacion } from '../core/profundos/index.js';
+import {
+  evaluarProfundizacion,
+  filtrarProfundizacionesActivas,
+  profundizacionesSugeridas,
+} from '../core/profundos/index.js';
 let ok=0, fail=0; const check=(n,c)=>{ if(c){ok++;console.log('  PASA  '+n);} else {fail++;console.log('  FALLA '+n);} };
 console.log('\nProfundizaciones adaptativas');
 check('menopausia dispara genitourinario y salud sexual', JSON.stringify(profundizacionesSugeridas({mrs:{mrs_sequedad:3}}).map(x=>x.id))==='["genitourinario","salud-sexual"]');
 check('dolor dispara mapa de dolor', profundizacionesSugeridas({dolor:{tiene:true}}).some(x=>x.id==='dolor-pelvico'));
 check('SOP dispara por reglas irregulares', profundizacionesSugeridas({hc:{reglasRegulares:false}}).some(x=>x.id==='sop'));
 check('vejiga leve NO dispara nada', profundizacionesSugeridas({mrs:{mrs_vejiga:1}}).length===0);
+check('escapes estructurados disparan ICIQ-SF', profundizacionesSugeridas({hc:{sintomasUrinarios:['escapes']}}).some(x=>x.id==='incontinencia'));
+check('tema íntimo elegido dispara módulos dirigidos', profundizacionesSugeridas({hc:{molestiasIntimas:['sequedad']}}).some(x=>x.id==='genitourinario'));
+const ocultas = filtrarProfundizacionesActivas(
+  {hc:{temasConsulta:['control']},dolor:{tiene:false},mrs:{}},
+  {'salud-sexual':{ss_deseo:2},incontinencia:{iciq_frecuencia:3}},
+);
+check('módulos que ya no aplican no conservan respuestas ocultas', Object.keys(ocultas).length===0);
 check('FSFI-6 corte <=19 positivo', /posible dificultad/.test(evaluarProfundizacion('salud-sexual',{ss_deseo:2,ss_excitacion:2,ss_lubricacion:1,ss_orgasmo:3,ss_satisfaccion:2,ss_dolor:4}).resumen));
 check('FSFI-6 sin actividad marca cautela', /cautela/.test(evaluarProfundizacion('salud-sexual',{ss_deseo:2,ss_excitacion:0,ss_lubricacion:0,ss_orgasmo:0,ss_satisfaccion:3,ss_dolor:0}).resumen));
 check('GSM identifica síntoma más molesto', /lo que más le molesta/.test(evaluarProfundizacion('genitourinario',{sequedad:3,comezon:1,ardor:2,dolor_sexo:2,urinario:1,evita_intimidad:1,mbs:3,impacto_dia:2,impacto_animo:3,impacto_intimidad:2}).resumen));

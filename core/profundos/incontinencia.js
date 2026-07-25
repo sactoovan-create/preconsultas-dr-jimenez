@@ -22,7 +22,9 @@ export function disparador(ar) {
   const mrs = (ar && ar.mrs) || {};
   const hc = (ar && ar.hc) || {};
   const vejiga = Number(mrs.mrs_vejiga);
-  return (Number.isFinite(vejiga) && vejiga >= 2) || hc.escapesOrina === true;
+  return (Number.isFinite(vejiga) && vejiga >= 2)
+    || hc.escapesOrina === true
+    || (Array.isArray(hc.sintomasUrinarios) && hc.sintomasUrinarios.includes('escapes'));
 }
 
 export const PREGUNTAS = [

@@ -32,7 +32,7 @@
 .portal-punto-dorado { width: 5px; height: 5px; border-radius: 50%; background: var(--dorado); flex-shrink: 0; }
 .portal-hero-titulo {
   font-family: var(--display); font-weight: 300; font-variation-settings: 'opsz' 144;
-  font-size: clamp(42px, 7vw, 78px); line-height: .98; letter-spacing: -.02em;
+  font-size: 72px; line-height: .98; letter-spacing: 0;
   max-width: 640px; margin: 0 auto 20px; animation: rev .9s ease both;
 }
 .portal-hero-titulo em { font-style: italic; }
@@ -100,9 +100,22 @@
 .portal-logo { width: 100%; max-width: 200px; height: auto; display: block; }
 .portal-tarjeta-fin .portal-logo { margin: 0 auto 22px; }
 .portal-tarjeta-fin .portal-sello { margin: 0 auto 22px; }
-.portal-tarjeta-fin h1 { font-family: var(--display); font-weight: 300; font-size: 36px; letter-spacing: -.02em; margin-bottom: 14px; }
+.portal-tarjeta-fin h1 { font-family: var(--display); font-weight: 300; font-size: 36px; letter-spacing: 0; margin-bottom: 14px; }
 .portal-tarjeta-fin p { font-size: 15px; line-height: 1.65; color: rgba(31,58,46,.74); }
 .portal-fin-nota { margin-top: 18px; font-size: 12.5px; color: rgba(31,58,46,.5); }
+.portal-fin-urgente {
+  margin-top: 22px; padding: 16px; text-align: left;
+  border: 1px solid rgba(184,80,66,.45); border-radius: 8px;
+  background: rgba(184,80,66,.10); color: #87372f;
+}
+.portal-fin-urgente b { display: block; font-size: 15px; }
+.portal-fin-urgente p { margin: 6px 0 0; color: #87372f; font-size: 13px; }
+
+@media (max-width: 640px) {
+  .portal-hero { padding: 54px 20px 110px; }
+  .portal-hero-titulo { font-size: 46px; }
+  .portal-tarjeta-fin { padding: 42px 24px; border-radius: 8px; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .portal-hero-titulo, .portal-form .pc-seccion { animation: none; }

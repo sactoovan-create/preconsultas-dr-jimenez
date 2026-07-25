@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { subirEstudio, MAX_ARCHIVOS } from '../core/estudios.js';
+import { eliminarEstudio, subirEstudio, MAX_ARCHIVOS } from '../core/estudios.js';
 
 /**
  * Buzón de estudios para la paciente, al final del cuestionario. Sube y sigue:
  * cada archivo muestra su estado. Los archivos van al almacenamiento privado; la
- * paciente nunca ve una carpeta ni inicia sesión en nada.
+ * paciente no ve una carpeta ni inicia sesión manualmente en nada.
  */
 
 const VERDE = '#1F3A2E';
@@ -17,29 +17,52 @@ const ICONO = {
   error: { t: 'No se pudo', c: 'var(--terracota)' },
 };
 
-export default function SubirEstudios({ folder, onEstadoCambio }) {
+export default function SubirEstudios({ folder, habilitado = false, onEstadoCambio }) {
   const [items, setItems] = useState([]);
   const [aviso, setAviso] = useState('');
 
   const subiendo = items.some((i) => i.estado === 'subiendo');
-  const listos = items.filter((i) => i.estado === 'listo').length;
+  const itemsListos = items.filter((i) => i.estado === 'listo' && i.resultado);
+  const listos = itemsListos.length;
   const errores = items.filter((i) => i.estado === 'error').length;
 
   useEffect(() => {
     if (!onEstadoCambio) return;
-    onEstadoCambio({ total: items.length, subiendo, listos, errores });
+    onEstadoCambio({
+      total: items.length,
+      subiendo,
+      listos,
+      errores,
+      archivos: itemsListos.map((i) => i.resultado),
+    });
   }, [errores, items.length, listos, onEstadoCambio, subiendo]);
 
   const subirUno = (file, id) => {
     setItems((l) => l.map((it) => (it.id === id ? { ...it, estado: 'subiendo', detalle: undefined } : it)));
     subirEstudio(folder, file)
-      .then(() => setItems((l) => l.map((it) => (it.id === id ? { ...it, estado: 'listo' } : it))))
+      .then((resultado) => setItems((l) => l.map((it) => (it.id === id ? { ...it, estado: 'listo', resultado } : it))))
       .catch((err) => setItems((l) => l.map((it) => (it.id === id
         ? { ...it, estado: 'error', detalle: err && err.code === 'grande' ? 'Pesa demasiado; intenta una foto más pequeña' : 'No se pudo subir' }
         : it))));
   };
 
+  const quitar = async (item) => {
+    setAviso('');
+    if (item.resultado?.path) {
+      setItems((l) => l.map((it) => (it.id === item.id ? { ...it, estado: 'subiendo', quitando: true } : it)));
+      try {
+        await eliminarEstudio(item.resultado.path);
+      } catch (_) {
+        setItems((l) => l.map((it) => (it.id === item.id ? { ...it, estado: 'listo', quitando: false } : it)));
+        setAviso('No pudimos quitar ese archivo. Inténtalo de nuevo.');
+        return;
+      }
+    }
+    setItems((l) => l.filter((it) => it.id !== item.id));
+  };
+
   const onElegir = (e) => {
+    if (!habilitado) return;
     const files = Array.from(e.target.files || []);
     e.target.value = '';
     if (!files.length) return;
@@ -63,20 +86,25 @@ export default function SubirEstudios({ folder, onEstadoCambio }) {
       </h2>
       <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: TINTA, marginTop: 0 }}>
         Laboratorios, ultrasonidos o recetas, en PDF o foto. Le ayudan a tu doctor a llegar
-        con tu información lista. Puedes cerrar esta ventana cuando terminen de subir.
+        con tu información lista. Cuando terminen de subir, presiona “Enviar cuestionario y estudios”.
       </p>
+      {!habilitado && (
+        <p role="status" style={{ fontSize: '0.88rem', color: 'var(--oro-texto)', fontWeight: 700 }}>
+          Acepta primero la autorización de arriba para habilitar la subida.
+        </p>
+      )}
 
       <label style={{
-        display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer',
-        background: VERDE, color: '#fff', borderRadius: 10, padding: '11px 18px',
+        display: 'inline-flex', alignItems: 'center', gap: 8, cursor: habilitado ? 'pointer' : 'not-allowed',
+        background: habilitado ? VERDE : '#8D968F', color: '#fff', borderRadius: 8, padding: '11px 18px',
         fontSize: '0.95rem', fontWeight: 500,
-      }}>
+      }} aria-disabled={!habilitado}>
         Seleccionar archivos
-        <input type="file" multiple accept="application/pdf,image/*" onChange={onElegir} style={{ display: 'none' }} />
+        <input type="file" multiple disabled={!habilitado} accept="application/pdf,image/*" onChange={onElegir} style={{ display: 'none' }} />
       </label>
 
       {items.length > 0 && (
-        <ul style={{ listStyle: 'none', padding: 0, margin: '16px 0 0' }}>
+        <ul aria-live="polite" style={{ listStyle: 'none', padding: 0, margin: '16px 0 0' }}>
           {items.map((it) => (
             <li key={it.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, padding: '8px 0', borderBottom: `1px solid ${DORADO}22`, fontSize: '0.9rem' }}>
               <span style={{ color: TINTA, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{it.nombre}</span>
@@ -85,20 +113,30 @@ export default function SubirEstudios({ folder, onEstadoCambio }) {
                   {ICONO[it.estado].t}{it.estado === 'error' && it.detalle ? `: ${it.detalle}` : ''}
                 </span>
                 {it.estado === 'error' && it.file && (
-                  <button onClick={() => subirUno(it.file, it.id)}
+                  <button type="button" onClick={() => subirUno(it.file, it.id)}
                           style={{ border: `1px solid ${DORADO}`, background: 'transparent', color: VERDE, borderRadius: 8, padding: '3px 10px', fontSize: '0.82rem', cursor: 'pointer' }}>
                     Reintentar
                   </button>
                 )}
+                {it.estado !== 'subiendo' && (
+                  <button
+                    type="button"
+                    onClick={() => quitar(it)}
+                    style={{ border: 0, background: 'transparent', color: 'var(--terracota)', padding: '4px 2px', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer' }}
+                  >
+                    Quitar
+                  </button>
+                )}
+                {it.quitando && <span style={{ color: DORADO }}>Quitando…</span>}
               </span>
             </li>
           ))}
         </ul>
       )}
 
-      {aviso && <div style={{ marginTop: 12, color: 'var(--terracota)', fontSize: '0.88rem' }}>{aviso}</div>}
+      {aviso && <div role="alert" style={{ marginTop: 12, color: 'var(--terracota)', fontSize: '0.88rem' }}>{aviso}</div>}
       {listos > 0 && !subiendo && (
-        <div style={{ marginTop: 14, color: 'var(--ok)', fontWeight: 600, fontSize: '0.92rem' }}>
+        <div role="status" aria-live="polite" style={{ marginTop: 14, color: 'var(--ok)', fontWeight: 600, fontSize: '0.92rem' }}>
           {listos === 1 ? 'Tu estudio llegó al consultorio.' : `Tus ${listos} estudios llegaron al consultorio.`}
         </div>
       )}

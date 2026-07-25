@@ -12,7 +12,9 @@
  * registro (construirRegistro), no este motor.
  */
 
-export const RUTEO_VERSION = 1;
+import { MRS_IDS } from './preconsultaFlow.js';
+
+export const RUTEO_VERSION = 2;
 
 // Catálogo de instrumentos (ids = carpetas en instruments/).
 const NOMBRE = {
@@ -35,9 +37,15 @@ function num(x) { if (x == null || x === '') return null; const n = Number(x); r
 function txt(x) { return (x == null ? '' : String(x)).toLowerCase(); }
 
 /** Suma del MRS a partir de los síntomas crudos (0..44). */
-function mrsTotal(mrs) {
-  if (!mrs) return 0;
-  return Object.keys(mrs).reduce((s, k) => s + (num(mrs[k]) || 0), 0);
+function mrsResultado(mrs) {
+  const datos = mrs || {};
+  const respondidos = MRS_IDS.filter((id) => {
+    const n = num(datos[id]);
+    return n != null && n >= 0 && n <= 4;
+  }).length;
+  if (respondidos !== MRS_IDS.length) return { total: null, respondidos, completa: false };
+  const total = MRS_IDS.reduce((s, id) => s + num(datos[id]), 0);
+  return { total, respondidos, completa: true };
 }
 
 const RE_METABOLICO = /(tirzepatida|tirzepatide|mounjaro|zepbound|semaglutida|semaglutide|ozempic|wegovy|saxenda|liraglutida|liraglutide)/;
@@ -55,7 +63,12 @@ export function instrumentosPara(pre) {
   const dolor = ar.dolor || {};
   const hc = ar.hc || {};
   const edad = num(pac.edad);
-  const total = mrsTotal(mrs);
+  const resultadoMrs = mrsResultado(mrs);
+  const total = resultadoMrs.total;
+  const temas = Array.isArray(hc.temasConsulta) ? hc.temasConsulta : [];
+  const etapa = hc.etapaReproductiva || '';
+  const posmenopausia = etapa === 'menopausia';
+  const enfermedadCardiovascular = hc.enfCorazon === true;
 
   const sug = [];
   const banderas = [];
@@ -79,49 +92,67 @@ export function instrumentosPara(pre) {
     vistos.add(instrumento);
   };
 
-  // ---------------- Capa 1: por edad (panel base) ----------------
+  // ---------------- Capa 1: recordatorios por edad ----------------
   if (edad != null) {
-    if (edad >= 52) {
-      add('osea', 'media', 'Riesgo de osteoporosis por edad posmenopáusica.', ['edad'], {}, 'completar_datos');
-      add('mama', 'media', 'Tamizaje mamario por edad.', ['edad']);
+    if (edad >= 65) {
+      add('osea', 'media', 'Revisar tamizaje de osteoporosis por edad.', ['edad'], {}, 'completar_datos');
+    }
+    if (edad >= 40 && edad <= 74) {
+      add('mama', 'baja', 'Revisar vigencia del tamizaje mamario según edad.', ['edad']);
+    }
+    if (edad >= 40 && edad <= 79 && !enfermedadCardiovascular) {
       add('cardiometabolico', 'media', 'Valorar riesgo cardiovascular (PREVENT) por edad.', ['edad'], {}, 'completar_datos');
-    } else if (edad >= 40) {
-      add('cardiometabolico', 'media', 'Valorar riesgo cardiometabólico por edad.', ['edad'], {}, 'completar_datos');
-      add('mama', 'baja', 'Tamizaje mamario según edad.', ['edad']);
-    } else if (edad >= 18) {
-      add('anticoncepcion', 'baja', 'Edad reproductiva: valorar anticoncepción.', ['edad']);
     }
   }
 
   // ---------------- Capa 2: por respuestas ----------------
 
   // Menopausia (síntomas vasomotores / MRS). Sintomática pesa más que la edad sola.
-  const sintomatica = total >= 5 || num(mrs.mrs_bochornos) >= 2;
-  if (sintomatica || (edad != null && edad >= 45)) {
-    const prio = total >= 17 ? 'alta' : (sintomatica ? 'media' : 'baja');
-    const motivo = sintomatica
-      ? `Menopause Rating Scale: total ${total}/44.`
-      : 'Edad perimenopáusica: valorar síntomas y candidatura a terapia hormonal.';
-    add('menopausia', prio, motivo, sintomatica ? ['mrs'] : ['edad'],
-      { mrs: { total, resumen: p.resumen && p.resumen.menopausia } });
+  const sintomatica = (total != null && total >= 5) || num(mrs.mrs_bochornos) >= 2;
+  const contextoClimaterio = temas.includes('climaterio')
+    || ['sin_regla_menos_12m', 'menopausia'].includes(etapa);
+  if (sintomatica || contextoClimaterio) {
+    const prio = total != null && total >= 17 ? 'alta' : (sintomatica ? 'media' : 'baja');
+    const motivo = resultadoMrs.completa
+      ? `Menopause Rating Scale completa: total ${total}/44.`
+      : 'Síntomas o cambio menstrual reportado: completar valoración de climaterio.';
+    add('menopausia', prio, motivo, resultadoMrs.completa ? ['mrs'] : ['motivo', 'etapa_reproductiva'],
+      { mrs: { total, completa: resultadoMrs.completa, respondidos: resultadoMrs.respondidos, resumen: p.resumen && p.resumen.menopausia } });
   }
 
   // Dolor pélvico (+ endometriosis si edad reproductiva)
-  if (dolor.tiene) {
+  if (dolor.tiene || temas.includes('dolor')) {
     const inten = num(dolor.intensidad);
     const prio = (inten != null && inten >= 7) || (num(dolor.meses) >= 6) ? 'alta' : 'media';
     add('dolor-pelvico', prio, `Reportó dolor pélvico${inten != null ? ` (${inten}/10)` : ''}${dolor.meses != null ? `, ${dolor.meses} meses` : ''}.`,
       ['dolor'], { dolor });
-    if (edad != null && edad <= 45) add('endometriosis', 'baja', 'Dolor pélvico en edad reproductiva: considerar endometriosis.', ['dolor', 'edad']);
+    const patronEndometriosis = Array.isArray(dolor.asociados)
+      && dolor.asociados.some((x) => ['menstruacion', 'relaciones', 'evacuar', 'orinar'].includes(x));
+    if (patronEndometriosis) {
+      add('endometriosis', 'media', 'Dolor relacionado con menstruación, relaciones, evacuación u orina: valorar endometriosis.', ['dolor']);
+    }
   }
 
   // Incontinencia / vejiga
-  if (num(mrs.mrs_vejiga) >= 2) add('incontinencia', 'media', 'Molestias urinarias reportadas en la escala.', ['mrs']);
+  const urinarios = Array.isArray(hc.sintomasUrinarios) ? hc.sintomasUrinarios : [];
+  if (num(mrs.mrs_vejiga) >= 2 || urinarios.includes('escapes')) {
+    add('incontinencia', 'media', 'Escapes o molestias urinarias reportadas.', urinarios.length ? ['hc'] : ['mrs']);
+  }
 
   // Cardiometabólico por antecedentes o fármaco metabólico. El seguimiento
   // longitudinal de composición corporal vive solo en el ERP/expediente.
   const meds = txt(hc.medicamentos);
   const enMetabolico = RE_METABOLICO.test(meds);
+  if (enfermedadCardiovascular) {
+    add(
+      'cardiometabolico',
+      'alta',
+      'Enfermedad cardiovascular o evento vascular previo reportado: revisar perfil cardiometabólico; PREVENT no aplica.',
+      ['antecedentes'],
+      {},
+      'revisar_en_consulta',
+    );
+  }
   if (hc.enfDiabetes || hc.enfHipertension || hc.fuma || enMetabolico) {
     const causas = [hc.enfDiabetes && 'diabetes', hc.enfHipertension && 'hipertensión', hc.fuma && 'tabaquismo', enMetabolico && 'fármaco metabólico'].filter(Boolean);
     add('cardiometabolico', 'alta', `Factores cardiometabólicos: ${causas.join(', ')}.`, ['antecedentes'], {}, 'completar_datos');
@@ -130,32 +161,70 @@ export function instrumentosPara(pre) {
   // Mama por antecedente familiar
   if (hc.famCancerMama || hc.famCancerOvario) {
     const f = [hc.famCancerMama && 'mama', hc.famCancerOvario && 'ovario'].filter(Boolean).join(' y ');
-    add('mama', 'alta', `Antecedente familiar de cáncer de ${f}: valorar riesgo (Tyrer-Cuzick).`, ['antecedente_familiar']);
+    const detalle = hc.cancerFamiliarDetalle ? ' con parentesco/edad reportados' : ' sin parentesco ni edad completos';
+    add('mama', 'alta', `Antecedente familiar de cáncer de ${f}${detalle}: completar evaluación de riesgo.`, ['antecedente_familiar'], {}, 'completar_datos');
+  }
+  const sintomasMama = Array.isArray(hc.sintomasMama) ? hc.sintomasMama : [];
+  const sintomasMamaPrioritarios = sintomasMama.filter((x) => [
+    'bolita', 'secrecion', 'piel_pezon',
+  ].includes(x));
+  if (sintomasMamaPrioritarios.length) {
+    add('mama', 'alta', 'Síntoma mamario nuevo reportado: requiere valoración clínica dirigida.', ['hc'], {}, 'revisar_en_consulta');
+  } else if (sintomasMama.includes('dolor')) {
+    add('mama', 'media', 'Dolor o sensibilidad mamaria persistente reportada.', ['hc'], {}, 'revisar_en_consulta');
   }
 
   // Ósea por factor de riesgo
-  if (hc.famOsteoporosis) add('osea', 'media', 'Antecedente familiar de osteoporosis.', ['antecedente_familiar'], {}, 'completar_datos');
+  if (hc.famOsteoporosis || (posmenopausia && hc.fuma)) {
+    add('osea', 'media', 'Posmenopausia con factor de riesgo óseo reportado.', ['etapa_reproductiva', 'antecedentes'], {}, 'completar_datos');
+  }
 
   // Síndrome poliendocrino metabólico ovárico (ciclos irregulares + androgénico nuevo)
   const androgenico = hc.acne || hc.hirsutismo || hc.caidaCabello;
-  if (hc.reglasRegulares === false || androgenico) {
-    const motivo = hc.reglasRegulares === false
-      ? (androgenico ? 'Ciclos irregulares y datos androgénicos.' : 'Ciclos irregulares reportados.')
-      : 'Datos androgénicos reportados.';
-    if (edad == null || edad <= 50) add('sop', androgenico && hc.reglasRegulares === false ? 'alta' : 'media', motivo, ['hc']);
+  const etapaCompatibleSop = !['menopausia', 'embarazada', 'posparto', 'histerectomia'].includes(etapa);
+  if (hc.reglasRegulares === false && etapaCompatibleSop) {
+    const motivo = androgenico ? 'Ciclos irregulares y datos androgénicos.' : 'Ciclos irregulares reportados.';
+    if (edad == null || edad <= 50) add('sop', androgenico ? 'alta' : 'media', motivo, ['hc'], {}, 'completar_datos');
   }
 
   // Sangrado uterino anormal (campo nuevo `sangrado`) + bandera posmenopáusica
-  if (hc.sangrado) {
+  const sangradoTipos = Array.isArray(hc.sangradoTipos) ? hc.sangradoTipos : [];
+  if (hc.sangrado || temas.includes('sangrado') || sangradoTipos.length) {
     add('hemorragia', 'alta', 'Sangrado uterino anormal reportado.', ['hc']);
-    if (edad != null && edad >= 51) {
+    if (posmenopausia || sangradoTipos.includes('despues_menopausia')) {
       banderas.push({ tipo: 'roja', mensaje: 'Sangrado posmenopáusico: descartar patología endometrial.', instrumentoRelacionado: 'hemorragia' });
     }
+  }
+
+  // Anticoncepción solo por objetivo expresado, nunca por edad.
+  if (hc.objetivoReproductivo === 'evitar' || temas.includes('anticoncepcion')) {
+    add('anticoncepcion', 'media', 'La paciente desea revisar anticoncepción.', ['objetivo_reproductivo']);
   }
 
   // Otras banderas de alarma
   if (dolor.tiene && num(dolor.intensidad) >= 9) {
     banderas.push({ tipo: 'roja', mensaje: 'Dolor pélvico intenso (9-10/10): valorar causa aguda.', instrumentoRelacionado: 'dolor-pelvico' });
+  }
+
+  const senales = Array.isArray(hc.senalesUrgencia) ? hc.senalesUrgencia : [];
+  if (senales.some((x) => x !== 'ninguna')) {
+    banderas.push({
+      tipo: 'roja',
+      mensaje: 'La paciente reportó señales que ameritaron orientación de atención urgente en el portal.',
+      instrumentoRelacionado: hc.sangrado ? 'hemorragia' : (dolor.tiene ? 'dolor-pelvico' : ''),
+    });
+  }
+  const senalesMaternas = Array.isArray(hc.senalesMaternas)
+    ? hc.senalesMaternas.filter((x) => x !== 'ninguna')
+    : [];
+  if (senalesMaternas.length) {
+    banderas.push({
+      tipo: 'roja',
+      mensaje: senalesMaternas.includes('ideas_dano')
+        ? 'La paciente reportó una señal urgente de salud mental durante embarazo o posparto.'
+        : 'La paciente reportó una señal materna urgente durante embarazo o posparto.',
+      instrumentoRelacionado: '',
+    });
   }
 
   sug.sort((a, b) => ORDEN_PRIORIDAD[a.prioridad] - ORDEN_PRIORIDAD[b.prioridad]);

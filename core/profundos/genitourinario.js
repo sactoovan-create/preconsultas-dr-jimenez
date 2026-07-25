@@ -7,14 +7,18 @@
  */
 
 export const ID = 'genitourinario';
-export const TITULO = "Salud íntima en la menopausia";
+export const TITULO = "Molestias vaginales y urinarias";
 export const FUENTE = "Escala de severidad de síntomas tipo MsFLASH (0 a 3) + lista del síntoma más molesto del consorcio COMMA + impacto en calidad de vida tipo DIVA (Day-to-Day Impact of Vaginal Aging); apoyado en el cuestionario de síntomas vulvovaginales (VSQ) y en el Cervantes-GSM (validado en español). No incluye el índice de salud vaginal (VHI), que lo mide el médico en la exploración.";
 
 function num(x) { const n = Number(x); return Number.isFinite(n) ? n : null; }
 
 export function disparador(ar) {
   const mrs = (ar && ar.mrs) || {};
-  return (num(mrs.mrs_sequedad) != null && num(mrs.mrs_sequedad) >= 2) || (num(mrs.mrs_sexual) != null && num(mrs.mrs_sexual) >= 2);
+  const hc = (ar && ar.hc) || {};
+  const intimas = Array.isArray(hc.molestiasIntimas) ? hc.molestiasIntimas : [];
+  return (num(mrs.mrs_sequedad) != null && num(mrs.mrs_sequedad) >= 2)
+    || (num(mrs.mrs_sexual) != null && num(mrs.mrs_sexual) >= 2)
+    || intimas.some((x) => ['sequedad', 'dolor_relaciones'].includes(x));
 }
 
 export const PREGUNTAS = [

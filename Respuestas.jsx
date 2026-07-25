@@ -17,6 +17,28 @@ import './Respuestas.css';
 
 const HC_LABEL = {
   motivo: 'Motivo de la visita', edadMenarca: 'Edad de la primera regla', embarazos: 'Embarazos',
+  temasConsulta: 'Temas elegidos', formularioVersion: 'Versión del formulario',
+  etapaReproductiva: 'Etapa reproductiva', ultimaMenstruacion: 'Última menstruación',
+  posibleEmbarazo: 'Posibilidad de embarazo', senalesUrgencia: 'Señales de alarma reportadas',
+  senalesMaternas: 'Señales de alarma de embarazo o posparto',
+  semanasEmbarazo: 'Semanas de embarazo', semanasPosparto: 'Semanas desde el parto',
+  lactancia: 'Lactancia actual',
+  sangradoTipos: 'Características del sangrado', sangradoAhora: 'Sangrado actual',
+  sangradoDuracionDias: 'Duración habitual del sangrado (días)', sangradoDesde: 'Cambio de sangrado desde',
+  diasEntreReglas: 'Días entre menstruaciones', cambiosAndrogenicos: 'Cambios de piel, vello o cabello',
+  sintomasUrinarios: 'Síntomas urinarios', urinarioDetalle: 'Detalle urinario',
+  molestiasIntimas: 'Temas de salud íntima', sintomasMama: 'Síntomas o cambios de mama',
+  mamaDetalle: 'Detalle de mama', objetivoReproductivo: 'Objetivo reproductivo',
+  mesesBuscandoEmbarazo: 'Meses buscando embarazo', antecedentesSeleccionados: 'Antecedentes confirmados',
+  enfTrombosis: 'Trombosis o embolia', migranaAura: 'Migraña con aura',
+  enfHepatica: 'Enfermedad hepática', enfRenal: 'Enfermedad renal',
+  cancerMamaPersonal: 'Antecedente personal de cáncer de mama',
+  cancerGinecologicoPersonal: 'Antecedente personal de cáncer ginecológico',
+  enfOsteoporosis: 'Osteoporosis o fractura por fragilidad', tabacoEstado: 'Tabaco',
+  tieneCuelloUterino: 'Conserva cuello uterino', ultimoPapFecha: 'Última prueba cervical',
+  ultimoPapResultado: 'Resultado de prueba cervical', ultimaMastografiaFecha: 'Última mastografía',
+  ultimaMastografiaResultado: 'Resultado de mastografía', cancerFamiliarTipos: 'Cáncer familiar',
+  cancerFamiliarDetalle: 'Detalle de cáncer familiar',
   partos: 'Partos', cesareas: 'Cesáreas', abortos: 'Pérdidas o abortos', reglasRegulares: 'Reglas regulares',
   sangrado: 'Sangrado vaginal fuera de lo normal', anticonceptivo: 'Método anticonceptivo',
   ultimoPap: 'Último Papanicolaou', cirugiasGineco: 'Cirugías ginecológicas',
@@ -38,7 +60,43 @@ function fmtFecha(iso) {
   if (Number.isNaN(d.getTime())) return '';
   return d.toLocaleString('es-MX', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
-function fmtValor(v) { if (v === true) return 'Sí'; if (v === false) return 'No'; return String(v); }
+const CODIGO_LABEL = {
+  control: 'Revisión ginecológica', sangrado: 'Sangrado', dolor: 'Dolor pélvico',
+  ciclos: 'Ciclos irregulares / andrógenos', climaterio: 'Climaterio',
+  anticoncepcion: 'Anticoncepción', fertilidad: 'Fertilidad', embarazo: 'Embarazo / posparto',
+  urinario: 'Salud urinaria', intimidad: 'Salud íntima', mama: 'Salud mamaria',
+  metabolico: 'Metabolismo', otro: 'Otro', menstrua_regular: 'Menstruaciones regulares',
+  menstrua_irregular: 'Menstruaciones irregulares', sin_regla_menos_12m: 'Sin regla por menos de 12 meses',
+  menopausia: 'Sin regla por 12 meses o más', posparto: 'Posparto / lactancia',
+  histerectomia: 'Histerectomía', no_se: 'No sabe', no_aplica: 'No aplica',
+  posible: 'Posible', confirmado: 'Confirmado', ninguna: 'Ninguna',
+  prefiero_no: 'Prefiere no responder', actual: 'Actualmente', antes: 'Anteriormente',
+  nunca: 'Nunca', normal: 'Normal', alterado: 'Alterado / seguimiento',
+  seguimiento: 'Requirió seguimiento', evitar: 'Desea evitar embarazo',
+  buscar_ahora: 'Busca embarazo ahora', buscar_despues: 'Desea embarazo después',
+  embarazada: 'Embarazada', no: 'No',
+  dolor_subito_intenso: 'Dolor súbito o muy intenso',
+  sangrado_abundante: 'Sangrado abundante',
+  desmayo_mareo: 'Desmayo, mareo intenso o debilidad',
+  dolor_hombro: 'Dolor de hombro con dolor abdominal o sangrado',
+  dificultad_respirar: 'Dificultad respiratoria o dolor torácico',
+  fiebre_dolor: 'Fiebre con dolor pélvico intenso',
+  hemorragia_posparto: 'Hemorragia posparto',
+  fiebre_materna: 'Fiebre de 38 °C o más en embarazo o posparto',
+  cefalea_vision: 'Cefalea intensa o alteraciones visuales',
+  movimiento_fetal_menos: 'Disminución de movimientos fetales',
+  salida_liquido: 'Salida de líquido durante el embarazo',
+  hinchazon_extrema: 'Hinchazón marcada de cara o manos',
+  pierna_unilateral: 'Dolor o hinchazón unilateral de pierna',
+  ideas_dano: 'Pensamientos de daño a sí misma o al bebé',
+};
+function fmtValor(v) {
+  if (v === true) return 'Sí';
+  if (v === false) return 'No';
+  if (Array.isArray(v)) return v.map((x) => CODIGO_LABEL[x] || String(x).replaceAll('_', ' ')).join(', ');
+  if (typeof v === 'object') return '';
+  return CODIGO_LABEL[v] || String(v).replaceAll('_', ' ');
+}
 
 function fmtHora(iso) {
   if (!iso) return '';

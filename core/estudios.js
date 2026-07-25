@@ -22,6 +22,31 @@ function bucket() {
   return import.meta.env.VITE_ESTUDIOS_BUCKET || 'estudios';
 }
 
+let _clientePaciente = null;
+async function clientePacienteEstudios() {
+  if (_clientePaciente) return _clientePaciente;
+  const { createClient } = await import('@supabase/supabase-js');
+  _clientePaciente = createClient(
+    import.meta.env.VITE_SUPABASE_URL,
+    import.meta.env.VITE_SUPABASE_ANON_KEY,
+    {
+      auth: {
+        persistSession: true,
+        storage: window.sessionStorage,
+        storageKey: 'drj-estudios-paciente',
+        autoRefreshToken: true,
+        detectSessionInUrl: false,
+      },
+    },
+  );
+  const { data } = await _clientePaciente.auth.getSession();
+  if (!data.session) {
+    const { error } = await _clientePaciente.auth.signInAnonymously();
+    if (error) throw error;
+  }
+  return _clientePaciente;
+}
+
 /** Identificador de carpeta para ligar los estudios a una preconsulta. */
 export function nuevaCarpeta() {
   try { if (crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (_) { /* sin crypto */ }
@@ -62,7 +87,7 @@ async function comprimirImagen(file) {
 
 /** Sube un archivo al buzón. Devuelve {path, nombre, size}. Lanza error con code='grande' si excede el tope. */
 export async function subirEstudio(folder, archivo) {
-  const sb = await clienteSupabase();
+  const sb = await clientePacienteEstudios();
   let f = archivo;
   try { f = await comprimirImagen(archivo); } catch (_) { f = archivo; }
   if (f.size > MAX_BYTES) { const e = new Error('Archivo demasiado grande'); e.code = 'grande'; throw e; }
@@ -72,7 +97,7 @@ export async function subirEstudio(folder, archivo) {
   return { path, nombre: archivo.name, size: f.size };
 }
 
-/** Lista los estudios de una carpeta (solo médico autenticado). El enlace firmado se
+/** Lista los estudios de una carpeta (panel médico autenticado). El enlace firmado se
  *  genera al momento de abrir cada archivo (ver firmarEstudio), no aquí, para que no
  *  caduque si el médico deja la pestaña abierta más de una hora. */
 export async function listarEstudios(folder) {
@@ -97,9 +122,14 @@ export async function firmarEstudio(ruta, expiraSegundos = 3600) {
 /** Borra un estudio individual sin tocar la respuesta ni los demás archivos. */
 export async function eliminarEstudio(ruta) {
   if (!ruta || !buzonActivo()) return;
-  const sb = await clienteSupabase();
-  const { error } = await sb.storage.from(bucket()).remove([ruta]);
+  const sb = await clientePacienteEstudios();
+  const { data, error } = await sb.storage.from(bucket()).remove([ruta]);
   if (error) throw error;
+  // Storage puede responder sin error cuando RLS deja la operación en cero filas.
+  // Solo retiramos el archivo de la pantalla después de una confirmación explícita.
+  if (!Array.isArray(data) || !data.some((objeto) => objeto && objeto.name === ruta)) {
+    throw new Error('Supabase no confirmó la eliminación del estudio.');
+  }
 }
 
 /** Borra todos los archivos de una carpeta de estudios. Se usa al eliminar una

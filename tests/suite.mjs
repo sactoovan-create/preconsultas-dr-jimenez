@@ -118,13 +118,25 @@ console.log('Impresión · escape de marcado en valores dinámicos');
 
 console.log('Resumen de la paciente · contrato portal hacia panel');
 {
-  const r1 = construirResumen({ mrs: { mrs_bochornos: 4, mrs_cardiaco: 4 }, dolor: { tiene: true, intensidad: 7, meses: 5 } });
+  const r1 = construirResumen({ mrs: {
+    mrs_bochornos: 4, mrs_cardiaco: 4, mrs_sueno: 0, mrs_musculo: 0,
+    mrs_animo: 0, mrs_irritable: 0, mrs_ansiedad: 0, mrs_agotamiento: 0,
+    mrs_sexual: 0, mrs_vejiga: 0, mrs_sequedad: 0,
+  }, dolor: { tiene: true, intensidad: 7, meses: 5 } });
   check('calcula total e intensidad de menopausia', r1.menopausia.total === 8 && r1.menopausia.intensidad === 'leve');
   check('incluye el dolor cuando lo hay', !!r1.dolor && r1.dolor.intensidad === 7 && r1.dolor.meses === 5);
   const r2 = construirResumen({ mrs: {}, dolor: { tiene: false } });
   check('sin dolor el campo es null', r2.dolor === null);
   const r3 = construirResumen({});
-  check('tolera datos vacíos', r3.menopausia.total === 0 && r3.dolor === null);
+  check('vacío queda incompleto, no se inventa total cero',
+    r3.menopausia.total === null && r3.menopausia.completa === false && r3.dolor === null);
+  const r4 = construirResumen({
+    profundos: {
+      incontinencia: { frecuencia: 3, cantidad: 2, afectacion: 3, cuando: ['tos_estornudo'] },
+    },
+  });
+  check('congela el resumen de una profundización contestada',
+    r4.profundizaciones.length === 1 && /ICIQ-SF 8/.test(r4.profundizaciones[0].resumen));
 }
 
 console.log('Almacenamiento de respuestas · modo local');

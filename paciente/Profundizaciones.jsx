@@ -70,16 +70,16 @@ function Bloque({ def, respuestas, onRespuestas }) {
 
   if (!abierto) {
     return (
-      <div className="pc-seccion pf-oferta">
-        <div className="pf-oferta-t">Notamos que mencionaste molestias en esta área.</div>
-        <div className="pf-oferta-d">¿Nos cuentas un poco más? Son {def.preguntas.length} preguntas rápidas y le dan a tu doctor un panorama mucho más claro. Es opcional.</div>
+      <div className="pf-oferta">
+        <div className="pf-oferta-t">{def.titulo}</div>
+        <div className="pf-oferta-d">Puedes responder una escala dirigida de {def.preguntas.length} preguntas. Es opcional y puedes continuar sin abrirla.</div>
         <button type="button" className="pf-oferta-btn" onClick={() => setAbierto(true)}>Sí, contestar unas preguntas más</button>
       </div>
     );
   }
 
   return (
-    <div className="pc-seccion pf-bloque">
+    <div className="pf-bloque">
       <div className="pc-seccion-t">{def.titulo}</div>
       <div className="pc-seccion-d">Contesta con calma. Nada de esto es un diagnóstico; le ayuda a tu doctor a entenderte mejor.</div>
       <div className="pf-preguntas">
@@ -138,7 +138,15 @@ function Pregunta({ q, respuestas, valor, onChange }) {
                 type="button"
                 key={o.id}
                 className={'pf-check' + (on ? ' on' : '')}
-                onClick={() => onChange(on ? marcadas.filter((x) => x !== o.id) : [...marcadas, o.id])}
+                onClick={() => {
+                  const esNinguna = /ninguna|ninguno/i.test(o.id);
+                  if (esNinguna) {
+                    onChange(on ? [] : [o.id]);
+                    return;
+                  }
+                  const sinNinguna = marcadas.filter((x) => !/ninguna|ninguno/i.test(x));
+                  onChange(on ? sinNinguna.filter((x) => x !== o.id) : [...sinNinguna, o.id]);
+                }}
               >
                 <span className="pf-check-caja" aria-hidden="true" />
                 <span>{o.etiqueta}</span>

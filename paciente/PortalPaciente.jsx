@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { PacienteProvider } from '../core/PacienteContext.jsx';
 import PreConsulta from '../PreConsulta.jsx';
 import { guardarRespuesta } from '../core/respuestas.js';
@@ -7,6 +7,7 @@ import { buzonActivo, nuevaCarpeta } from '../core/estudios.js';
 import { instrumentosPara } from '../core/ruteoClinico.js';
 import { CREDITO } from '../core/marca.js';
 import SubirEstudios from './SubirEstudios.jsx';
+import { FORMULARIO_VERSION } from '../core/preconsultaFlow.js';
 import './PortalPaciente.css';
 
 /**
@@ -39,11 +40,14 @@ function RamaBotanica() {
   );
 }
 
-function construirRegistro(datos, estudiosFolder) {
+export function construirRegistro(datos, estudiosFolder, archivos = []) {
+  const submittedAtClient = datos.consentimientoFecha || new Date().toISOString();
   const registro = {
-    // Versión del contrato de datos. Lo consume el ERP; no cambiar sin
-    // actualizar CONTRATO-PRECONSULTA.md y subir el número.
-    version: 1,
+    // v2 conserva los campos canónicos de v1 para una migración gradual, pero
+    // distingue respuesta parcial, consentimiento, reloj del cliente y adjuntos.
+    version: 2,
+    formularioVersion: datos.formularioVersion || FORMULARIO_VERSION,
+    submittedAtClient,
     paciente: {
       nombre: datos.demografia?.nombre || null,
       edad: datos.demografia?.edad ?? null,
@@ -52,9 +56,27 @@ function construirRegistro(datos, estudiosFolder) {
     },
     autoReporte: { mrs: datos.mrs, dolor: datos.dolor, hc: datos.hc, profundos: datos.profundos || {} },
     resumen: construirResumen(datos),
-    consentimiento: true,
-    // Carpeta de estudios adjuntos (opcional; campo aditivo del contrato).
-    estudiosFolder: estudiosFolder || null,
+    consentimiento: {
+      aceptado: true,
+      aceptadoEnCliente: submittedAtClient,
+      avisoVersion: '2026-07',
+      finalidades: ['atencion-clinica'],
+    },
+    alertaSeguridad: datos.alertaSeguridad || {
+      urgente: false,
+      embarazoConSintomas: false,
+      saludMental: false,
+      senales: [],
+      senalesMaternas: [],
+    },
+    // La carpeta solo viaja cuando existe por lo menos un archivo confirmado.
+    estudiosFolder: archivos.length ? (estudiosFolder || null) : null,
+    adjuntos: archivos.map((a) => ({
+      nombre: a.nombre,
+      ruta: a.path,
+      bytes: a.size,
+      estado: 'recibido',
+    })),
   };
   registro.ruteoClinico = { ...instrumentosPara(registro), generadoEn: new Date().toISOString() };
   return registro;
@@ -62,7 +84,7 @@ function construirRegistro(datos, estudiosFolder) {
 
 export default function PortalPaciente() {
   return (
-    <PacienteProvider>
+    <PacienteProvider persistirTrabajo={false}>
       <PortalInterno />
     </PacienteProvider>
   );
@@ -72,7 +94,15 @@ function PortalInterno() {
   const [enviado, setEnviado] = useState(null);
   const [error, setError] = useState('');
   const [estudiosFolder] = useState(() => (buzonActivo() ? nuevaCarpeta() : null));
-  const [estudiosEstado, setEstudiosEstado] = useState({ total: 0, subiendo: false, listos: 0, errores: 0 });
+  const [estudiosEstado, setEstudiosEstado] = useState({
+    total: 0, subiendo: false, listos: 0, errores: 0, archivos: [],
+  });
+  const confirmacionRef = useRef(null);
+
+  useEffect(() => {
+    if (!enviado) return;
+    requestAnimationFrame(() => confirmacionRef.current?.focus());
+  }, [enviado]);
 
   const onEstudiosEstado = useCallback((estado) => {
     setEstudiosEstado(estado);
@@ -81,7 +111,11 @@ function PortalInterno() {
   const onEnviar = async (datos) => {
     setError('');
     try {
-      const guardado = await guardarRespuesta(construirRegistro(datos, estudiosFolder));
+      const guardado = await guardarRespuesta(construirRegistro(
+        datos,
+        estudiosFolder,
+        estudiosEstado.archivos || [],
+      ));
       setEnviado(guardado);
     } catch (e) {
       // Un problema de configuración del consultorio no se resuelve reintentando:
@@ -104,15 +138,23 @@ function PortalInterno() {
     // No callar los estudios que fallaron: la paciente podría creer que llegaron.
     if (estudiosEstado.errores > 0) partesEstudios.push(`No pudimos recibir ${estudiosEstado.errores === 1 ? 'uno de tus estudios' : `${estudiosEstado.errores} de tus estudios`}; si quieres, llévalos impresos a tu consulta.`);
     const estudiosTexto = partesEstudios.length ? ' ' + partesEstudios.join(' ') : '';
+    const urgente = enviado.alertaSeguridad?.urgente === true;
     return (
       <div className="portal portal-centro">
         <Grano />
-        <div className="portal-tarjeta-fin">
+        <div className="portal-tarjeta-fin" ref={confirmacionRef} tabIndex={-1} role="status" aria-live="polite">
           <img className="portal-logo" src="/marca/logo_maestro_verde.svg" alt="dr. jiménez, ginecología" />
           <div className="portal-sello" aria-hidden="true" />
           <h1>Gracias{primerNombre ? `, ${primerNombre}` : ''}.</h1>
           <p>Tus respuestas llegaron al consultorio del Dr. Iván Jiménez Martínez.{estudiosTexto} Las revisará antes de tu consulta para dedicarle el tiempo a lo que más te importa.</p>
-          <p className="portal-fin-nota">Ya puedes cerrar esta ventana.</p>
+          {urgente ? (
+            <div className="portal-fin-urgente" role="alert">
+              <b>El envío no sustituye atención urgente.</b>
+              <p>No esperes a que el consultorio revise el cuestionario. Busca atención médica de urgencia ahora.</p>
+            </div>
+          ) : (
+            <p className="portal-fin-nota">Ya puedes cerrar esta ventana.</p>
+          )}
           <div className="portal-credito">{CREDITO}</div>
         </div>
       </div>
@@ -133,9 +175,14 @@ function PortalInterno() {
       <div className="portal-form">
         <PreConsulta
           onEnviar={onEnviar}
-          extraAntesDeEnviar={estudiosFolder ? <SubirEstudios folder={estudiosFolder} onEstadoCambio={onEstudiosEstado} /> : null}
+          extraAntesDeEnviar={({ consentimientoAceptado }) => (
+            estudiosFolder
+              ? <SubirEstudios folder={estudiosFolder} habilitado={consentimientoAceptado} onEstadoCambio={onEstudiosEstado} />
+              : null
+          )}
           envioBloqueado={estudiosEstado.subiendo}
           envioBloqueadoMensaje="Espera a que terminen de subir tus estudios para enviar tus respuestas."
+          estudiosEstado={estudiosEstado}
         />
         <footer className="portal-colofon">
           <div className="portal-sello" aria-hidden="true" />

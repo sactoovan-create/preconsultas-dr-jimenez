@@ -19,8 +19,8 @@ function hayBackend() {
 
 /** Guarda una respuesta de paciente. Devuelve el registro guardado. */
 export async function guardarRespuesta(registro) {
+  if (hayBackend()) return guardarEnSupabase(registro);
   const completo = { ...registro, creado: registro.creado || new Date().toISOString() };
-  if (hayBackend()) return guardarEnSupabase(completo);
   // En producción NO debe caer en silencio a almacenamiento local: si falta la
   // configuración del consultorio, los datos quedarían solo en el teléfono de la
   // paciente y el médico nunca los vería. Se trata como error explícito.
@@ -86,7 +86,10 @@ async function guardarEnSupabase(registro) {
   const sb = await cliente();
   const { error } = await sb
     .from('respuestas')
-    .insert({ contenido: registro, creado: registro.creado, nombre: registro.paciente?.nombre || null });
+    // `creado` usa el default `now()` de PostgreSQL. El reloj del teléfono queda
+    // solo como `submittedAtClient` dentro del contenido y no gobierna auditoría
+    // ni el cruce temporal con la agenda.
+    .insert({ contenido: registro, nombre: registro.paciente?.nombre || null });
   if (error) throw error;
   // La clave anon solo puede insertar; no puede leer la fila insertada. El id
   // devuelto aqui es solo para el estado visual de confirmacion de la paciente.

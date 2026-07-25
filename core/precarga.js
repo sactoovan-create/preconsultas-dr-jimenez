@@ -38,7 +38,12 @@ export function pacienteDesdeRespuesta(registro) {
   return {
     demografia: { nombre: pac.nombre || '', edad: num(pac.edad) },
     antecedentes,
-    autoReporte: { mrs: ar.mrs || {}, dolor: ar.dolor || {}, hc },
+    autoReporte: {
+      mrs: ar.mrs || {},
+      dolor: ar.dolor || {},
+      hc,
+      profundos: ar.profundos || {},
+    },
   };
 }
 

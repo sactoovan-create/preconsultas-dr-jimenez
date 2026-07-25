@@ -33,6 +33,14 @@ export function profundizacionesSugeridas(autoReporte) {
   }).map((m) => ({ id: m.ID, titulo: m.TITULO, fuente: m.FUENTE, preguntas: m.PREGUNTAS }));
 }
 
+/** Conserva únicamente respuestas de módulos que siguen visibles en el flujo. */
+export function filtrarProfundizacionesActivas(autoReporte, respuestas) {
+  const activas = new Set(profundizacionesSugeridas(autoReporte).map((m) => m.id));
+  return Object.fromEntries(
+    Object.entries(respuestas || {}).filter(([id]) => activas.has(id)),
+  );
+}
+
 /** Evalúa las respuestas de una profundización por su id. Devuelve null si no existe. */
 export function evaluarProfundizacion(id, respuestas) {
   const m = MODULOS.find((x) => x.ID === id);

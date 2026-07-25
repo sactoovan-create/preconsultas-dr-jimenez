@@ -14,7 +14,11 @@ function num(x) { const n = Number(x); return Number.isFinite(n) ? n : null; }
 
 export function disparador(ar) {
   const mrs = (ar && ar.mrs) || {};
-  return (num(mrs.mrs_sexual) != null && num(mrs.mrs_sexual) >= 2) || (num(mrs.mrs_sequedad) != null && num(mrs.mrs_sequedad) >= 2);
+  const hc = (ar && ar.hc) || {};
+  const intimas = Array.isArray(hc.molestiasIntimas) ? hc.molestiasIntimas : [];
+  return (num(mrs.mrs_sexual) != null && num(mrs.mrs_sexual) >= 2)
+    || (num(mrs.mrs_sequedad) != null && num(mrs.mrs_sequedad) >= 2)
+    || intimas.some((x) => ['deseo', 'satisfaccion', 'dolor_relaciones'].includes(x));
 }
 
 export const PREGUNTAS = [

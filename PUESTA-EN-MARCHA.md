@@ -29,9 +29,10 @@ hacer eso por ti). Todo lo demás —código, configuración, pruebas— ya est�
   ya endurecida para no notificar filas vacías (anti-spam).
 - Anti-robots discreto en el formulario (campo trampa invisible + tiempo mínimo de
   llenado). Sin captcha ni cuentas extra.
-- App `preconsultas` en tu sistema: archiva las respuestas, las liga a la paciente
-  por teléfono (con respaldo por nombre), idempotente, con botón **Sincronizar** y
-  endpoint para cron. Pruebas en verde. (En el PR, pendiente de tu Merge.)
+- App `preconsultas` en tu sistema: archiva las respuestas, las liga
+  automáticamente solo por un teléfono válido y único, es idempotente y cuenta
+  con botón **Sincronizar** y endpoint para cron. El nombre ayuda a revisar, pero
+  nunca basta por sí solo para adjuntar datos clínicos al expediente.
 - Contrato de datos congelado: [`CONTRATO-PRECONSULTA.md`](CONTRATO-PRECONSULTA.md).
 
 ---
@@ -43,7 +44,9 @@ hacer eso por ti). Todo lo demás —código, configuración, pruebas— ya est�
 
 ### Fase 1 — Base de datos (Supabase, gratis)
 Sigue la sección «**2. Base de datos (Supabase)**» de [`DESPLIEGUE.md`](DESPLIEGUE.md):
-crear proyecto, correr `supabase/schema.sql`, crear tu usuario médico, y copiar de
+crear proyecto, correr `supabase/schema.sql` y
+`supabase/schema-estudios.sql`, crear tu usuario médico y habilitar
+**Authentication → Settings → Allow anonymous sign-ins**. Después copia de
 **Project Settings → API**:
 - **Project URL**
 - clave **anon public** (para el portal)

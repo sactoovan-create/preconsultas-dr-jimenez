@@ -2,8 +2,9 @@
 
 Deja que la paciente suba sus laboratorios, ultrasonidos o recetas desde el portal,
 antes de la consulta. Los archivos van al **almacenamiento privado de Supabase** (no
-público); la paciente nunca ve una carpeta ni inicia sesión en nada, y solo tú,
-autenticado, los abres.
+público). El navegador crea una sesión anónima aislada sin pedir cuenta ni
+contraseña; la paciente solo puede gestionar los archivos que ella misma subió.
+Tú, autenticado como médico, puedes abrir todos los estudios.
 
 Se activa cuando el portal tiene Supabase configurado. Por defecto usa el bucket
 `estudios`; `VITE_ESTUDIOS_BUCKET` solo hace falta si algún día cambias el nombre
@@ -20,10 +21,12 @@ del bucket.
 ## Activarlo (una vez)
 
 1. **Crea el bucket y las políticas:** en el SQL Editor de Supabase, pega y ejecuta
-   [`supabase/schema-estudios.sql`](supabase/schema-estudios.sql). Crea un bucket privado
-   `estudios` donde la paciente (anon) **solo puede subir**, y solo tú (autenticado)
-   lees y borras.
-2. **Enciende el portal:** verifica que Vercel tenga `VITE_SUPABASE_URL` y
+   [`supabase/schema-estudios.sql`](supabase/schema-estudios.sql). Crea el bucket
+   privado `estudios` y limita a cada paciente a sus propios objetos.
+2. **Habilita las sesiones anónimas:** Supabase → Authentication → Settings →
+   **Allow anonymous sign-ins**. No muestra una pantalla de acceso a la paciente;
+   únicamente da a cada navegador una identidad temporal para aislar sus archivos.
+3. **Enciende el portal:** verifica que Vercel tenga `VITE_SUPABASE_URL` y
    `VITE_SUPABASE_ANON_KEY`, y **vuelve a desplegar**. El bucket usado por defecto
    es `estudios`.
 
@@ -48,27 +51,25 @@ hasta entonces.
 
 ## Seguridad: lo que cubre y lo que no
 
-- **Privacidad de lectura (cubierto):** el bucket es privado y la paciente (clave
-  anónima) **solo puede subir; nunca leer ni listar**. Solo tú, autenticado, abres los
-  archivos, con enlaces firmados que caducan en una hora. Una paciente no puede ver los
-  estudios de otra.
+- **Aislamiento por paciente (cubierto):** el bucket es privado y cada sesión
+  anónima solo puede subir, consultar metadatos y retirar sus propios objetos.
+  No puede ver ni borrar estudios de otra paciente aunque conozca la ruta. Tú,
+  autenticado, abres los archivos con enlaces firmados que caducan en una hora.
+- **Consentimiento antes de cargar (cubierto):** el selector de archivos permanece
+  deshabilitado hasta que la paciente acepte la autorización clínica.
 - **El tope de tamaño (15 MB) y los tipos permitidos se hacen cumplir en el servidor**
   (en el bucket), no solo en el navegador.
-- **Lo que NO cubre todavía (igual que el envío del cuestionario):** la subida usa la
-  clave anónima pública directo al almacenamiento. Para un enlace privado por WhatsApp el
-  riesgo es bajo, pero un actor que tenga esa clave podría subir basura (llenar el bucket)
-  o, si conoce el identificador de carpeta de una paciente, plantarle archivos. El tope de
-  10 archivos es solo del navegador. Por eso: **antes de abrir el portal a público masivo,
-  la subida debe pasar por la misma Edge Function blindada con Cloudflare Turnstile que el
-  cuestionario** (ver `LANZAMIENTO-PUBLICO.md`), y ahí se cierra el acceso anónimo directo.
-- El identificador de carpeta (`estudiosFolder`) es una clave de capacidad: no lo
-  expongas en claro fuera del sistema.
+- **Lo que NO cubre todavía:** una persona puede crear su propia sesión anónima y
+  subir basura a su propia carpeta. Los límites de tipo y 15 MB sí viven en el
+  servidor, pero el máximo de 10 archivos es de interfaz. Antes de campañas
+  públicas masivas, conviene llevar la subida a una función validada con Turnstile
+  y cuota por sesión (ver `LANZAMIENTO-PUBLICO.md`).
+- El identificador de carpeta (`estudiosFolder`) es dato interno y no debe
+  publicarse fuera del sistema.
 
 ## Pendiente / futuro
 
-- **Verlo dentro del expediente (sistema):** hoy los estudios se ven en el panel del
-  portal (`/consultorio`). El siguiente paso es mostrarlos también en la app
-  `preconsultas` del sistema, ligados por el campo `estudiosFolder` que ya viaja en el
-  contrato de datos.
+- **Expediente:** los estudios ya se muestran en la app `preconsultas` del ERP,
+  ligados por `estudiosFolder`, sin duplicarlos en Render.
 - **Paso automático a Google Drive** cuando el almacenamiento se llene (plan futuro).
 - **Link por paciente reanudable** para subir estudios en varias sesiones hasta la consulta.

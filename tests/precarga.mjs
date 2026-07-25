@@ -23,6 +23,7 @@ const registro = {
     mrs: { mrs_bochornos: 3, mrs_vejiga: 2 },
     dolor: { tiene: true, intensidad: 7, meses: 8 },
     hc: { enfDiabetes: true, fuma: true, sangrado: true, acne: true, caidaCabello: false, reglasRegulares: false },
+    profundos: { incontinencia: { frecuencia: 2 } },
   },
   ruteoClinico: {
     version: RUTEO_VERSION,
@@ -40,6 +41,8 @@ check('tabaquismo afirmado precarga antecedente', p.antecedentes.tabaquismo === 
 check('sangrado reportado precarga sangrado sin diagnóstico', p.antecedentes.sangradoNoDx === true);
 check('auto-reporte viaja completo (escala, dolor, historia)',
   p.autoReporte.mrs.mrs_bochornos === 3 && p.autoReporte.dolor.intensidad === 7 && p.autoReporte.hc.acne === true);
+check('las profundizaciones también llegan a la precarga',
+  p.autoReporte.profundos.incontinencia.frecuencia === 2);
 
 const negada = pacienteDesdeRespuesta({ paciente: { nombre: 'B' }, autoReporte: { hc: { enfDiabetes: false, fuma: false } } });
 check('lo negado NO se precarga como antecedente (queda para el médico)',

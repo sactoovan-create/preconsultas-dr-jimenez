@@ -54,7 +54,13 @@ function esMasNuevo(a, b) {
 
 const PacienteContext = createContext(null);
 
-export function PacienteProvider({ children, pacienteInicial, onGuardarResultado, irA }) {
+export function PacienteProvider({
+  children,
+  pacienteInicial,
+  onGuardarResultado,
+  irA,
+  persistirTrabajo = true,
+}) {
   const [paciente, setPaciente] = useState(() => ({ ...formaVacia(), ...(pacienteInicial || {}) }));
   // Resumen clave que cada instrumento publica para el panel del paciente.
   const [resumenes, setResumenes] = useState({});
@@ -99,7 +105,7 @@ export function PacienteProvider({ children, pacienteInicial, onGuardarResultado
   // Restaura el trabajo activo al montar (recarga de página o reapertura de pestaña).
   // No aplica si GineOS inyecta un paciente inicial.
   useEffect(() => {
-    if (!pacienteInicial) {
+    if (persistirTrabajo && !pacienteInicial) {
       const clave = claveActiva();
       const local = clave ? leerTrabajo(clave) : null;
       if (local && local.paciente) { claveRef.current = clave; aplicarTrabajo(local); }
@@ -117,7 +123,7 @@ export function PacienteProvider({ children, pacienteInicial, onGuardarResultado
 
   // Guardado automático: cada cambio se persiste en el navegador, por paciente.
   useEffect(() => {
-    if (!montadoRef.current || restaurandoRef.current) return;
+    if (!persistirTrabajo || !montadoRef.current || restaurandoRef.current) return;
     const hayContenido = origen || Object.keys(resumenes).length > 0
       || Object.keys(datosInstrumentos).length > 0
       || (paciente.demografia && paciente.demografia.nombre);
@@ -137,11 +143,12 @@ export function PacienteProvider({ children, pacienteInicial, onGuardarResultado
         setEstadoNube(ok ? 'nube' : 'local');
       }, 2000);
     }
-  }, [paciente, resumenes, datosInstrumentos, origen, ruteo, descartados]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [paciente, resumenes, datosInstrumentos, origen, ruteo, descartados, persistirTrabajo]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Guardado manual (el botón "Guardar"). Fuerza la escritura local y, de inmediato,
   // la subida a la nube.
   const guardar = useCallback(() => {
+    if (!persistirTrabajo) return;
     const clave = origen && origen.id != null ? String(origen.id) : 'manual';
     const cuando = new Date().toISOString();
     const contenido = { paciente, resumenes, datosInstrumentos, origen, ruteo, descartados, guardadoEn: cuando };
@@ -152,7 +159,7 @@ export function PacienteProvider({ children, pacienteInicial, onGuardarResultado
       if (nubeTimerRef.current) clearTimeout(nubeTimerRef.current);
       guardarTrabajoNube(clave, contenido).then((ok) => setEstadoNube(ok ? 'nube' : 'local'));
     }
-  }, [paciente, resumenes, datosInstrumentos, origen, ruteo, descartados]);
+  }, [paciente, resumenes, datosInstrumentos, origen, ruteo, descartados, persistirTrabajo]);
 
   const guardarAutoReporte = useCallback((parcial) => {
     setPaciente((p) => ({ ...p, autoReporte: { ...(p.autoReporte || {}), ...parcial } }));
