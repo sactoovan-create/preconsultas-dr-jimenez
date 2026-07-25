@@ -92,11 +92,31 @@ async function cliente() {
   return _cliente;
 }
 
+let _clientePublico = null;
+async function clientePublico() {
+  if (_clientePublico) return _clientePublico;
+  const { createClient } = await import('@supabase/supabase-js');
+  // El formulario público nunca hereda la sesión del panel médico aunque ambos
+  // vivan en el mismo dominio. Así el INSERT conserva el rol anon previsto por RLS.
+  _clientePublico = createClient(
+    import.meta.env.VITE_SUPABASE_URL,
+    import.meta.env.VITE_SUPABASE_ANON_KEY,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    },
+  );
+  return _clientePublico;
+}
+
 /** Cliente de Supabase compartido (lo reutiliza el buzón de estudios). */
 export async function clienteSupabase() { return cliente(); }
 
 async function guardarEnSupabase(registro) {
-  const sb = await cliente();
+  const sb = await clientePublico();
   const { id: idSolicitado, creado: _creadoLocal, ...contenido } = registro;
   const id = idSolicitado || nuevaRespuestaId();
   const { error } = await sb

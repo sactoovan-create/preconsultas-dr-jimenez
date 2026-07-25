@@ -99,6 +99,9 @@ atención urgente de inmediato.
   por ninguna respuesta de Supabase.
 - El navegador abre una sesión anónima aislada de Supabase Auth, sin pedir cuenta
   ni contraseña.
+- El cliente que inserta la respuesta tampoco comparte la sesión del panel médico;
+  probar el portal en un navegador donde el doctor inició sesión conserva el rol
+  público correcto y no rompe la política de inserción.
 - Cada sesión solo puede subir, consultar metadatos y retirar sus propios objetos.
   No puede leer ni borrar estudios de otra paciente, aunque conozca la ruta.
 - El médico principal puede listar, abrir mediante enlace firmado y borrar todos
