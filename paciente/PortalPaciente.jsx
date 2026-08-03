@@ -103,7 +103,7 @@ function PortalInterno() {
   const estudiosFolder = intentoEnvio.estudiosFolder;
   const respuestaId = intentoEnvio.respuestaId;
   const [estudiosEstado, setEstudiosEstado] = useState({
-    total: 0, subiendo: false, listos: 0, errores: 0, archivos: [],
+    total: 0, subiendo: false, listos: 0, pendientes: 0, errores: 0, archivos: [],
   });
   const estudiosRef = useRef(null);
   const confirmacionRef = useRef(null);
@@ -222,8 +222,10 @@ function PortalInterno() {
               )
               : null
           )}
-          envioBloqueado={estudiosEstado.subiendo}
-          envioBloqueadoMensaje="Espera a que terminen de subir tus estudios para enviar tus respuestas."
+          envioBloqueado={estudiosEstado.subiendo || estudiosEstado.pendientes > 0 || estudiosEstado.errores > 0}
+          envioBloqueadoMensaje={estudiosEstado.errores > 0
+            ? 'Reintenta o quita los estudios que dicen “No se pudo” antes de enviar.'
+            : 'Espera a que todos tus estudios indiquen “Recibido” antes de enviar tus respuestas.'}
           estudiosEstado={estudiosEstado}
         />
         <footer className="portal-colofon">

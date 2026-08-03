@@ -204,7 +204,7 @@ function ResumenEnvio({ dem, hc, pasos, irPaso, estudiosEstado }) {
       </div>
       <div>
         <span>Estudios</span>
-        <b>{estudiosEstado?.listos ? `${estudiosEstado.listos} archivo(s) listos` : 'Ningún archivo; es opcional'}</b>
+        <b>{estudiosEstado?.listos ? `${estudiosEstado.listos} archivo(s) recibido(s)` : 'Ningún archivo; es opcional'}</b>
       </div>
     </div>
   );

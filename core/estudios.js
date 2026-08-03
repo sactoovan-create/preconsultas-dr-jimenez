@@ -36,28 +36,39 @@ function bucket() {
 }
 
 let _clientePaciente = null;
+let _clientePacientePromesa = null;
 async function clientePacienteEstudios() {
-  if (_clientePaciente) return _clientePaciente;
-  const { createClient } = await import('@supabase/supabase-js');
-  _clientePaciente = createClient(
-    import.meta.env.VITE_SUPABASE_URL,
-    import.meta.env.VITE_SUPABASE_ANON_KEY,
-    {
-      auth: {
-        persistSession: true,
-        storage: window.sessionStorage,
-        storageKey: 'drj-estudios-paciente',
-        autoRefreshToken: true,
-        detectSessionInUrl: false,
+  if (_clientePacientePromesa) return _clientePacientePromesa;
+  _clientePacientePromesa = (async () => {
+    const { createClient } = await import('@supabase/supabase-js');
+    _clientePaciente = createClient(
+      import.meta.env.VITE_SUPABASE_URL,
+      import.meta.env.VITE_SUPABASE_ANON_KEY,
+      {
+        auth: {
+          persistSession: true,
+          storage: window.sessionStorage,
+          storageKey: 'drj-estudios-paciente',
+          autoRefreshToken: true,
+          detectSessionInUrl: false,
+        },
       },
-    },
-  );
-  const { data } = await _clientePaciente.auth.getSession();
-  if (!data.session) {
-    const { error } = await _clientePaciente.auth.signInAnonymously();
-    if (error) throw error;
+    );
+    const { data } = await _clientePaciente.auth.getSession();
+    if (!data.session) {
+      const { error } = await _clientePaciente.auth.signInAnonymously();
+      if (error) throw error;
+    }
+    return _clientePaciente;
+  })();
+  try {
+    return await _clientePacientePromesa;
+  } catch (error) {
+    // Un corte durante el inicio anónimo debe poder reintentarse en el botón.
+    _clientePaciente = null;
+    _clientePacientePromesa = null;
+    throw error;
   }
-  return _clientePaciente;
 }
 
 /** Identificador de carpeta para ligar los estudios a una preconsulta. */
@@ -146,9 +157,14 @@ export async function subirEstudio(folder, archivo) {
   const mime = f.type || validacion.mime;
   const base = nombreSeguro(f.name).replace(/\.[^.]+$/i, '') || 'archivo';
   const extension = MIME_EXTENSION[mime] || 'bin';
-  const path = `${folder}/${Date.now()}-${base}.${extension}`;
-  const { error } = await sb.storage.from(bucket()).upload(path, f, { contentType: mime, upsert: false });
+  // Los tres dígitos aleatorios evitan colisiones si se eligen varias copias del
+  // mismo archivo en el mismo milisegundo; el prefijo sigue siendo solo numérico
+  // para que el panel médico pueda ocultarlo al mostrar el nombre original.
+  const orden = `${Date.now()}${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
+  const path = `${folder}/${orden}-${base}.${extension}`;
+  const { data, error } = await sb.storage.from(bucket()).upload(path, f, { contentType: mime, upsert: false });
   if (error) throw error;
+  if (!data?.path) throw new Error('El almacenamiento no confirmó el archivo.');
   return { path, nombre: archivo.name, size: f.size };
 }
 

@@ -14,8 +14,10 @@ del bucket.
 
 - **Paciente:** al final de la pre-consulta, antes del botón de enviar, aparece
   "¿Tienes estudios? Súbelos aquí (opcional)". Los selecciona y puede quitarlos;
-  la transferencia al bucket ocurre únicamente al enviar el cuestionario. Después
-  recibe una confirmación clara de que respuestas y estudios llegaron.
+  cada archivo se transfiere de inmediato y solo muestra **Recibido** cuando
+  Supabase confirmó la carga. Si uno falla puede reintentarlo o quitarlo sin perder
+  los demás. Después recibe una confirmación clara de cuántos estudios quedaron
+  ligados a sus respuestas.
 - **Tú:** en el panel del médico (`/consultorio`), cada respuesta muestra "Estudios
   adjuntos" con un botón **Abrir** por archivo (enlace firmado que caduca en 1 hora).
 
@@ -60,11 +62,12 @@ hasta entonces.
   autenticado, abres los archivos con enlaces firmados que caducan en una hora.
 - **Consentimiento antes de cargar (cubierto):** el selector de archivos permanece
   deshabilitado hasta que la paciente acepte la autorización clínica.
-- **Sin archivos huérfanos por abandono (cubierto):** seleccionar un archivo no lo
-  transmite. La subida se inicia al presionar el envío final. Un rechazo confirmado
-  retira los objetos recién creados; además, el cron del ERP compara el bucket
-  contra las respuestas y elimina después de 24 horas cualquier objeto que haya
-  quedado sin cuestionario por cierre del navegador o corte de red.
+- **Abandono y fallos parciales (cubierto):** cada archivo se sube al seleccionarlo;
+  el envío final queda bloqueado mientras alguno siga subiendo o haya fallado. Los
+  fallos se pueden reintentar o quitar y no borran los archivos ya confirmados. Si
+  la paciente cierra el navegador antes de enviar el cuestionario, el cron del ERP
+  compara el bucket contra las respuestas y elimina después de 24 horas cualquier
+  objeto huérfano.
 - **El tope de tamaño (15 MB) y los tipos permitidos se hacen cumplir en el servidor**
   (en el bucket), no solo en el navegador.
 - **Lo que NO cubre todavía:** una persona puede crear su propia sesión anónima y
