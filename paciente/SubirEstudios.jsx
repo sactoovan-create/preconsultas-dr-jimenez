@@ -60,6 +60,7 @@ const SubirEstudios = forwardRef(function SubirEstudios(
   const itemsRef = useRef(inicialesRef.current);
   const subidasRef = useRef(new Map());
   const vivoRef = useRef(true);
+  const [decision, setDecision] = useState(() => (archivosIniciales.length ? 'si' : null));
   const [aviso, setAviso] = useState('');
 
   const subiendo = items.some((i) => i.estado === 'subiendo');
@@ -89,9 +90,10 @@ const SubirEstudios = forwardRef(function SubirEstudios(
       listos,
       pendientes,
       errores,
+      decision,
       archivos: itemsSubidos.map((i) => i.resultado),
     });
-  }, [errores, items, listos, onEstadoCambio, pendientes, subiendo]);
+  }, [decision, errores, items, listos, onEstadoCambio, pendientes, subiendo]);
 
   const iniciarSubida = useCallback((item) => {
     if (!item?.file) {
@@ -185,7 +187,7 @@ const SubirEstudios = forwardRef(function SubirEstudios(
   };
 
   const onElegir = (e) => {
-    if (!habilitado || bloqueado) return;
+    if (!habilitado || bloqueado || decision !== 'si') return;
     const files = Array.from(e.target.files || []);
     e.target.value = '';
     if (!files.length) return;
@@ -193,26 +195,33 @@ const SubirEstudios = forwardRef(function SubirEstudios(
     const activos = itemsRef.current.length;
     const disponibles = MAX_ARCHIVOS - activos;
     if (disponibles <= 0) { setAviso(`Ya alcanzaste el máximo de ${MAX_ARCHIVOS} archivos.`); return; }
-    const validos = [];
-    const invalidos = [];
-    files.forEach((file) => {
+    const seleccionados = files.slice(0, disponibles).map((file) => {
       const validacion = validarArchivoEstudio(file);
-      if (validacion.ok) validos.push(file);
-      else invalidos.push(validacion.mensaje);
+      return { file, validacion };
     });
-    const aPreparar = validos.slice(0, disponibles);
-    if (invalidos.length) setAviso(invalidos[0]);
-    else if (validos.length > disponibles) setAviso(`Se tomaron ${disponibles}; el máximo es ${MAX_ARCHIVOS} archivos.`);
-    const nuevos = aPreparar.map((file) => ({
+    const invalidos = seleccionados.filter(({ validacion }) => !validacion.ok);
+    if (files.length > disponibles) setAviso(`Se tomaron ${disponibles}; el máximo es ${MAX_ARCHIVOS} archivos.`);
+    else if (invalidos.length) setAviso('Uno o más archivos necesitan atención antes de enviar.');
+    const nuevos = seleccionados.map(({ file, validacion }) => ({
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
       nombre: file.name,
-      estado: 'pendiente',
-      file,
+      estado: validacion.ok ? 'pendiente' : 'error',
+      detalle: validacion.ok ? undefined : validacion.mensaje,
+      file: validacion.ok ? file : null,
     }));
     if (nuevos.length) {
       cambiarItems((lista) => [...lista, ...nuevos]);
-      nuevos.forEach((item) => iniciarSubida(item));
+      nuevos.filter((item) => item.estado === 'pendiente').forEach((item) => iniciarSubida(item));
     }
+  };
+
+  const elegirDecision = (valor) => {
+    setAviso('');
+    if (valor === 'no' && itemsRef.current.length) {
+      setAviso('Quita primero los archivos agregados para indicar que no tienes estudios ahora.');
+      return;
+    }
+    setDecision(valor);
   };
 
   return (
@@ -230,14 +239,46 @@ const SubirEstudios = forwardRef(function SubirEstudios(
         </p>
       )}
 
-      <label style={{
-        display: 'inline-flex', alignItems: 'center', gap: 8, cursor: habilitado && !bloqueado ? 'pointer' : 'not-allowed',
-        background: habilitado && !bloqueado ? VERDE : '#8D968F', color: '#fff', borderRadius: 8, padding: '11px 18px',
-        fontSize: '0.95rem', fontWeight: 500,
-      }} aria-disabled={!habilitado || bloqueado}>
-        Agregar estudios
-        <input type="file" multiple disabled={!habilitado || bloqueado} accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" onChange={onElegir} style={{ display: 'none' }} />
-      </label>
+      <fieldset disabled={!habilitado || bloqueado} style={{ border: 0, padding: 0, margin: '16px 0 14px' }}>
+        <legend style={{ fontSize: '0.9rem', fontWeight: 700, color: TINTA, marginBottom: 8 }}>
+          ¿Tienes algún estudio para compartir? *
+        </legend>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', maxWidth: 430, border: `1px solid ${DORADO}66`, borderRadius: 7, overflow: 'hidden' }}>
+          <button
+            type="button"
+            aria-pressed={decision === 'si'}
+            onClick={() => elegirDecision('si')}
+            style={{ border: 0, borderRight: `1px solid ${DORADO}66`, padding: '10px 12px', background: decision === 'si' ? VERDE : '#fff', color: decision === 'si' ? '#fff' : VERDE, fontWeight: 700, cursor: habilitado && !bloqueado ? 'pointer' : 'not-allowed' }}
+          >
+            Sí, los agregaré
+          </button>
+          <button
+            type="button"
+            aria-pressed={decision === 'no'}
+            onClick={() => elegirDecision('no')}
+            style={{ border: 0, padding: '10px 12px', background: decision === 'no' ? VERDE : '#fff', color: decision === 'no' ? '#fff' : VERDE, fontWeight: 700, cursor: habilitado && !bloqueado ? 'pointer' : 'not-allowed' }}
+          >
+            No los tengo ahora
+          </button>
+        </div>
+      </fieldset>
+
+      {decision === 'si' && (
+        <label style={{
+          display: 'inline-flex', alignItems: 'center', gap: 8, cursor: habilitado && !bloqueado ? 'pointer' : 'not-allowed',
+          background: habilitado && !bloqueado ? VERDE : '#8D968F', color: '#fff', borderRadius: 8, padding: '11px 18px',
+          fontSize: '0.95rem', fontWeight: 500,
+        }} aria-disabled={!habilitado || bloqueado}>
+          Agregar estudios
+          <input type="file" multiple disabled={!habilitado || bloqueado} accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,image/heic-sequence,image/heif-sequence" onChange={onElegir} style={{ display: 'none' }} />
+        </label>
+      )}
+
+      {decision === 'no' && (
+        <p role="status" style={{ color: 'var(--ok)', fontWeight: 600, fontSize: '0.92rem', margin: '8px 0 0' }}>
+          Entendido. Puedes enviar el cuestionario sin estudios y llevarlos después.
+        </p>
+      )}
 
       {items.length > 0 && (
         <ul aria-live="polite" style={{ listStyle: 'none', padding: 0, margin: '16px 0 0' }}>

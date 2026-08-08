@@ -118,6 +118,9 @@ el reloj del teléfono; la columna `creado` de PostgreSQL es siempre la hora
 autoritativa de recepción.
 
 `estudiosFolder`, `adjuntos` y `ruteoClinico` son campos opcionales.
+`estudiosDeclaracion` congela la elección explícita de la paciente:
+`adjunto_estudios` o `no_los_tengo_ahora`. Permite distinguir una omisión real de
+un formulario que todavía no preguntaba por los archivos.
 `alertaSeguridad` congela la orientación mostrada a la paciente. Si `urgente` es
 verdadero, la pantalla posterior al envío mantiene la indicación de no esperar
 la revisión del consultorio y el ERP conserva el dato para revisión prioritaria.

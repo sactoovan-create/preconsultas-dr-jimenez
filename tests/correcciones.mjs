@@ -10,7 +10,7 @@ import { condicionesAutomaticas } from '../instruments/anticoncepcion/engine.js'
 import { clasificarCiclo } from '../instruments/sop/engine.js';
 import { evaluarVia } from '../instruments/menopausia/engine.js';
 import { extraerLabsPorVision } from '../core/labReaderVision.js';
-import { validarArchivoEstudio } from '../core/estudios.js';
+import { bloqueoEnvioEstudios, validarArchivoEstudio } from '../core/estudios.js';
 import {
   borrarIntentoEnvio,
   cargarIntentoEnvio,
@@ -71,9 +71,9 @@ console.log('\nBuzón de estudios: formatos compatibles');
 check('PDF y JPEG son aceptados',
   validarArchivoEstudio({ name: 'laboratorio.pdf', type: 'application/pdf' }).ok
   && validarArchivoEstudio({ name: 'ultrasonido.jpg', type: 'image/jpeg' }).ok);
-check('HEIC se bloquea con orientación específica',
-  !validarArchivoEstudio({ name: 'IMG_1234.HEIC', type: 'image/heic' }).ok
-  && /HEIC/.test(validarArchivoEstudio({ name: 'IMG_1234.HEIC', type: 'image/heic' }).mensaje));
+check('HEIC se acepta para conversión privada a JPEG',
+  validarArchivoEstudio({ name: 'IMG_1234.HEIC', type: 'image/heic' }).ok
+  && validarArchivoEstudio({ name: 'IMG_1234.HEIC', type: 'image/heic' }).requiereConversion === true);
 check('un formato ajeno no llega al bucket',
   !validarArchivoEstudio({ name: 'archivo.exe', type: 'application/octet-stream' }).ok);
 check('un PDF mayor de 15 MB se rechaza antes de mostrarlo como listo',
@@ -82,6 +82,14 @@ check('un PDF mayor de 15 MB se rechaza antes de mostrarlo como listo',
     type: 'application/pdf',
     size: (15 * 1024 * 1024) + 1,
   }).ok);
+check('la decisión sobre estudios es explícita antes del envío',
+  /Indica si tienes estudios/.test(bloqueoEnvioEstudios({ decision: null })));
+check('elegir adjuntar exige al menos un archivo confirmado',
+  /por lo menos un estudio/.test(bloqueoEnvioEstudios({ decision: 'si', listos: 0 })));
+check('elegir no tener estudios permite continuar',
+  bloqueoEnvioEstudios({ decision: 'no', listos: 0, errores: 0, pendientes: 0, subiendo: false }) === '');
+check('un archivo rechazado bloquea el envío aunque otros hayan llegado',
+  /Reintenta o quita/.test(bloqueoEnvioEstudios({ decision: 'si', listos: 2, errores: 1 })));
 
 console.log('\nEnvío idempotente al recargar');
 const memoria = (() => {

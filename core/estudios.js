@@ -27,6 +27,12 @@ const MIME_POR_EXTENSION = {
   png: 'image/png',
   webp: 'image/webp',
 };
+const MIME_HEIC = new Set([
+  'image/heic',
+  'image/heif',
+  'image/heic-sequence',
+  'image/heif-sequence',
+]);
 
 export function buzonActivo() {
   return !!(import.meta.env && import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
@@ -89,12 +95,8 @@ export function validarArchivoEstudio(file = {}) {
   const mimeDeclarado = String(file.type || '').toLowerCase();
   const mime = MIME_EXTENSION[mimeDeclarado] ? mimeDeclarado : MIME_POR_EXTENSION[extension];
 
-  if (['heic', 'heif'].includes(extension) || ['image/heic', 'image/heif'].includes(mimeDeclarado)) {
-    return {
-      ok: false,
-      code: 'formato',
-      mensaje: 'La foto está en formato HEIC. En iPhone, envía una captura de pantalla o guárdala como JPG o PDF.',
-    };
+  if (['heic', 'heif'].includes(extension) || MIME_HEIC.has(mimeDeclarado)) {
+    return { ok: true, mime: mimeDeclarado || 'image/heic', requiereConversion: true };
   }
   if (!mime) {
     return {
@@ -111,6 +113,37 @@ export function validarArchivoEstudio(file = {}) {
     };
   }
   return { ok: true, mime };
+}
+
+/** Convierte HEIC/HEIF a JPEG dentro del navegador. La imagen clínica nunca se
+ * envía a un conversor externo; solo el JPEG resultante llega al bucket privado. */
+async function convertirHeic(file) {
+  try {
+    const modulo = await import('heic2any');
+    const convertir = modulo.default || modulo;
+    const salida = await convertir({ blob: file, toType: 'image/jpeg', quality: 0.82 });
+    const blob = Array.isArray(salida) ? salida[0] : salida;
+    if (!(blob instanceof Blob) || !blob.size) throw new Error('Conversión vacía');
+    const base = nombreSeguro(file.name).replace(/\.[^.]+$/i, '') || 'foto-estudio';
+    return new File([blob], `${base}.jpg`, {
+      type: 'image/jpeg',
+      lastModified: file.lastModified || Date.now(),
+    });
+  } catch (_) {
+    const error = new Error('No pudimos convertir esta foto HEIC. Haz una captura de pantalla y vuelve a agregarla.');
+    error.code = 'formato';
+    throw error;
+  }
+}
+
+/** Devuelve vacío cuando el estado permite enviar; de otro modo, el mensaje que
+ * explica a la paciente qué falta. */
+export function bloqueoEnvioEstudios(estado = {}) {
+  if (!estado.decision) return 'Indica si tienes estudios para compartir antes de enviar.';
+  if (estado.errores > 0) return 'Reintenta o quita los estudios que dicen “No se pudo” antes de enviar.';
+  if (estado.subiendo || estado.pendientes > 0) return 'Espera a que todos tus estudios indiquen “Recibido” antes de enviar.';
+  if (estado.decision === 'si' && !(estado.listos > 0)) return 'Agrega por lo menos un estudio o elige “No los tengo ahora”.';
+  return '';
 }
 
 /** Comprime una imagen en el navegador. Si no mejora, deja el original. */
@@ -148,11 +181,11 @@ export async function subirEstudio(folder, archivo) {
     throw error;
   }
   const sb = await clientePacienteEstudios();
-  let f = archivo;
-  try { f = await comprimirImagen(archivo); } catch (_) { f = archivo; }
-  if (!f.type && validacion.mime) {
+  let f = validacion.requiereConversion ? await convertirHeic(archivo) : archivo;
+  if (!f.type && validacion.mime && !validacion.requiereConversion) {
     f = new File([f], f.name, { type: validacion.mime });
   }
+  try { f = await comprimirImagen(f); } catch (_) { /* conserva el archivo convertido/original */ }
   if (f.size > MAX_BYTES) { const e = new Error('Archivo demasiado grande'); e.code = 'grande'; throw e; }
   const mime = f.type || validacion.mime;
   const base = nombreSeguro(f.name).replace(/\.[^.]+$/i, '') || 'archivo';

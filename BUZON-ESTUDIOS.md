@@ -13,7 +13,8 @@ del bucket.
 ## Cómo se ve
 
 - **Paciente:** al final de la pre-consulta, antes del botón de enviar, aparece
-  "¿Tienes estudios? Súbelos aquí (opcional)". Los selecciona y puede quitarlos;
+  "¿Tienes estudios? Súbelos aquí (opcional)". Primero indica explícitamente si
+  los agregará o si no los tiene en ese momento. Los selecciona y puede quitarlos;
   cada archivo se transfiere de inmediato y solo muestra **Recibido** cuando
   Supabase confirmó la carga. Si uno falla puede reintentarlo o quitarlo sin perder
   los demás. Después recibe una confirmación clara de cuántos estudios quedaron
@@ -39,10 +40,10 @@ Para usar otro bucket, agrega `VITE_ESTUDIOS_BUCKET=<nombre>`.
 
 - **Compresión en el navegador:** las imágenes se reducen a 1600 px de lado y se
   recomprimen (una foto de laboratorio de 5 MB baja a unos cientos de kilobytes) antes
-  de subir. Los PDF se suben tal cual.
+  de subir. Las fotos HEIC/HEIF de iPhone se convierten localmente a JPEG; no pasan
+  por ningún conversor externo. Los PDF se suben tal cual.
 - **Límites:** máximo 10 archivos por paciente; 15 MB por archivo. Solo PDF, JPG,
-  PNG y WebP. HEIC se bloquea antes de transmitir y explica cómo usar una captura
-  de pantalla, JPG o PDF.
+  PNG, WebP, HEIC y HEIF. Los dos últimos se convierten a JPEG antes de transmitir.
 
 Con eso, el primer giga gratis de Supabase dura muchísimo (cientos de pacientes).
 

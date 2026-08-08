@@ -180,6 +180,13 @@ function EscalaMrs({ mrs, onChange }) {
 function ResumenEnvio({ dem, hc, pasos, irPaso, estudiosEstado }) {
   const etiquetas = new Map(TEMAS_CONSULTA.map((t) => [t.id, t.etiqueta]));
   const temas = (hc.temasConsulta || []).map((id) => etiquetas.get(id) || id);
+  const resumenEstudios = estudiosEstado?.listos
+    ? `${estudiosEstado.listos} archivo(s) recibido(s)`
+    : estudiosEstado?.decision === 'no'
+      ? 'Los llevarás después'
+      : estudiosEstado?.decision === 'si'
+        ? 'Falta agregar por lo menos un archivo'
+        : 'Falta indicar si compartirás estudios';
   return (
     <div className="pc-revision">
       <div>
@@ -204,7 +211,7 @@ function ResumenEnvio({ dem, hc, pasos, irPaso, estudiosEstado }) {
       </div>
       <div>
         <span>Estudios</span>
-        <b>{estudiosEstado?.listos ? `${estudiosEstado.listos} archivo(s) recibido(s)` : 'Ningún archivo; es opcional'}</b>
+        <b>{resumenEstudios}</b>
       </div>
     </div>
   );

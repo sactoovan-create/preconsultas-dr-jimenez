@@ -3,7 +3,7 @@ import { PacienteProvider } from '../core/PacienteContext.jsx';
 import PreConsulta from '../PreConsulta.jsx';
 import { guardarRespuesta } from '../core/respuestas.js';
 import { construirResumen } from '../core/resumenPaciente.js';
-import { eliminarEstudioPaciente } from '../core/estudios.js';
+import { bloqueoEnvioEstudios, eliminarEstudioPaciente } from '../core/estudios.js';
 import { instrumentosPara } from '../core/ruteoClinico.js';
 import { CREDITO } from '../core/marca.js';
 import SubirEstudios from './SubirEstudios.jsx';
@@ -45,7 +45,7 @@ function RamaBotanica() {
   );
 }
 
-export function construirRegistro(datos, estudiosFolder, archivos = [], respuestaId = null) {
+export function construirRegistro(datos, estudiosFolder, archivos = [], respuestaId = null, estudiosDecision = null) {
   const submittedAtClient = datos.consentimientoFecha || new Date().toISOString();
   const registro = {
     // v2 conserva los campos canónicos de v1 para una migración gradual, pero
@@ -83,6 +83,7 @@ export function construirRegistro(datos, estudiosFolder, archivos = [], respuest
       bytes: a.size,
       estado: 'recibido',
     })),
+    estudiosDeclaracion: estudiosDecision === 'si' ? 'adjunto_estudios' : 'no_los_tengo_ahora',
   };
   registro.ruteoClinico = { ...instrumentosPara(registro), generadoEn: new Date().toISOString() };
   return registro;
@@ -103,7 +104,7 @@ function PortalInterno() {
   const estudiosFolder = intentoEnvio.estudiosFolder;
   const respuestaId = intentoEnvio.respuestaId;
   const [estudiosEstado, setEstudiosEstado] = useState({
-    total: 0, subiendo: false, listos: 0, pendientes: 0, errores: 0, archivos: [],
+    total: 0, subiendo: false, listos: 0, pendientes: 0, errores: 0, decision: null, archivos: [],
   });
   const estudiosRef = useRef(null);
   const confirmacionRef = useRef(null);
@@ -131,6 +132,7 @@ function PortalInterno() {
         estudiosFolder,
         archivos,
         respuestaId,
+        estudiosEstado.decision,
       ));
       borrarIntentoEnvio();
       setEnviado(guardado);
@@ -222,10 +224,8 @@ function PortalInterno() {
               )
               : null
           )}
-          envioBloqueado={estudiosEstado.subiendo || estudiosEstado.pendientes > 0 || estudiosEstado.errores > 0}
-          envioBloqueadoMensaje={estudiosEstado.errores > 0
-            ? 'Reintenta o quita los estudios que dicen “No se pudo” antes de enviar.'
-            : 'Espera a que todos tus estudios indiquen “Recibido” antes de enviar tus respuestas.'}
+          envioBloqueado={!!bloqueoEnvioEstudios(estudiosEstado)}
+          envioBloqueadoMensaje={bloqueoEnvioEstudios(estudiosEstado)}
           estudiosEstado={estudiosEstado}
         />
         <footer className="portal-colofon">
