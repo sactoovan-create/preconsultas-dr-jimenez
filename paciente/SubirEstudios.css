@@ -197,7 +197,16 @@
   color: var(--oro-texto);
 }
 .pc-estudios-archivo-icono svg { width: 20px; height: 20px; }
+.pc-estudios-archivo-icono.tiene-preview {
+  overflow: hidden;
+  border: 1px solid var(--linea);
+  border-radius: 5px;
+  background: #fff;
+}
+.pc-estudios-archivo-icono img { width: 100%; height: 100%; object-fit: cover; }
+.pc-estudios-archivo-datos { display: grid; min-width: 0; gap: 2px; }
 .pc-estudios-archivo-nombre {
+  display: block;
   min-width: 0;
   overflow: hidden;
   color: var(--verde);
@@ -206,6 +215,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.pc-estudios-archivo-datos small { color: rgba(31, 58, 46, .54); font-size: 10.5px; }
 .pc-estudios-archivo-controles {
   display: flex;
   align-items: center;

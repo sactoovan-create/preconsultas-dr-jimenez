@@ -11,8 +11,9 @@ import './Profundizaciones.css';
  *
  * `tamizaje` = { mrs, dolor, hc } (lo ya contestado). `valor` = respuestas por id.
  */
-export default function Profundizaciones({ tamizaje, valor, onChange }) {
-  const sugeridas = profundizacionesSugeridas(tamizaje || {});
+export default function Profundizaciones({ tamizaje, valor, onChange, soloId = null }) {
+  const sugeridas = profundizacionesSugeridas(tamizaje || {})
+    .filter((profundizacion) => !soloId || profundizacion.id === soloId);
   if (!sugeridas.length) return null;
 
   return (

@@ -45,6 +45,17 @@ function detalleError(error) {
   return 'Revisa tu conexión y presiona Reintentar';
 }
 
+function formatearBytes(bytes) {
+  const cantidad = Number(bytes || 0);
+  if (!cantidad) return '';
+  if (cantidad < 1024 * 1024) return `${Math.max(1, Math.round(cantidad / 1024))} KB`;
+  return `${(cantidad / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function puedePrevisualizar(file) {
+  return /^image\/(jpeg|png|webp)$/i.test(file?.type || '');
+}
+
 const SubirEstudios = forwardRef(function SubirEstudios(
   {
     folder,
@@ -88,7 +99,12 @@ const SubirEstudios = forwardRef(function SubirEstudios(
   useEffect(() => {
     // React StrictMode desmonta y vuelve a montar los efectos en desarrollo.
     vivoRef.current = true;
-    return () => { vivoRef.current = false; };
+    return () => {
+      vivoRef.current = false;
+      itemsRef.current.forEach((item) => {
+        if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
+      });
+    };
   }, []);
 
   useEffect(() => {
@@ -192,6 +208,7 @@ const SubirEstudios = forwardRef(function SubirEstudios(
         return;
       }
     }
+    if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
     cambiarItems((l) => l.filter((it) => it.id !== item.id));
   };
 
@@ -217,6 +234,7 @@ const SubirEstudios = forwardRef(function SubirEstudios(
       estado: validacion.ok ? 'pendiente' : 'error',
       detalle: validacion.ok ? undefined : validacion.mensaje,
       file: validacion.ok ? file : null,
+      previewUrl: validacion.ok && puedePrevisualizar(file) ? URL.createObjectURL(file) : null,
     }));
     if (nuevos.length) {
       cambiarItems((lista) => [...lista, ...nuevos]);
@@ -305,8 +323,13 @@ const SubirEstudios = forwardRef(function SubirEstudios(
             const ArchivoIcono = /\.pdf$/i.test(it.nombre) ? FileText : FileImage;
             return (
             <li key={it.id}>
-              <span className="pc-estudios-archivo-icono" aria-hidden="true"><ArchivoIcono /></span>
-              <span className="pc-estudios-archivo-nombre" title={it.nombre}>{it.nombre}</span>
+              <span className={`pc-estudios-archivo-icono${it.previewUrl ? ' tiene-preview' : ''}`} aria-hidden="true">
+                {it.previewUrl ? <img src={it.previewUrl} alt="" /> : <ArchivoIcono />}
+              </span>
+              <span className="pc-estudios-archivo-datos">
+                <span className="pc-estudios-archivo-nombre" title={it.nombre}>{it.nombre}</span>
+                <small>{formatearBytes(it.resultado?.size || it.file?.size)}</small>
+              </span>
               <span className="pc-estudios-archivo-controles">
                 <span className={`pc-estudios-estado is-${estado.clase}`}>
                   <EstadoIcono className={it.estado === 'subiendo' ? 'is-spinning' : ''} aria-hidden="true" />

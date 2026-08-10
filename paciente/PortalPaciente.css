@@ -130,6 +130,51 @@
   line-height: 1.5;
 }
 
+.portal-continuacion {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 38px;
+  align-items: center;
+  gap: 12px;
+  width: min(calc(100% - 32px), 740px);
+  margin: 14px auto 0;
+  padding: 13px 14px;
+  border: 1px solid rgba(31, 58, 46, .16);
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(31, 58, 46, .09);
+}
+.portal-continuacion > svg { width: 22px; height: 22px; color: var(--oro-texto); }
+.portal-continuacion > div { display: grid; min-width: 0; gap: 3px; }
+.portal-continuacion b { color: var(--verde); font-size: 12.5px; line-height: 1.35; }
+.portal-continuacion span { color: rgba(31, 58, 46, .62); font-size: 11px; line-height: 1.4; }
+.portal-continuacion input {
+  width: 100%;
+  min-width: 0;
+  margin-top: 5px;
+  padding: 7px 9px;
+  border: 1px solid var(--linea);
+  border-radius: 5px;
+  background: #F5F7F5;
+  color: rgba(31, 58, 46, .68);
+  font: 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.portal-continuacion > button,
+.portal-imprimir-recibo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(31, 58, 46, .22);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--verde);
+  cursor: pointer;
+}
+.portal-continuacion > button { width: 38px; height: 38px; padding: 0; }
+.portal-continuacion > button:hover { border-color: var(--verde); background: #F2F5F3; }
+.portal-continuacion > button svg { width: 17px; height: 17px; }
+
 /* El cuestionario es la primera superficie operativa de la página. */
 .portal-form {
   position: relative;
@@ -214,6 +259,35 @@
   line-height: 1.65;
 }
 .portal-fin-nota { margin-top: 18px !important; color: rgba(31, 58, 46, .52) !important; font-size: 12.5px !important; }
+.portal-recibo {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr .7fr;
+  gap: 0;
+  margin: 24px 0 0;
+  overflow: hidden;
+  border: 1px solid rgba(31, 58, 46, .13);
+  border-radius: 7px;
+  background: #F6F8F6;
+  text-align: left;
+}
+.portal-recibo > div { display: grid; gap: 4px; padding: 12px; border-right: 1px solid rgba(31, 58, 46, .1); }
+.portal-recibo > div:nth-child(3) { border-right: 0; }
+.portal-recibo span { color: rgba(31, 58, 46, .54); font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.portal-recibo b { color: var(--verde); font-size: 12px; line-height: 1.35; }
+.portal-recibo ul { grid-column: 1 / -1; margin: 0; padding: 8px 12px 10px; border-top: 1px solid rgba(31, 58, 46, .1); list-style: none; }
+.portal-recibo li { display: flex; min-width: 0; align-items: center; gap: 7px; padding: 3px 0; overflow: hidden; color: rgba(31, 58, 46, .72); font-size: 10.5px; text-overflow: ellipsis; white-space: nowrap; }
+.portal-recibo li svg { width: 13px; height: 13px; flex: 0 0 13px; color: var(--oro-texto); }
+.portal-imprimir-recibo {
+  width: 100%;
+  min-height: 44px;
+  gap: 8px;
+  margin-top: 19px;
+  padding: 10px 14px;
+  font: 750 12.5px var(--sans);
+}
+.portal-imprimir-recibo:hover { border-color: var(--verde); background: #F2F5F3; }
+.portal-imprimir-recibo svg { width: 16px; height: 16px; }
+.portal-restaurando > svg { width: 34px; height: 34px; margin-bottom: 16px; color: var(--oro-texto); }
 .portal-fin-urgente {
   margin-top: 22px;
   padding: 16px;
@@ -243,6 +317,19 @@
   .portal-tarjeta-fin { padding: 38px 24px; }
   .portal-logo { width: 188px; }
   .portal-tarjeta-fin h1 { font-size: 34px; }
+  .portal-continuacion { grid-template-columns: 28px minmax(0, 1fr) 38px; width: min(calc(100% - 24px), 740px); gap: 9px; }
+  .portal-recibo { grid-template-columns: 1fr 1fr; }
+  .portal-recibo > div { border-bottom: 1px solid rgba(31, 58, 46, .1); }
+  .portal-recibo > div:nth-child(2) { border-right: 0; }
+  .portal-recibo > div:nth-child(3) { grid-column: 1 / -1; border-bottom: 0; }
+}
+
+@media print {
+  .portal-centro { display: block; padding: 0; background: #fff; }
+  .portal-grano,
+  .portal-imprimir-recibo { display: none !important; }
+  .portal-tarjeta-fin { width: 100%; padding: 18mm; border: 0; box-shadow: none; }
+  .portal-fin-urgente { break-inside: avoid; }
 }
 
 @media (prefers-reduced-motion: reduce) {

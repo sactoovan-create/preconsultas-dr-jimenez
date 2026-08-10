@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, LoaderCircle, Send } from 'lucide-react';
 import { usePaciente } from './core/PacienteContext.jsx';
 import {
   alertaUrgente,
+  expandirPasosProfundos,
   filtrarHistoriaActiva,
   FORMULARIO_VERSION,
   normalizarTelefonoMexicano,
@@ -13,7 +14,10 @@ import {
   TEMAS_CONSULTA,
   validarPaso,
 } from './core/preconsultaFlow.js';
-import { filtrarProfundizacionesActivas } from './core/profundos/index.js';
+import {
+  filtrarProfundizacionesActivas,
+  profundizacionesSugeridas,
+} from './core/profundos/index.js';
 import Profundizaciones from './paciente/Profundizaciones.jsx';
 import {
   CampoNumero,
@@ -206,11 +210,16 @@ export default function PreConsulta({
   envioBloqueado = false,
   envioBloqueadoMensaje = 'Espera a que terminen de subir tus estudios para enviar.',
   estudiosEstado = null,
+  borradorInicial = null,
+  onGuardarParaDespues = null,
+  onBorradorCambio = null,
+  guardandoParaDespues = false,
+  enlaceContinuacion = '',
 }) {
   const { paciente, actualizar, guardarAutoReporte } = usePaciente();
   const dem = paciente.demografia;
   const ar = paciente.autoReporte || {};
-  const borradorRef = useRef(onEnviar ? leerBorrador() : null);
+  const borradorRef = useRef(onEnviar ? (borradorInicial || leerBorrador()) : null);
   const borrador = borradorRef.current;
   const [mrs, setMrs] = useState(() => ({ ...(ar.mrs || {}), ...(borrador?.mrs || {}) }));
   const [dolor, setDolor] = useState(() => ({
@@ -234,7 +243,14 @@ export default function PreConsulta({
   const pasoRef = useRef(null);
   const alertaRef = useRef(null);
 
-  const pasos = useMemo(() => pasosPara({ hc, mrs, dolor }), [hc, mrs, dolor]);
+  const sugeridas = useMemo(
+    () => profundizacionesSugeridas({ hc, mrs, dolor }),
+    [dolor, hc, mrs],
+  );
+  const pasos = useMemo(
+    () => expandirPasosProfundos(pasosPara({ hc, mrs, dolor }), sugeridas),
+    [dolor, hc, mrs, sugeridas],
+  );
   const indice = Math.max(0, pasos.findIndex((p) => p.id === pasoId));
   const paso = pasos[indice] || pasos[0];
   const alerta = useMemo(() => alertaUrgente({ hc, dolor }), [hc, dolor]);
@@ -264,11 +280,14 @@ export default function PreConsulta({
     if (!onEnviar) return;
     const hayDatos = dem.nombre || hc.telefono || hc.motivo || (hc.temasConsulta || []).length;
     if (!hayDatos) return;
-    guardarBorrador({
+    const contenido = {
       demografia: { nombre: dem.nombre || '', edad: dem.edad ?? null },
       mrs, dolor, hc, profundos: profundosSeguros, pasoId,
-    });
-  }, [dem.edad, dem.nombre, dolor, hc, mrs, onEnviar, pasoId, profundosSeguros]);
+      formularioVersion: FORMULARIO_VERSION,
+    };
+    guardarBorrador(contenido);
+    onBorradorCambio?.(contenido);
+  }, [dem.edad, dem.nombre, dolor, hc, mrs, onBorradorCambio, onEnviar, pasoId, profundosSeguros]);
 
   useEffect(() => {
     if (!pasos.some((p) => p.id === pasoId)) setPasoId(pasos[Math.min(indice, pasos.length - 1)].id);
@@ -408,6 +427,16 @@ export default function PreConsulta({
     };
   };
 
+  const borradorActual = () => ({
+    demografia: { nombre: dem.nombre || '', edad: dem.edad ?? null },
+    mrs,
+    dolor,
+    hc,
+    profundos: profundosSeguros,
+    pasoId: paso.id,
+    formularioVersion: FORMULARIO_VERSION,
+  });
+
   const enviar = async () => {
     if (trampaRef.current?.value) return;
     if (Date.now() - inicioRef.current < 2000) {
@@ -415,7 +444,7 @@ export default function PreConsulta({
       return;
     }
     for (const p of pasos) {
-      if (['profundizaciones', 'prevencion', 'envio'].includes(p.id)) continue;
+      if (p.id.startsWith('profundizacion:') || ['prevencion', 'envio'].includes(p.id)) continue;
       const resultado = validarPaso(p.id, { demografia: dem, hc, mrs, dolor });
       if (!resultado.ok) { setPasoId(p.id); mostrarError(resultado); return; }
     }
@@ -700,10 +729,15 @@ export default function PreConsulta({
       </>
     );
 
-    if (paso.id === 'profundizaciones') return (
+    if (paso.id.startsWith('profundizacion:')) return (
       <>
-        <p className="pc-paso-intro">Según lo que contaste, puedes responder una escala breve adicional. Es opcional y puedes continuar sin abrirla.</p>
-        <Profundizaciones tamizaje={{ mrs, dolor, hc }} valor={profundos} onChange={(p) => setProfundos(p)} />
+        <p className="pc-paso-intro">Esta escala breve apareció por lo que contaste. Es opcional y puedes continuar sin abrirla.</p>
+        <Profundizaciones
+          tamizaje={{ mrs, dolor, hc }}
+          valor={profundos}
+          onChange={(p) => setProfundos(p)}
+          soloId={paso.profundoId}
+        />
       </>
     );
 
@@ -840,7 +874,7 @@ export default function PreConsulta({
           <div className="pc-progreso-meta">
             <div className="pc-progreso-identidad">
               <img src="/marca/isotipo_verde.svg" alt="" aria-hidden="true" />
-              <span>Paso {indice + 1} de {pasos.length}</span>
+              <span>Cuestionario privado</span>
             </div>
             <b>{paso.titulo}</b>
           </div>
@@ -849,10 +883,22 @@ export default function PreConsulta({
             <span>{progreso}%</span>
           </div>
         </div>
+        {onGuardarParaDespues && paso.id !== 'envio' && (
+          <div className="pc-continuar-despues">
+            <button
+              type="button"
+              onClick={() => onGuardarParaDespues(borradorActual())}
+              disabled={guardandoParaDespues}
+            >
+              {guardandoParaDespues ? 'Guardando...' : 'Guardar y continuar después'}
+            </button>
+            {enlaceContinuacion && <span>Enlace privado actualizado</span>}
+          </div>
+        )}
 
         <section className="pc-paso" ref={pasoRef} tabIndex={-1} aria-labelledby="pc-paso-titulo">
           <header className="pc-paso-cab">
-            <span>{String(indice + 1).padStart(2, '0')}</span>
+            <span>Etapa</span>
             <h1 id="pc-paso-titulo">{paso.titulo}</h1>
           </header>
 

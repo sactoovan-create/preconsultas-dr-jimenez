@@ -1,5 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { CheckCircle2, Clock3, FileUp, LockKeyhole } from 'lucide-react';
+import {
+  CheckCircle2,
+  Clock3,
+  Copy,
+  FileText,
+  FileUp,
+  Link2,
+  LoaderCircle,
+  LockKeyhole,
+  Printer,
+} from 'lucide-react';
 import { PacienteProvider } from '../core/PacienteContext.jsx';
 import PreConsulta from '../PreConsulta.jsx';
 import { guardarRespuesta } from '../core/respuestas.js';
@@ -14,6 +24,15 @@ import {
   cargarIntentoEnvio,
   guardarAdjuntosIntento,
 } from '../core/intentoEnvio.js';
+import {
+  borrarBorradorRemoto,
+  BORRADOR_REMOTO_VIGENCIA_HORAS,
+  construirEnlaceContinuacion,
+  guardarBorradorRemoto,
+  leerBorradorRemoto,
+  nuevoTokenContinuacion,
+  tokenContinuacionDesdeHash,
+} from '../core/borradores.js';
 import './PortalPaciente.css';
 
 /**
@@ -83,6 +102,17 @@ export default function PortalPaciente() {
 
 function PortalInterno() {
   const [intentoEnvio] = useState(cargarIntentoEnvio);
+  const tokenInicialRef = useRef(tokenContinuacionDesdeHash());
+  const [tokenContinuacion, setTokenContinuacion] = useState(tokenInicialRef.current);
+  const [restauracion, setRestauracion] = useState(() => ({
+    cargando: !!tokenInicialRef.current,
+    borrador: null,
+  }));
+  const [enlaceContinuacion, setEnlaceContinuacion] = useState(() => (
+    tokenInicialRef.current ? construirEnlaceContinuacion(tokenInicialRef.current) : ''
+  ));
+  const [guardandoParaDespues, setGuardandoParaDespues] = useState(false);
+  const [mensajeContinuacion, setMensajeContinuacion] = useState('');
   const [enviado, setEnviado] = useState(null);
   const [error, setError] = useState('');
   const estudiosFolder = intentoEnvio.estudiosFolder;
@@ -92,6 +122,34 @@ function PortalInterno() {
   });
   const estudiosRef = useRef(null);
   const confirmacionRef = useRef(null);
+  const temporizadorBorradorRef = useRef(null);
+
+  useEffect(() => {
+    const token = tokenInicialRef.current;
+    if (!token) return;
+    let activo = true;
+    leerBorradorRemoto(token)
+      .then((borrador) => {
+        if (!activo) return;
+        if (!borrador) {
+          setError('Este enlace de continuación venció o ya fue utilizado. Puedes iniciar un cuestionario nuevo.');
+          setTokenContinuacion('');
+          setEnlaceContinuacion('');
+          globalThis.history?.replaceState({}, '', globalThis.location?.pathname || '/');
+        } else {
+          setMensajeContinuacion('Recuperamos tu cuestionario privado. Puedes continuar donde lo dejaste.');
+        }
+        setRestauracion({ cargando: false, borrador });
+      })
+      .catch(() => {
+        if (!activo) return;
+        setError('No pudimos recuperar el cuestionario guardado. Revisa tu conexión o empieza uno nuevo.');
+        setRestauracion({ cargando: false, borrador: null });
+      });
+    return () => { activo = false; };
+  }, []);
+
+  useEffect(() => () => clearTimeout(temporizadorBorradorRef.current), []);
 
   useEffect(() => {
     if (!enviado) return;
@@ -102,6 +160,47 @@ function PortalInterno() {
     setEstudiosEstado(estado);
     guardarAdjuntosIntento(estado.archivos);
   }, []);
+
+  const copiarEnlace = useCallback(async (enlace = enlaceContinuacion) => {
+    if (!enlace) return false;
+    try {
+      if (!globalThis.navigator?.clipboard?.writeText) throw new Error('clipboard no disponible');
+      await globalThis.navigator.clipboard.writeText(enlace);
+      setMensajeContinuacion('Enlace privado copiado. Guárdalo o envíatelo; vence en 48 horas.');
+      return true;
+    } catch (_) {
+      setMensajeContinuacion('El cuestionario quedó guardado. Selecciona y copia el enlace de abajo.');
+      return false;
+    }
+  }, [enlaceContinuacion]);
+
+  const onGuardarParaDespues = useCallback(async (borrador) => {
+    setGuardandoParaDespues(true);
+    setError('');
+    try {
+      const token = tokenContinuacion || nuevoTokenContinuacion();
+      await guardarBorradorRemoto(token, borrador);
+      const enlace = construirEnlaceContinuacion(token);
+      setTokenContinuacion(token);
+      setEnlaceContinuacion(enlace);
+      globalThis.history?.replaceState({}, '', `#continuar=${token}`);
+      await copiarEnlace(enlace);
+    } catch (_) {
+      setError('No pudimos crear el enlace para continuar después. Tu avance sigue guardado en este dispositivo.');
+    } finally {
+      setGuardandoParaDespues(false);
+    }
+  }, [copiarEnlace, tokenContinuacion]);
+
+  const onBorradorCambio = useCallback((borrador) => {
+    if (!tokenContinuacion) return;
+    clearTimeout(temporizadorBorradorRef.current);
+    temporizadorBorradorRef.current = setTimeout(() => {
+      guardarBorradorRemoto(tokenContinuacion, borrador).catch(() => {
+        setMensajeContinuacion('No se pudo actualizar el enlace; tu avance sigue guardado en este dispositivo.');
+      });
+    }, 900);
+  }, [tokenContinuacion]);
 
   const onEnviar = async (datos) => {
     setError('');
@@ -118,6 +217,10 @@ function PortalInterno() {
         respuestaId,
         estudiosEstado.decision,
       ));
+      if (tokenContinuacion) {
+        await borrarBorradorRemoto(tokenContinuacion).catch(() => {});
+        globalThis.history?.replaceState({}, '', globalThis.location?.pathname || '/');
+      }
       borrarIntentoEnvio();
       setEnviado(guardado);
     } catch (e) {
@@ -158,6 +261,11 @@ function PortalInterno() {
     if (estudiosEstado.errores > 0) partesEstudios.push(`No pudimos recibir ${estudiosEstado.errores === 1 ? 'uno de tus estudios' : `${estudiosEstado.errores} de tus estudios`}; si quieres, llévalos impresos a tu consulta.`);
     const estudiosTexto = partesEstudios.length ? ' ' + partesEstudios.join(' ') : '';
     const urgente = enviado.alertaSeguridad?.urgente === true;
+    const folio = String(enviado.id || '').slice(0, 8).toUpperCase() || 'CONFIRMADO';
+    const enviadoEn = new Date(enviado.submittedAtClient || Date.now());
+    const fechaEnvio = Number.isNaN(enviadoEn.getTime())
+      ? 'Enviado correctamente'
+      : new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' }).format(enviadoEn);
     return (
       <div className="portal portal-centro">
         <Grano />
@@ -166,15 +274,43 @@ function PortalInterno() {
           <CheckCircle2 className="portal-fin-check" aria-hidden="true" />
           <h1>Gracias{primerNombre ? `, ${primerNombre}` : ''}.</h1>
           <p>Tus respuestas llegaron al consultorio del Dr. Iván Jiménez Martínez.{estudiosTexto} Las revisará antes de tu consulta para dedicarle el tiempo a lo que más te importa.</p>
+          <div className="portal-recibo" aria-label="Comprobante de envío">
+            <div><span>Folio</span><b>{folio}</b></div>
+            <div><span>Enviado</span><b>{fechaEnvio}</b></div>
+            <div><span>Archivos</span><b>{estudiosRecibidos}</b></div>
+            {estudiosRecibidos > 0 && (
+              <ul>
+                {enviado.adjuntos.map((archivo) => (
+                  <li key={archivo.ruta || archivo.nombre}><FileText aria-hidden="true" />{archivo.nombre}</li>
+                ))}
+              </ul>
+            )}
+          </div>
           {urgente ? (
             <div className="portal-fin-urgente" role="alert">
               <b>El envío no sustituye atención urgente.</b>
               <p>No esperes a que el consultorio revise el cuestionario. Busca atención médica de urgencia ahora.</p>
             </div>
           ) : (
-            <p className="portal-fin-nota">Ya puedes cerrar esta ventana.</p>
+            <p className="portal-fin-nota">No necesitas volver a enviarlo. Ya puedes cerrar esta ventana.</p>
           )}
+          <button type="button" className="portal-imprimir-recibo" onClick={() => globalThis.print?.()}>
+            <Printer aria-hidden="true" />Imprimir o guardar comprobante
+          </button>
           <div className="portal-credito">{CREDITO}</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (restauracion.cargando) {
+    return (
+      <div className="portal portal-centro">
+        <Grano />
+        <div className="portal-tarjeta-fin portal-restaurando" role="status">
+          <LoaderCircle className="is-spinning" aria-hidden="true" />
+          <h1>Recuperando tu cuestionario</h1>
+          <p>Estamos abriendo tu enlace privado.</p>
         </div>
       </div>
     );
@@ -202,9 +338,28 @@ function PortalInterno() {
         </div>
       </header>
       {error && <div className="portal-error">{error}</div>}
+      {enlaceContinuacion && (
+        <aside className="portal-continuacion" aria-live="polite">
+          <Link2 aria-hidden="true" />
+          <div>
+            <b>{mensajeContinuacion || 'Tu cuestionario quedó guardado.'}</b>
+            <span>Vence en {BORRADOR_REMOTO_VIGENCIA_HORAS} horas. Quien tenga el enlace puede abrir tus respuestas; no incluye estudios ni autorización.</span>
+            <input value={enlaceContinuacion} readOnly aria-label="Enlace privado para continuar el cuestionario" onFocus={(e) => e.target.select()} />
+          </div>
+          <button type="button" onClick={() => copiarEnlace()} title="Copiar enlace" aria-label="Copiar enlace privado">
+            <Copy aria-hidden="true" />
+          </button>
+        </aside>
+      )}
       <div className="portal-form">
         <PreConsulta
+          key={tokenInicialRef.current || 'nuevo'}
           onEnviar={onEnviar}
+          borradorInicial={tokenInicialRef.current ? (restauracion.borrador || {}) : null}
+          onGuardarParaDespues={onGuardarParaDespues}
+          onBorradorCambio={onBorradorCambio}
+          guardandoParaDespues={guardandoParaDespues}
+          enlaceContinuacion={enlaceContinuacion}
           extraAntesDeEnviar={({ consentimientoAceptado, enviando }) => (
             estudiosFolder
               ? (
