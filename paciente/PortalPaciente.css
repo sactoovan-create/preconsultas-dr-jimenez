@@ -1,124 +1,251 @@
-/* Portal público de la paciente — "El Dossier Sereno".
-   Variables de marca desde :root (core/designTokens.css). */
+/* Portal público de la paciente. La identidad proviene del paquete maestro
+   dr. jiménez y las variables compartidas de core/designTokens.css. */
 .portal {
   position: relative;
   min-height: 100vh;
-  background: radial-gradient(120% 80% at 50% 0%, #F6F1E6, var(--crema) 62%);
-  font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: clip;
+  background: #F3F5F2;
   color: var(--verde);
+  font-family: var(--sans);
 }
 
-/* Grano de papel fino sobre todo el lienzo. */
+.portal *,
+.portal *::before,
+.portal *::after { box-sizing: border-box; }
+
 .portal-grano {
-  position: fixed; inset: 0; z-index: 9; pointer-events: none; opacity: .035; mix-blend-mode: multiply;
+  position: fixed;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+  opacity: .022;
+  mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* ---- Encabezado editorial en verde profundo ---- */
+/* Cabecera compacta: la marca se ve primero sin retrasar el cuestionario. */
 .portal-hero {
-  position: relative; overflow: hidden; text-align: center; color: var(--crema);
-  padding: 80px 24px 132px;
-  background:
-    radial-gradient(130% 85% at 50% -10%, rgba(168,139,92,.10), transparent 62%),
-    linear-gradient(165deg, #3A5E49 0%, #2C4D3B 48%, #1F3A2E 100%);
+  position: relative;
+  padding: 0 24px 104px;
+  background: var(--verde);
+  color: var(--crema);
 }
-.portal-hero > *:not(.portal-rama) { position: relative; z-index: 1; }
-.portal-hero-logo { width: 100%; max-width: 348px; height: auto; display: block; margin: 0 auto 38px; }
+.portal-hero-inner { width: min(100%, 980px); margin: 0 auto; }
+.portal-masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 92px;
+  border-bottom: 1px solid rgba(241, 234, 219, .16);
+}
+.portal-hero-logo {
+  display: block;
+  width: 224px;
+  height: auto;
+  margin: 0;
+}
+.portal-masthead > span {
+  color: rgba(241, 234, 219, .68);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.portal-hero-copy { max-width: 720px; padding-top: 44px; }
 .portal-hero-eyebrow {
-  display: inline-flex; align-items: center; gap: 10px;
-  font-size: 11px; font-weight: 600; letter-spacing: .26em; text-transform: uppercase;
-  color: rgba(241,234,219,.72); margin-bottom: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 16px;
+  color: rgba(241, 234, 219, .72);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
 }
-.portal-punto-dorado { width: 5px; height: 5px; border-radius: 50%; background: var(--dorado); flex-shrink: 0; }
+.portal-punto-dorado {
+  width: 5px;
+  height: 5px;
+  flex: 0 0 5px;
+  border-radius: 50%;
+  background: var(--dorado);
+}
 .portal-hero-titulo {
-  font-family: var(--display); font-weight: 300; font-variation-settings: 'opsz' 144;
-  font-size: 72px; line-height: .98; letter-spacing: 0;
-  max-width: 640px; margin: 0 auto 20px; animation: rev .9s ease both;
+  max-width: 680px;
+  margin: 0 0 16px;
+  color: var(--crema);
+  font-family: var(--display);
+  font-size: 58px;
+  font-variation-settings: 'opsz' 120;
+  font-weight: 300;
+  letter-spacing: 0;
+  line-height: 1.02;
+  animation: portal-entrada .55s ease both;
 }
 .portal-hero-titulo em { font-style: italic; }
 .portal-hero-sub {
-  font-size: 16px; line-height: 1.65; font-weight: 300;
-  color: rgba(241,234,219,.74); max-width: 540px; margin: 0 auto;
+  max-width: 600px;
+  margin: 0;
+  color: rgba(241, 234, 219, .76);
+  font-size: 16px;
+  font-weight: 350;
+  line-height: 1.65;
 }
+.portal-hero-datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin-top: 26px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(241, 234, 219, .14);
+}
+.portal-hero-datos span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(241, 234, 219, .78);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.portal-hero-datos svg { width: 15px; height: 15px; color: var(--dorado); }
 
-/* Rama de laurel que se autodibuja. */
-.portal-rama { position: absolute; top: -14px; right: -6px; width: clamp(150px, 26vw, 232px); height: auto; z-index: 0; }
-.rama-p { stroke-dasharray: 100; stroke-dashoffset: 100; animation: trazo 1.5s ease forwards; }
-.rama-p.h1 { animation-delay: .55s; } .rama-p.h2 { animation-delay: .75s; }
-.rama-p.h3 { animation-delay: .95s; } .rama-p.h4 { animation-delay: 1.15s; } .rama-p.h5 { animation-delay: 1.35s; }
-.rama-semilla { opacity: 0; animation: aparece .5s ease forwards; animation-delay: 1.7s; }
-
-@keyframes trazo { to { stroke-dashoffset: 0; } }
-@keyframes aparece { to { opacity: 1; } }
-@keyframes rev { from { opacity: 0; filter: blur(8px); } to { opacity: 1; filter: blur(0); } }
-@keyframes subir { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes portal-entrada {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
 
 .portal-error {
-  max-width: 700px; margin: 16px auto 0; padding: 12px 16px; position: relative; z-index: 2;
-  background: rgba(184,80,66,.12); border: 1px solid rgba(184,80,66,.4);
-  border-radius: 10px; color: var(--terracota); font-size: 13px; font-weight: 600;
+  position: relative;
+  z-index: 3;
+  max-width: 740px;
+  margin: 14px auto 0;
+  padding: 12px 15px;
+  border: 1px solid rgba(184, 80, 66, .4);
+  border-radius: 7px;
+  background: #FFF2EF;
+  color: #87372F;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.5;
 }
 
-/* ---- El cuestionario se eleva sobre el verde ---- */
-.portal-form { max-width: 700px; margin: -72px auto 0; padding: 0 22px 40px; position: relative; z-index: 1; }
+/* El cuestionario es la primera superficie operativa de la página. */
+.portal-form {
+  position: relative;
+  z-index: 2;
+  max-width: 780px;
+  margin: -58px auto 0;
+  padding: 0 20px 48px;
+}
 .portal-form .pc { min-height: auto; background: transparent; }
 .portal-form .pc-cuerpo { max-width: none; margin: 0; padding: 0; }
-.portal-form .pc-seccion { animation: subir .6s cubic-bezier(.22,.61,.36,1) both; }
-
-/* Consentimiento como tarjeta de papel. */
-.pc-consent {
-  display: flex; align-items: flex-start; gap: 12px;
-  background: var(--papel); border: 1px solid var(--linea-suave); border-radius: var(--radio);
-  padding: 18px 20px; margin-bottom: 18px; cursor: pointer; box-shadow: var(--sombra-1);
-  font-size: 13px; line-height: 1.55; color: rgba(31,58,46,.8);
-}
-.pc-consent input { margin-top: 2px; width: 18px; height: 18px; accent-color: var(--verde); flex-shrink: 0; cursor: pointer; }
-
-/* Sello en seco del punto de marca. */
-.portal-sello {
-  width: 52px; height: 52px; border-radius: 50%; margin: 0 auto;
-  background: radial-gradient(at 38% 30%, #2A4D38, #1F3A2E 62%);
-  box-shadow: inset 0 1px 2px rgba(0,0,0,.26), inset 0 -1px 1px rgba(255,255,255,.10),
-    0 0 0 1px rgba(168,139,92,.55), 0 8px 16px -8px rgba(31,58,46,.45);
+.portal-form .pc-paso { animation: portal-paso .35s ease both; }
+@keyframes portal-paso {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
 }
 
-/* Colofón de cierre del documento. */
-.portal-colofon { text-align: center; padding: 46px 0 10px; }
-.portal-colofon .portal-sello { width: 38px; height: 38px; margin: 0 auto 16px; }
-.portal-firma { font-size: 11px; letter-spacing: .12em; color: rgba(31,58,46,.5); font-weight: 500; }
-/* Cinta de crédito: identidad profesional y cédula. Dato de confianza y legalmente
-   esperado en un documento médico. Oro legible, discreto. */
-.portal-credito { margin-top: 10px; font-size: 10px; letter-spacing: .06em; line-height: 1.5; color: var(--oro-texto); max-width: 30rem; margin-left: auto; margin-right: auto; }
+.portal-form .pc-consent {
+  padding: 17px 18px;
+  border-color: rgba(31, 58, 46, .14);
+  border-radius: 7px;
+  background: #F3F6F4;
+  box-shadow: none;
+}
 
-/* ---- Pantalla de confirmación ---- */
-.portal-centro { display: flex; align-items: center; justify-content: center; padding: 24px; }
+.portal-colofon {
+  padding: 38px 0 8px;
+  text-align: center;
+}
+.portal-footer-logo {
+  display: block;
+  width: 138px;
+  height: auto;
+  margin: 0 auto 12px;
+}
+.portal-credito {
+  max-width: 32rem;
+  margin: 0 auto;
+  color: rgba(31, 58, 46, .56);
+  font-size: 10px;
+  letter-spacing: .02em;
+  line-height: 1.5;
+}
+
+/* Confirmación inequívoca después de enviar. */
+.portal-centro {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #F3F5F2;
+}
 .portal-tarjeta-fin {
-  max-width: 520px; text-align: center; background: #FFFFFF;
-  border: 1px solid var(--linea-suave); border-radius: 24px;
-  padding: 56px 46px; box-shadow: var(--sombra-2); position: relative; z-index: 1;
+  position: relative;
+  z-index: 1;
+  width: min(100%, 540px);
+  padding: 48px 44px;
+  border: 1px solid rgba(31, 58, 46, .12);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 24px 64px rgba(31, 58, 46, .12);
+  text-align: center;
 }
-.portal-logo { width: 100%; max-width: 200px; height: auto; display: block; }
-.portal-tarjeta-fin .portal-logo { margin: 0 auto 22px; }
-.portal-tarjeta-fin .portal-sello { margin: 0 auto 22px; }
-.portal-tarjeta-fin h1 { font-family: var(--display); font-weight: 300; font-size: 36px; letter-spacing: 0; margin-bottom: 14px; }
-.portal-tarjeta-fin p { font-size: 15px; line-height: 1.65; color: rgba(31,58,46,.74); }
-.portal-fin-nota { margin-top: 18px; font-size: 12.5px; color: rgba(31,58,46,.5); }
+.portal-logo { display: block; width: 210px; height: auto; margin: 0 auto 22px; }
+.portal-fin-check {
+  width: 42px;
+  height: 42px;
+  margin: 0 auto 18px;
+  color: var(--ok);
+  stroke-width: 1.5;
+}
+.portal-tarjeta-fin h1 {
+  margin: 0 0 13px;
+  font-family: var(--display);
+  font-size: 38px;
+  font-weight: 350;
+  letter-spacing: 0;
+}
+.portal-tarjeta-fin p {
+  margin: 0;
+  color: rgba(31, 58, 46, .74);
+  font-size: 15px;
+  line-height: 1.65;
+}
+.portal-fin-nota { margin-top: 18px !important; color: rgba(31, 58, 46, .52) !important; font-size: 12.5px !important; }
 .portal-fin-urgente {
-  margin-top: 22px; padding: 16px; text-align: left;
-  border: 1px solid rgba(184,80,66,.45); border-radius: 8px;
-  background: rgba(184,80,66,.10); color: #87372f;
+  margin-top: 22px;
+  padding: 16px;
+  border: 1px solid rgba(184, 80, 66, .45);
+  border-radius: 7px;
+  background: #FFF2EF;
+  color: #87372F;
+  text-align: left;
 }
 .portal-fin-urgente b { display: block; font-size: 15px; }
-.portal-fin-urgente p { margin: 6px 0 0; color: #87372f; font-size: 13px; }
+.portal-fin-urgente p { margin: 6px 0 0; color: #87372F; font-size: 13px; }
+.portal-tarjeta-fin .portal-credito { margin-top: 24px; }
 
 @media (max-width: 640px) {
-  .portal-hero { padding: 54px 20px 110px; }
-  .portal-hero-titulo { font-size: 46px; }
-  .portal-tarjeta-fin { padding: 42px 24px; border-radius: 8px; }
+  .portal-hero { padding: 0 18px 78px; }
+  .portal-masthead { min-height: 74px; }
+  .portal-hero-logo { width: 178px; }
+  .portal-masthead > span { font-size: 9px; }
+  .portal-hero-copy { padding-top: 28px; }
+  .portal-hero-eyebrow { margin-bottom: 13px; }
+  .portal-hero-titulo { max-width: 340px; margin-bottom: 14px; font-size: 42px; line-height: 1.04; }
+  .portal-hero-sub { max-width: 350px; font-size: 14.5px; line-height: 1.6; }
+  .portal-hero-datos { gap: 9px 15px; margin-top: 20px; padding-top: 15px; }
+  .portal-hero-datos span { font-size: 11.5px; }
+  .portal-form { margin-top: -44px; padding: 0 12px 36px; }
+  .portal-colofon { padding-top: 30px; }
+  .portal-tarjeta-fin { padding: 38px 24px; }
+  .portal-logo { width: 188px; }
+  .portal-tarjeta-fin h1 { font-size: 34px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .portal-hero-titulo, .portal-form .pc-seccion { animation: none; }
-  .rama-p { stroke-dashoffset: 0; animation: none; }
-  .rama-semilla { opacity: 1; animation: none; }
+  .portal-hero-titulo,
+  .portal-form .pc-paso { animation: none; }
 }

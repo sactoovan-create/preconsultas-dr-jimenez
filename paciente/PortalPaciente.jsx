@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { CheckCircle2, Clock3, FileUp, LockKeyhole } from 'lucide-react';
 import { PacienteProvider } from '../core/PacienteContext.jsx';
 import PreConsulta from '../PreConsulta.jsx';
 import { guardarRespuesta } from '../core/respuestas.js';
@@ -26,23 +27,6 @@ import './PortalPaciente.css';
 /** Textura de grano fino sobre todo el lienzo (sensación de papel premium). */
 function Grano() {
   return <div className="portal-grano" aria-hidden="true" />;
-}
-
-/** Rama de laurel a trazo dorado que se dibuja sola al cargar. Motivo botánico. */
-function RamaBotanica() {
-  return (
-    <svg className="portal-rama" viewBox="0 0 240 260" fill="none" aria-hidden="true">
-      <g stroke="#A88B5C" strokeWidth="1.25" fill="none" strokeLinecap="round">
-        <path className="rama-p t" pathLength="100" d="M52 248 C 84 200 92 172 110 134 C 126 100 140 70 174 40" />
-        <path className="rama-p h1" pathLength="100" d="M110 134 C 128 124 148 128 160 144 C 140 146 120 142 110 134 Z" />
-        <path className="rama-p h2" pathLength="100" d="M101 156 C 82 150 68 156 60 172 C 81 172 93 166 101 156 Z" />
-        <path className="rama-p h3" pathLength="100" d="M124 104 C 142 95 162 99 174 115 C 154 117 134 113 124 104 Z" />
-        <path className="rama-p h4" pathLength="100" d="M116 80 C 98 73 84 79 76 95 C 97 95 109 89 116 80 Z" />
-        <path className="rama-p h5" pathLength="100" d="M150 60 C 168 51 188 55 200 71 C 180 73 160 69 150 60 Z" />
-      </g>
-      <circle className="rama-semilla" cx="174" cy="40" r="3.4" fill="#A88B5C" />
-    </svg>
-  );
 }
 
 export function construirRegistro(datos, estudiosFolder, archivos = [], respuestaId = null, estudiosDecision = null) {
@@ -178,8 +162,8 @@ function PortalInterno() {
       <div className="portal portal-centro">
         <Grano />
         <div className="portal-tarjeta-fin" ref={confirmacionRef} tabIndex={-1} role="status" aria-live="polite">
-          <img className="portal-logo" src="/marca/logo_maestro_verde.svg" alt="dr. jiménez, ginecología" />
-          <div className="portal-sello" aria-hidden="true" />
+          <img className="portal-logo" src="/marca/logo_maestro_web.svg" alt="dr. jiménez, ginecología" />
+          <CheckCircle2 className="portal-fin-check" aria-hidden="true" />
           <h1>Gracias{primerNombre ? `, ${primerNombre}` : ''}.</h1>
           <p>Tus respuestas llegaron al consultorio del Dr. Iván Jiménez Martínez.{estudiosTexto} Las revisará antes de tu consulta para dedicarle el tiempo a lo que más te importa.</p>
           {urgente ? (
@@ -200,11 +184,22 @@ function PortalInterno() {
     <div className="portal">
       <Grano />
       <header className="portal-hero">
-        <RamaBotanica />
-        <img className="portal-hero-logo" src="/marca/logo_invertido_transparente.svg" alt="dr. jiménez, ginecología" />
-        <div className="portal-hero-eyebrow"><span className="portal-punto-dorado" />Tu espacio privado</div>
-        <h1 className="portal-hero-titulo">Antes de tu <em>consulta</em></h1>
-        <p className="portal-hero-sub">Responde con calma desde donde estés. Tus respuestas le ayudan al doctor a conocer cómo te sientes y a dedicar la consulta a lo que más te importa.</p>
+        <div className="portal-hero-inner">
+          <div className="portal-masthead">
+            <img className="portal-hero-logo" src="/marca/logo_invertido_web.svg" alt="dr. jiménez, ginecología" />
+            <span>Preconsulta</span>
+          </div>
+          <div className="portal-hero-copy">
+            <div className="portal-hero-eyebrow"><span className="portal-punto-dorado" />Tu espacio privado</div>
+            <h1 className="portal-hero-titulo">Antes de tu <em>consulta</em></h1>
+            <p className="portal-hero-sub">Responde con calma desde donde estés. Tus respuestas le ayudan al doctor a conocer cómo te sientes y a dedicar la consulta a lo que más te importa.</p>
+            <div className="portal-hero-datos" aria-label="Información del cuestionario">
+              <span><Clock3 aria-hidden="true" />8 a 12 minutos</span>
+              <span><LockKeyhole aria-hidden="true" />Información privada</span>
+              <span><FileUp aria-hidden="true" />Estudios al final</span>
+            </div>
+          </div>
+        </div>
       </header>
       {error && <div className="portal-error">{error}</div>}
       <div className="portal-form">
@@ -229,8 +224,7 @@ function PortalInterno() {
           estudiosEstado={estudiosEstado}
         />
         <footer className="portal-colofon">
-          <div className="portal-sello" aria-hidden="true" />
-          <div className="portal-firma">dr. jiménez · ginecología</div>
+          <img className="portal-footer-logo" src="/marca/logo_maestro_web.svg" alt="dr. jiménez, ginecología" />
           <div className="portal-credito">{CREDITO}</div>
         </footer>
       </div>

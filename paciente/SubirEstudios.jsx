@@ -7,11 +7,24 @@ import React, {
   useState,
 } from 'react';
 import {
+  CircleAlert,
+  CircleCheck,
+  Clock3,
+  FileImage,
+  FileText,
+  LoaderCircle,
+  RotateCw,
+  ShieldCheck,
+  Trash2,
+  Upload,
+} from 'lucide-react';
+import {
   eliminarEstudioPaciente,
   subirEstudio,
   validarArchivoEstudio,
   MAX_ARCHIVOS,
 } from '../core/estudios.js';
+import './SubirEstudios.css';
 
 /**
  * Buzón de estudios para la paciente, al final del cuestionario. Cada archivo se
@@ -19,15 +32,11 @@ import {
  * almacenamiento privado; la paciente no ve una carpeta ni inicia sesión manual.
  */
 
-const VERDE = '#1F3A2E';
-const DORADO = '#A88B5C';
-const TINTA = '#2D2A26';
-
 const ICONO = {
-  pendiente: { t: 'En espera', c: DORADO },
-  subiendo: { t: 'Enviando…', c: DORADO },
-  listo: { t: 'Recibido', c: 'var(--ok)' },
-  error: { t: 'No se pudo', c: 'var(--terracota)' },
+  pendiente: { texto: 'En espera', clase: 'espera', Icono: Clock3 },
+  subiendo: { texto: 'Subiendo…', clase: 'subiendo', Icono: LoaderCircle },
+  listo: { texto: 'Recibido', clase: 'listo', Icono: CircleCheck },
+  error: { texto: 'No se pudo', clase: 'error', Icono: CircleAlert },
 };
 
 function detalleError(error) {
@@ -225,30 +234,37 @@ const SubirEstudios = forwardRef(function SubirEstudios(
   };
 
   return (
-    <div className="pc-estudios" style={{ marginTop: 28, textAlign: 'left', borderTop: `1px solid ${DORADO}33`, paddingTop: 24 }}>
-      <h2 style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: '1.25rem', color: VERDE, margin: '0 0 6px' }}>
-        ¿Tienes estudios? Súbelos aquí <span style={{ fontWeight: 400, color: TINTA }}>(opcional)</span>
-      </h2>
-      <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: TINTA, marginTop: 0 }}>
-        Laboratorios, ultrasonidos o recetas, en PDF o foto. Se suben de forma
-        privada en cuanto los seleccionas; espera a que cada uno diga “Recibido”.
-      </p>
+    <section className="pc-estudios" aria-labelledby="pc-estudios-titulo">
+      <header className="pc-estudios-cabecera">
+        <span className="pc-estudios-cabecera-icono" aria-hidden="true"><Upload /></span>
+        <div>
+          <span className="pc-estudios-kicker">Adjuntos opcionales</span>
+          <h2 id="pc-estudios-titulo">Estudios médicos</h2>
+          <p>Agrega laboratorios, ultrasonidos o recetas en PDF o foto.</p>
+        </div>
+      </header>
+
+      <div className="pc-estudios-privacidad">
+        <ShieldCheck aria-hidden="true" />
+        <span>Se guardan de forma privada y solo el consultorio puede abrirlos.</span>
+      </div>
+
       {!habilitado && (
-        <p role="status" style={{ fontSize: '0.88rem', color: 'var(--oro-texto)', fontWeight: 700 }}>
-          Acepta primero la autorización de arriba para habilitar la subida.
-        </p>
+        <div className="pc-estudios-bloqueado" role="status">
+          Acepta primero la autorización de arriba para habilitar esta sección.
+        </div>
       )}
 
-      <fieldset disabled={!habilitado || bloqueado} style={{ border: 0, padding: 0, margin: '16px 0 14px' }}>
-        <legend style={{ fontSize: '0.9rem', fontWeight: 700, color: TINTA, marginBottom: 8 }}>
+      <fieldset disabled={!habilitado || bloqueado} className="pc-estudios-pregunta">
+        <legend>
           ¿Tienes algún estudio para compartir? *
         </legend>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', maxWidth: 430, border: `1px solid ${DORADO}66`, borderRadius: 7, overflow: 'hidden' }}>
+        <div className="pc-estudios-decision">
           <button
             type="button"
             aria-pressed={decision === 'si'}
             onClick={() => elegirDecision('si')}
-            style={{ border: 0, borderRight: `1px solid ${DORADO}66`, padding: '10px 12px', background: decision === 'si' ? VERDE : '#fff', color: decision === 'si' ? '#fff' : VERDE, fontWeight: 700, cursor: habilitado && !bloqueado ? 'pointer' : 'not-allowed' }}
+            className={decision === 'si' ? 'is-active' : ''}
           >
             Sí, los agregaré
           </button>
@@ -256,7 +272,7 @@ const SubirEstudios = forwardRef(function SubirEstudios(
             type="button"
             aria-pressed={decision === 'no'}
             onClick={() => elegirDecision('no')}
-            style={{ border: 0, padding: '10px 12px', background: decision === 'no' ? VERDE : '#fff', color: decision === 'no' ? '#fff' : VERDE, fontWeight: 700, cursor: habilitado && !bloqueado ? 'pointer' : 'not-allowed' }}
+            className={decision === 'no' ? 'is-active' : ''}
           >
             No los tengo ahora
           </button>
@@ -264,68 +280,80 @@ const SubirEstudios = forwardRef(function SubirEstudios(
       </fieldset>
 
       {decision === 'si' && (
-        <label style={{
-          display: 'inline-flex', alignItems: 'center', gap: 8, cursor: habilitado && !bloqueado ? 'pointer' : 'not-allowed',
-          background: habilitado && !bloqueado ? VERDE : '#8D968F', color: '#fff', borderRadius: 8, padding: '11px 18px',
-          fontSize: '0.95rem', fontWeight: 500,
-        }} aria-disabled={!habilitado || bloqueado}>
-          Agregar estudios
-          <input type="file" multiple disabled={!habilitado || bloqueado} accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,image/heic-sequence,image/heif-sequence" onChange={onElegir} style={{ display: 'none' }} />
+        <label className="pc-estudios-selector" aria-disabled={!habilitado || bloqueado}>
+          <Upload aria-hidden="true" />
+          <span>
+            <b>Agregar PDF o fotos</b>
+            <small>Hasta {MAX_ARCHIVOS} archivos, máximo 15 MB cada uno</small>
+          </span>
+          <input className="pc-estudios-input" type="file" multiple disabled={!habilitado || bloqueado} accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,image/heic-sequence,image/heif-sequence" onChange={onElegir} />
         </label>
       )}
 
       {decision === 'no' && (
-        <p role="status" style={{ color: 'var(--ok)', fontWeight: 600, fontSize: '0.92rem', margin: '8px 0 0' }}>
-          Entendido. Puedes enviar el cuestionario sin estudios y llevarlos después.
-        </p>
+        <div className="pc-estudios-sin-adjuntos" role="status">
+          <CircleCheck aria-hidden="true" />
+          <span>Entendido. Puedes enviar el cuestionario y llevarlos después.</span>
+        </div>
       )}
 
       {items.length > 0 && (
-        <ul aria-live="polite" style={{ listStyle: 'none', padding: 0, margin: '16px 0 0' }}>
-          {items.map((it) => (
-            <li key={it.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, padding: '8px 0', borderBottom: `1px solid ${DORADO}22`, fontSize: '0.9rem' }}>
-              <span style={{ color: TINTA, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{it.nombre}</span>
-              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 10 }}>
-                <span style={{ color: ICONO[it.estado].c, fontWeight: 600, textAlign: 'right' }}>
-                  {ICONO[it.estado].t}
+        <ul className="pc-estudios-lista" aria-live="polite">
+          {items.map((it) => {
+            const estado = ICONO[it.estado];
+            const EstadoIcono = estado.Icono;
+            const ArchivoIcono = /\.pdf$/i.test(it.nombre) ? FileText : FileImage;
+            return (
+            <li key={it.id}>
+              <span className="pc-estudios-archivo-icono" aria-hidden="true"><ArchivoIcono /></span>
+              <span className="pc-estudios-archivo-nombre" title={it.nombre}>{it.nombre}</span>
+              <span className="pc-estudios-archivo-controles">
+                <span className={`pc-estudios-estado is-${estado.clase}`}>
+                  <EstadoIcono className={it.estado === 'subiendo' ? 'is-spinning' : ''} aria-hidden="true" />
+                  {it.quitando ? 'Quitando…' : estado.texto}
                 </span>
                 {it.estado === 'error' && it.detalle && (
-                  <span style={{ color: 'var(--terracota)', fontSize: '0.8rem', textAlign: 'right', flexBasis: '100%' }}>{it.detalle}</span>
+                  <span className="pc-estudios-error-detalle">{it.detalle}</span>
                 )}
                 {it.estado === 'error' && it.file && !bloqueado && (
                   <button
                     type="button"
                     onClick={() => iniciarSubida(it)}
-                    style={{ border: `1px solid ${DORADO}`, borderRadius: 6, background: '#fff', color: VERDE, padding: '5px 9px', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer' }}
+                    className="pc-estudios-accion"
+                    aria-label={`Reintentar ${it.nombre}`}
+                    title="Reintentar subida"
                   >
-                    Reintentar
+                    <RotateCw aria-hidden="true" />
                   </button>
                 )}
                 {it.estado !== 'subiendo' && !bloqueado && (
                   <button
                     type="button"
                     onClick={() => quitar(it)}
-                    style={{ border: 0, background: 'transparent', color: 'var(--terracota)', padding: '4px 2px', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer' }}
+                    className="pc-estudios-accion is-danger"
+                    aria-label={`Quitar ${it.nombre}`}
+                    title="Quitar archivo"
                   >
-                    Quitar
+                    <Trash2 aria-hidden="true" />
                   </button>
                 )}
-                {it.quitando && <span style={{ color: DORADO }}>Quitando…</span>}
               </span>
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
 
-      {aviso && <div role="alert" style={{ marginTop: 12, color: 'var(--terracota)', fontSize: '0.88rem' }}>{aviso}</div>}
+      {aviso && <div className="pc-estudios-aviso" role="alert"><CircleAlert aria-hidden="true" />{aviso}</div>}
       {listos > 0 && !subiendo && (
-        <div role="status" aria-live="polite" style={{ marginTop: 14, color: 'var(--ok)', fontWeight: 600, fontSize: '0.92rem' }}>
-          {listos === 1
-            ? 'Tu estudio ya fue recibido de forma privada. Al enviar el cuestionario quedará ligado a tus respuestas.'
-            : `Tus ${listos} estudios ya fueron recibidos de forma privada. Al enviar el cuestionario quedarán ligados a tus respuestas.`}
+        <div className="pc-estudios-confirmacion" role="status" aria-live="polite">
+          <CircleCheck aria-hidden="true" />
+          <span>{listos === 1
+            ? 'Tu estudio fue recibido. Al enviar el cuestionario quedará ligado a tus respuestas.'
+            : `Tus ${listos} estudios fueron recibidos. Al enviar el cuestionario quedarán ligados a tus respuestas.`}</span>
         </div>
       )}
-    </div>
+    </section>
   );
 });
 
