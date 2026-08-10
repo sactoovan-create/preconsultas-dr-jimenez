@@ -1,6 +1,7 @@
 import {
   alternarOpcion,
   alertaUrgente,
+  expandirPasosProfundos,
   filtrarHistoriaActiva,
   mrsCompleta,
   normalizarTelefonoMexicano,
@@ -62,6 +63,16 @@ const rutaClimaterioProfunda = pasosPara({
 t('abrir preguntas específicas no hace retroceder el progreso en climaterio',
   rutaClimaterioProfunda.some((p) => p.id === 'profundizaciones')
   && porcentajePaso('climaterio', rutaClimaterioSimple) === porcentajePaso('climaterio', rutaClimaterioProfunda));
+const rutaSeparada = expandirPasosProfundos(rutaClimaterioProfunda, [
+  { id: 'genitourinario', titulo: 'Salud genitourinaria' },
+  { id: 'salud-sexual', titulo: 'Salud sexual' },
+]);
+t('cada escala profunda ocupa una etapa independiente',
+  rutaSeparada.some((p) => p.id === 'profundizacion:genitourinario')
+  && rutaSeparada.some((p) => p.id === 'profundizacion:salud-sexual')
+  && !rutaSeparada.some((p) => p.id === 'profundizaciones'));
+t('las escalas profundas comparten un avance fijo sin mover etapas previas',
+  porcentajePaso('profundizacion:salud-sexual') === 72);
 t('salud general e historia viven en pasos separados y consecutivos',
   rutaClimaterioSimple.findIndex((p) => p.id === 'historia')
   === rutaClimaterioSimple.findIndex((p) => p.id === 'antecedentes') + 1);

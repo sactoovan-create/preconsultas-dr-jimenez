@@ -5,15 +5,19 @@
   "type": "module",
   "description": "Suite de instrumentos clínicos de ginecología. Motores puros verificables.",
   "scripts": {
-    "test": "node tests/suite.mjs && node tests/ruteo.mjs && node tests/precarga.mjs && node tests/agenda.mjs && node tests/correcciones.mjs && node tests/profundos.mjs && node tests/preconsulta-flow.mjs",
+    "test": "node tests/suite.mjs && node tests/ruteo.mjs && node tests/precarga.mjs && node tests/agenda.mjs && node tests/correcciones.mjs && node tests/profundos.mjs && node tests/preconsulta-flow.mjs && node tests/borradores.mjs && node tests/clinical-knowledge.mjs",
+    "knowledge:build": "node scripts/build-clinical-knowledge.mjs",
+    "knowledge:check": "node scripts/build-clinical-knowledge.mjs --check",
     "dev": "vite",
     "build": "vite build"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
+    "ajv": "^8.17.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "vite": "^5.4.11"
+    "vite": "^5.4.11",
+    "yaml": "^2.8.1"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",

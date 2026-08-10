@@ -214,9 +214,23 @@ export function pasosPara({ hc, mrs, dolor } = {}) {
   return pasos;
 }
 
+/** Convierte el contenedor de escalas profundas en una etapa por escala. Así una
+ * paciente nunca recibe varias escalas largas amontonadas en la misma pantalla. */
+export function expandirPasosProfundos(pasos = [], sugeridas = []) {
+  return pasos.flatMap((paso) => {
+    if (paso.id !== 'profundizaciones') return [paso];
+    return sugeridas.map((profundizacion) => ({
+      id: `profundizacion:${profundizacion.id}`,
+      titulo: profundizacion.titulo,
+      profundoId: profundizacion.id,
+    }));
+  });
+}
+
 /** Avance fijo por etapa. Una respuesta puede abrir módulos posteriores, pero
  * nunca hace retroceder la barra del paso donde ya está la paciente. */
 export function porcentajePaso(id) {
+  if (String(id || '').startsWith('profundizacion:')) return 72;
   const porcentaje = {
     inicio: 8,
     motivo: 18,

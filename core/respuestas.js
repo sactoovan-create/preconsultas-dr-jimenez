@@ -30,6 +30,8 @@ function hayBackend() {
   return !!(import.meta.env && import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
 }
 
+export function backendConfigurado() { return hayBackend(); }
+
 /** Guarda una respuesta de paciente. Devuelve el registro guardado. */
 export async function guardarRespuesta(registro) {
   if (hayBackend()) return guardarEnSupabase(registro);
@@ -104,6 +106,7 @@ async function clientePublico() {
     {
       auth: {
         persistSession: false,
+        storageKey: 'drj-preconsulta-publica',
         autoRefreshToken: false,
         detectSessionInUrl: false,
       },
@@ -111,6 +114,9 @@ async function clientePublico() {
   );
   return _clientePublico;
 }
+
+/** Cliente aislado del portal público. Nunca hereda la sesión del panel médico. */
+export async function clientePacienteSupabase() { return clientePublico(); }
 
 /** Cliente de Supabase compartido (lo reutiliza el buzón de estudios). */
 export async function clienteSupabase() { return cliente(); }
