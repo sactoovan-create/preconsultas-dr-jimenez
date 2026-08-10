@@ -5,7 +5,7 @@
 > liga al expediente). Este documento congela la forma de los datos para que ambos
 > evolucionen sin romperse. **Si cambias la forma, sube `version` y actualiza aquí.**
 
-Estado: **versión 2** (desde formulario `2026.08`). Producido por
+Estado: **versión 2** (formulario actual `2026.08.1`). Producido por
 `paciente/PortalPaciente.jsx` (`construirRegistro`) y `core/resumenPaciente.js`.
 Almacenado por `core/respuestas.js`.
 
@@ -24,7 +24,7 @@ Cada envío de una paciente es **un objeto JSON** con esta forma:
 ```jsonc
 {
   "version": 2,
-  "formularioVersion": "2026.08",
+  "formularioVersion": "2026.08.1",
   "submittedAtClient": "2026-08-01T20:10:50.000Z",
   "id": "uuid|loc_...",         // id único estable del envío
   "creado": "2026-06-23T20:11:05.123Z",  // ISO 8601 UTC, lo asigna el almacén
@@ -85,7 +85,7 @@ Cada envío de una paciente es **un objeto JSON** con esta forma:
   ],
 
   "ruteoClinico": {              // opcional/aditivo. Sugerencias, no diagnóstico.
-    "version": 2,
+    "version": 3,
     "generadoEn": "2026-06-27T00:00:00.000Z",
     "instrumentosSugeridos": [
       {
@@ -180,8 +180,7 @@ mapa `HC_LABEL`.)
 
 Campos estructurados de v2: `formularioVersion`, `temasConsulta` (lista),
 `etapaReproductiva`, `ultimaMenstruacion`, `posibleEmbarazo`,
-`senalesUrgencia` (lista), `senalesMaternas` (lista), `semanasEmbarazo`,
-`semanasPosparto`, `lactancia`, `sangradoTipos` (lista), `sangradoAhora`,
+`senalesUrgencia` (lista), `sangradoTipos` (lista), `sangradoAhora`,
 `sangradoDuracionDias`, `sangradoDesde`, `diasEntreReglas`,
 `cambiosAndrogenicos` (lista), `sintomasUrinarios` (lista),
 `molestiasIntimas` (lista), `sintomasMama` (lista), `objetivoReproductivo`,
@@ -189,6 +188,13 @@ Campos estructurados de v2: `formularioVersion`, `temasConsulta` (lista),
 `ultimoPapFecha`, `ultimoPapResultado`, `ultimaMastografiaFecha`,
 `ultimaMastografiaResultado`, `cancerFamiliarTipos` (lista) y
 `cancerFamiliarDetalle`.
+
+Desde `2026.08.1` el portal no ofrece atención de embarazo o posparto: retiró ese
+motivo, sus etapas y sus preguntas dirigidas. Conserva únicamente
+`posibleEmbarazo` como filtro mínimo de seguridad ginecológica. Los campos
+`senalesMaternas`, `semanasEmbarazo`, `semanasPosparto` y `lactancia` pueden
+existir en respuestas históricas; los envíos nuevos los limpian y el ERP debe
+tratarlos como datos heredados de solo lectura.
 
 Las opciones explícitas `ninguna`, `no_se`, `no_aplica` y `prefiero_no` son datos;
 una clave ausente sigue significando **no contestada**, no “No”.

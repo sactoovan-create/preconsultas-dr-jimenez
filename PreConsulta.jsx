@@ -3,13 +3,11 @@ import { ArrowLeft, ArrowRight, LoaderCircle, Send } from 'lucide-react';
 import { usePaciente } from './core/PacienteContext.jsx';
 import {
   alertaUrgente,
-  contextoMaterno,
   filtrarHistoriaActiva,
   FORMULARIO_VERSION,
   normalizarTelefonoMexicano,
   pasosPara,
   porcentajePaso,
-  reconciliarPosibleEmbarazo,
   senalFuerzaDolor,
   senalFuerzaSangrado,
   TEMAS_CONSULTA,
@@ -46,8 +44,6 @@ const ETAPAS = [
   { valor: 'menstrua_irregular', etiqueta: 'Mis menstruaciones son irregulares' },
   { valor: 'sin_regla_menos_12m', etiqueta: 'No menstruo desde hace menos de 12 meses' },
   { valor: 'menopausia', etiqueta: 'No menstruo desde hace 12 meses o más' },
-  { valor: 'embarazada', etiqueta: 'Estoy embarazada' },
-  { valor: 'posparto', etiqueta: 'Estoy en posparto o lactancia' },
   { valor: 'histerectomia', etiqueta: 'Me retiraron la matriz (histerectomía)' },
   { valor: 'no_se', etiqueta: 'No estoy segura' },
 ];
@@ -55,7 +51,6 @@ const ETAPAS = [
 const POSIBLE_EMBARAZO = [
   { valor: 'no', etiqueta: 'No' },
   { valor: 'posible', etiqueta: 'Sí, es posible' },
-  { valor: 'confirmado', etiqueta: 'Tengo una prueba positiva o embarazo confirmado' },
   { valor: 'no_se', etiqueta: 'No estoy segura' },
   { valor: 'no_aplica', etiqueta: 'No aplica en mi caso' },
 ];
@@ -67,19 +62,6 @@ const SENALES_URGENCIA = [
   { id: 'dolor_hombro', etiqueta: 'Dolor en el hombro junto con dolor abdominal o sangrado' },
   { id: 'dificultad_respirar', etiqueta: 'Dificultad para respirar o dolor en el pecho' },
   { id: 'fiebre_dolor', etiqueta: 'Fiebre junto con dolor pélvico intenso' },
-  { id: 'ninguna', etiqueta: 'Ninguna de estas' },
-];
-
-const SENALES_MATERNAS = [
-  { id: 'sangrado_embarazo', etiqueta: 'Durante el embarazo: sangrado vaginal mayor que un manchado leve' },
-  { id: 'hemorragia_posparto', etiqueta: 'Después del parto: sangrado que empapa una toalla o más en una hora, o coágulos grandes' },
-  { id: 'fiebre_materna', etiqueta: 'Durante el embarazo o posparto: fiebre de 38 °C o más' },
-  { id: 'cefalea_vision', etiqueta: 'Dolor de cabeza intenso que no cede, visión borrosa, luces o manchas' },
-  { id: 'movimiento_fetal_menos', etiqueta: 'El bebé se mueve mucho menos o dejó de moverse' },
-  { id: 'salida_liquido', etiqueta: 'Salida de líquido por vagina durante el embarazo' },
-  { id: 'hinchazon_extrema', etiqueta: 'Hinchazón marcada de cara o manos' },
-  { id: 'pierna_unilateral', etiqueta: 'Dolor, enrojecimiento o hinchazón importante en una sola pierna' },
-  { id: 'ideas_dano', etiqueta: 'Pensamientos de hacerte daño o hacerle daño al bebé' },
   { id: 'ninguna', etiqueta: 'Ninguna de estas' },
 ];
 
@@ -112,7 +94,7 @@ const ANTECEDENTE_CAMPO = {
   osteoporosis: 'enfOsteoporosis',
 };
 
-const BORRADOR = 'drj_preconsulta_borrador_v2';
+const BORRADOR = 'drj_preconsulta_borrador_v3';
 const BORRADOR_VIGENCIA_MS = 4 * 60 * 60 * 1000;
 function leerBorrador() {
   try {
@@ -236,7 +218,10 @@ export default function PreConsulta({
     ...(borrador?.dolor || {}),
     tiene: borrador?.dolor?.tiene ?? ar.dolor?.tiene ?? null,
   }));
-  const [hc, setHc] = useState(() => ({ ...(ar.hc || {}), ...(borrador?.hc || {}) }));
+  const [hc, setHc] = useState(() => filtrarHistoriaActiva({
+    ...(ar.hc || {}),
+    ...(borrador?.hc || {}),
+  }));
   const [profundos, setProfundos] = useState(() => borrador?.profundos || ar.profundos || {});
   const [pasoId, setPasoId] = useState(() => borrador?.pasoId || 'inicio');
   const [acepto, setAcepto] = useState(false);
@@ -357,31 +342,26 @@ export default function PreConsulta({
       semanasEmbarazo: null,
       semanasPosparto: null,
       lactancia: null,
+      senalesMaternas: [],
     };
     if (valor === 'menstrua_regular') cambio.reglasRegulares = true;
     if (valor === 'menstrua_irregular') cambio.reglasRegulares = false;
-    if (valor === 'embarazada') cambio.posibleEmbarazo = 'confirmado';
     if (['menopausia', 'histerectomia'].includes(valor)) cambio.posibleEmbarazo = 'no_aplica';
     setHc((p) => {
-      if (valor !== 'embarazada' && p.posibleEmbarazo === 'confirmado') {
-        cambio.posibleEmbarazo = null;
-      }
       if (
-        ['menstrua_regular', 'menstrua_irregular', 'sin_regla_menos_12m', 'posparto'].includes(valor)
+        ['menstrua_regular', 'menstrua_irregular', 'sin_regla_menos_12m', 'no_se'].includes(valor)
         && p.posibleEmbarazo === 'no_aplica'
       ) {
         cambio.posibleEmbarazo = null;
       }
-      const siguiente = { ...p, ...cambio };
-      if (!contextoMaterno(siguiente)) siguiente.senalesMaternas = [];
-      return siguiente;
+      return { ...p, ...cambio };
     });
     setGuardado(false);
     limpiarError();
   };
 
   const setPosibleEmbarazo = (valor) => {
-    setHc((p) => reconciliarPosibleEmbarazo(p, valor));
+    setHc((p) => ({ ...p, posibleEmbarazo: valor }));
     setGuardado(false);
     limpiarError();
   };
@@ -505,7 +485,6 @@ export default function PreConsulta({
           onChange={(v) => {
             setHc((p) => {
               const siguiente = { ...p, temasConsulta: v };
-              if (!contextoMaterno(siguiente)) siguiente.senalesMaternas = [];
               if (!v.includes('intimidad')) siguiente.molestiasIntimas = [];
               if (!v.includes('sangrado') && !senalFuerzaSangrado(siguiente)) {
                 siguiente.sangrado = false;
@@ -533,7 +512,7 @@ export default function PreConsulta({
                   siguiente.reglasRegulares = null;
                 }
               }
-              if (!v.some((t) => ['anticoncepcion', 'fertilidad', 'embarazo'].includes(t))) {
+              if (!v.some((t) => ['anticoncepcion', 'fertilidad'].includes(t))) {
                 siguiente.objetivoReproductivo = null;
                 siguiente.mesesBuscandoEmbarazo = null;
               }
@@ -557,38 +536,21 @@ export default function PreConsulta({
       <>
         <p className="pc-paso-intro">Estas preguntas no diagnostican. Sirven para avisarte si no conviene esperar a que el consultorio revise el formulario.</p>
         <GrupoOpciones id="posibleEmbarazo" etiqueta="¿Hay posibilidad de embarazo ahora?" requerido opciones={POSIBLE_EMBARAZO} valor={hc.posibleEmbarazo} onChange={setPosibleEmbarazo} />
-        <GrupoMultiple id="senalesUrgencia" etiqueta="¿Tienes hoy alguna de estas señales?" requerido opciones={SENALES_URGENCIA} valor={hc.senalesUrgencia} onChange={(v) => setH('senalesUrgencia', v)} />
-        {contextoMaterno(hc) && (
-          <GrupoMultiple
-            id="senalesMaternas"
-            etiqueta="Si estás embarazada o en posparto, ¿tienes hoy alguna de estas señales?"
-            ayuda="Incluye las primeras semanas después del parto, aunque el embarazo haya terminado."
-            requerido
-            opciones={SENALES_MATERNAS}
-            valor={hc.senalesMaternas}
-            onChange={(v) => setH('senalesMaternas', v)}
-          />
+        {['posible', 'no_se'].includes(hc.posibleEmbarazo) && (
+          <p className="pc-paso-intro">Si tienes una prueba positiva, busca valoración obstétrica. Este consultorio no ofrece control prenatal.</p>
         )}
+        <GrupoMultiple id="senalesUrgencia" etiqueta="¿Tienes hoy alguna de estas señales?" requerido opciones={SENALES_URGENCIA} valor={hc.senalesUrgencia} onChange={(v) => setH('senalesUrgencia', v)} />
         {avisoUrgenteTexto(alerta)}
       </>
     );
 
     if (paso.id === 'contexto') {
       const muestraFecha = ['menstrua_regular', 'menstrua_irregular', 'sin_regla_menos_12m'].includes(hc.etapaReproductiva)
-        || ['posible', 'confirmado', 'no_se'].includes(hc.posibleEmbarazo);
+        || ['posible', 'no_se'].includes(hc.posibleEmbarazo);
       return (
         <>
           <GrupoOpciones id="etapaReproductiva" etiqueta="¿Cuál opción describe mejor tu situación actual?" requerido opciones={ETAPAS} valor={hc.etapaReproductiva} onChange={setEtapa} />
           {muestraFecha && <CampoTexto etiqueta="Primer día de tu última menstruación (si lo recuerdas)" tipo="date" valor={hc.ultimaMenstruacion} onChange={(v) => setH('ultimaMenstruacion', v)} />}
-          {hc.etapaReproductiva === 'embarazada' && (
-            <CampoNumero etiqueta="¿De cuántas semanas estás? (si lo sabes)" min={1} max={45} valor={hc.semanasEmbarazo} onChange={(v) => setH('semanasEmbarazo', v)} placeholder="semanas" />
-          )}
-          {hc.etapaReproductiva === 'posparto' && (
-            <>
-              <CampoNumero etiqueta="¿Hace cuántas semanas fue el parto? (si lo sabes)" min={0} max={104} valor={hc.semanasPosparto} onChange={(v) => setH('semanasPosparto', v)} placeholder="semanas" />
-              <GrupoOpciones etiqueta="¿Estás amamantando?" opciones={[{ valor: true, etiqueta: 'Sí' }, { valor: false, etiqueta: 'No' }]} valor={hc.lactancia} onChange={(v) => setH('lactancia', v)} />
-            </>
-          )}
           <CampoTexto etiqueta="Método anticonceptivo u hormonas que usas (opcional)" valor={hc.anticonceptivo} onChange={(v) => setH('anticonceptivo', v)} placeholder="Pastillas, DIU, implante, terapia hormonal, ninguno..." />
         </>
       );
@@ -728,7 +690,6 @@ export default function PreConsulta({
           { valor: 'buscar_ahora', etiqueta: 'Estoy buscando embarazo ahora' },
           { valor: 'buscar_despues', etiqueta: 'Quiero un embarazo más adelante' },
           { valor: 'evitar', etiqueta: 'Quiero evitar un embarazo' },
-          { valor: 'embarazada', etiqueta: 'Ya estoy embarazada' },
           { valor: 'no_aplica', etiqueta: 'No aplica o no deseo embarazo' },
           { valor: 'prefiero_no', etiqueta: 'Prefiero hablarlo en consulta' },
         ]} valor={hc.objetivoReproductivo} onChange={(v) => setH('objetivoReproductivo', v)} />
