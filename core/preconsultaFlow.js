@@ -6,7 +6,7 @@
  * portal debe mostrar una orientación de seguridad inmediata.
  */
 
-export const FORMULARIO_VERSION = '2026.08';
+export const FORMULARIO_VERSION = '2026.08.1';
 
 export const TEMAS_CONSULTA = [
   { id: 'control', etiqueta: 'Revisión o chequeo ginecológico' },
@@ -16,7 +16,6 @@ export const TEMAS_CONSULTA = [
   { id: 'climaterio', etiqueta: 'Bochornos, sueño o menopausia' },
   { id: 'anticoncepcion', etiqueta: 'Anticoncepción' },
   { id: 'fertilidad', etiqueta: 'Fertilidad o búsqueda de embarazo' },
-  { id: 'embarazo', etiqueta: 'Embarazo o posparto' },
   { id: 'urinario', etiqueta: 'Orina, urgencia o escapes' },
   { id: 'intimidad', etiqueta: 'Sequedad, dolor o salud sexual' },
   { id: 'mama', etiqueta: 'Molestia o revisión de mama' },
@@ -32,7 +31,6 @@ export const MRS_IDS = [
 
 export const SENAL_NINGUNA = 'ninguna';
 export const OPCION_NINGUNA = 'ninguna';
-export const SENAL_MATERNA_NINGUNA = 'ninguna';
 
 const PASO_TEMA = {
   sangrado: { id: 'sangrado', titulo: 'Tu sangrado' },
@@ -44,34 +42,14 @@ const PASO_TEMA = {
   mama: { id: 'mama', titulo: 'Salud mamaria' },
 };
 
+const ETAPAS_NO_OBSTETRICAS = new Set([
+  'menstrua_regular', 'menstrua_irregular', 'sin_regla_menos_12m',
+  'menopausia', 'histerectomia', 'no_se',
+]);
+const POSIBILIDAD_EMBARAZO_VALIDA = new Set(['no', 'posible', 'no_se', 'no_aplica']);
+
 function lista(valor) {
   return Array.isArray(valor) ? valor : [];
-}
-
-export function contextoMaterno(hc = {}) {
-  const temas = lista(hc.temasConsulta);
-  return temas.includes('embarazo')
-    || ['embarazada', 'posparto'].includes(hc.etapaReproductiva)
-    || hc.posibleEmbarazo === 'confirmado';
-}
-
-/** Mantiene consistentes la respuesta de seguridad y la etapa reproductiva.
- * Una confirmación selecciona embarazo; cualquier respuesta posterior que lo
- * descarte obliga a elegir de nuevo la etapa en vez de enviar datos opuestos. */
-export function reconciliarPosibleEmbarazo(hc = {}, valor) {
-  const siguiente = { ...hc, posibleEmbarazo: valor };
-
-  if (valor === 'confirmado') {
-    siguiente.etapaReproductiva = 'embarazada';
-    siguiente.semanasPosparto = null;
-    siguiente.lactancia = null;
-  } else if (siguiente.etapaReproductiva === 'embarazada') {
-    siguiente.etapaReproductiva = null;
-    siguiente.semanasEmbarazo = null;
-  }
-
-  if (!contextoMaterno(siguiente)) siguiente.senalesMaternas = [];
-  return siguiente;
 }
 
 export function senalFuerzaDolor(hc = {}) {
@@ -88,7 +66,20 @@ export function senalFuerzaSangrado(hc = {}) {
  * Se aplica otra vez al enviar para cubrir borradores de versiones anteriores. */
 export function filtrarHistoriaActiva(hc = {}) {
   const limpia = { ...hc };
-  const temas = lista(limpia.temasConsulta);
+  const temas = lista(limpia.temasConsulta).filter((tema) => tema !== 'embarazo');
+  limpia.temasConsulta = temas;
+
+  // La práctica no ofrece atención obstétrica. Se limpian datos de borradores
+  // creados antes de retirar esa ruta, sin perder antecedentes obstétricos previos.
+  if (['embarazada', 'posparto'].includes(limpia.etapaReproductiva)) {
+    limpia.etapaReproductiva = null;
+  }
+  if (limpia.posibleEmbarazo === 'confirmado') limpia.posibleEmbarazo = 'posible';
+  if (limpia.objetivoReproductivo === 'embarazada') limpia.objetivoReproductivo = null;
+  limpia.senalesMaternas = [];
+  limpia.semanasEmbarazo = null;
+  limpia.semanasPosparto = null;
+  limpia.lactancia = null;
 
   if (!temas.includes('sangrado') && !senalFuerzaSangrado(limpia)) {
     limpia.sangrado = false;
@@ -114,7 +105,7 @@ export function filtrarHistoriaActiva(hc = {}) {
     limpia.caidaCabello = false;
     limpia.diasEntreReglas = null;
   }
-  if (!temas.some((tema) => ['anticoncepcion', 'fertilidad', 'embarazo'].includes(tema))) {
+  if (!temas.some((tema) => ['anticoncepcion', 'fertilidad'].includes(tema))) {
     limpia.objetivoReproductivo = null;
     limpia.mesesBuscandoEmbarazo = null;
   }
@@ -207,7 +198,7 @@ export function pasosPara({ hc, mrs, dolor } = {}) {
     if (temas.includes(tema) || forzado) pasos.push(PASO_TEMA[tema]);
   });
 
-  if (temas.some((t) => ['anticoncepcion', 'fertilidad', 'embarazo'].includes(t))) {
+  if (temas.some((t) => ['anticoncepcion', 'fertilidad'].includes(t))) {
     pasos.push({ id: 'plan-reproductivo', titulo: 'Plan reproductivo' });
   }
   if (hayProfundizaciones({ hc: historia, mrs, dolor })) {
@@ -271,24 +262,20 @@ export function validarPaso(id, { demografia, hc, mrs, dolor } = {}) {
   }
 
   if (id === 'seguridad') {
-    if (!historia.posibleEmbarazo) {
+    if (!POSIBILIDAD_EMBARAZO_VALIDA.has(historia.posibleEmbarazo)) {
       return error('Indica si existe posibilidad de embarazo.', 'posibleEmbarazo');
     }
     if (!lista(historia.senalesUrgencia).length) {
       return error('Marca si tienes alguna señal de alarma o elige “Ninguna de estas”.', 'senalesUrgencia');
     }
-    if (contextoMaterno(historia) && !lista(historia.senalesMaternas).length) {
-      return error('Revisa también las señales de alarma del embarazo o posparto.', 'senalesMaternas');
-    }
   }
 
   if (id === 'contexto') {
-    if (!historia.etapaReproductiva) return error('Elige la opción que mejor describe tu etapa actual.', 'etapaReproductiva');
-    if (!historia.posibleEmbarazo) return error('Indica si existe posibilidad de embarazo.', 'posibleEmbarazo');
-    const etapaEmbarazo = historia.etapaReproductiva === 'embarazada';
-    const embarazoConfirmado = historia.posibleEmbarazo === 'confirmado';
-    if (etapaEmbarazo !== embarazoConfirmado) {
-      return error('Revisa la etapa actual y la respuesta sobre embarazo para que sean consistentes.', 'etapaReproductiva');
+    if (!ETAPAS_NO_OBSTETRICAS.has(historia.etapaReproductiva)) {
+      return error('Elige la opción que mejor describe tu etapa actual.', 'etapaReproductiva');
+    }
+    if (!POSIBILIDAD_EMBARAZO_VALIDA.has(historia.posibleEmbarazo)) {
+      return error('Indica si existe posibilidad de embarazo.', 'posibleEmbarazo');
     }
   }
 
@@ -344,9 +331,7 @@ export function validarPaso(id, { demografia, hc, mrs, dolor } = {}) {
 export function alertaUrgente({ hc, dolor } = {}) {
   const historia = hc || {};
   const senales = lista(historia.senalesUrgencia).filter((x) => x !== SENAL_NINGUNA);
-  const senalesMaternas = lista(historia.senalesMaternas)
-    .filter((x) => x !== SENAL_MATERNA_NINGUNA);
-  const embarazo = ['posible', 'confirmado', 'no_se'].includes(historia.posibleEmbarazo);
+  const embarazo = ['posible', 'no_se'].includes(historia.posibleEmbarazo);
   const dolorImportante = senales.includes('dolor_subito_intenso')
     || Number((dolor || {}).intensidad) >= 9;
   const sangrado = senales.includes('sangrado_abundante');
@@ -355,14 +340,13 @@ export function alertaUrgente({ hc, dolor } = {}) {
   ].includes(x));
   const infeccion = senales.includes('fiebre_dolor');
   const embarazoConSintomas = embarazo && (dolorImportante || sangrado || inestabilidad);
-  const saludMental = senalesMaternas.includes('ideas_dano');
 
   return {
     urgente: dolorImportante || sangrado || inestabilidad || infeccion
-      || embarazoConSintomas || senalesMaternas.length > 0,
+      || embarazoConSintomas,
     embarazoConSintomas,
-    saludMental,
+    saludMental: false,
     senales,
-    senalesMaternas,
+    senalesMaternas: [],
   };
 }

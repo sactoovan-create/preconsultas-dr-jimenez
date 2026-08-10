@@ -14,7 +14,7 @@
 
 import { MRS_IDS } from './preconsultaFlow.js';
 
-export const RUTEO_VERSION = 2;
+export const RUTEO_VERSION = 3;
 
 // Catálogo de instrumentos (ids = carpetas en instruments/).
 const NOMBRE = {
@@ -214,19 +214,6 @@ export function instrumentosPara(pre) {
       instrumentoRelacionado: hc.sangrado ? 'hemorragia' : (dolor.tiene ? 'dolor-pelvico' : ''),
     });
   }
-  const senalesMaternas = Array.isArray(hc.senalesMaternas)
-    ? hc.senalesMaternas.filter((x) => x !== 'ninguna')
-    : [];
-  if (senalesMaternas.length) {
-    banderas.push({
-      tipo: 'roja',
-      mensaje: senalesMaternas.includes('ideas_dano')
-        ? 'La paciente reportó una señal urgente de salud mental durante embarazo o posparto.'
-        : 'La paciente reportó una señal materna urgente durante embarazo o posparto.',
-      instrumentoRelacionado: '',
-    });
-  }
-
   sug.sort((a, b) => ORDEN_PRIORIDAD[a.prioridad] - ORDEN_PRIORIDAD[b.prioridad]);
   return { version: RUTEO_VERSION, instrumentosSugeridos: sug, banderas };
 }
