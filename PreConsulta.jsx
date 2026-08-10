@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowLeft, ArrowRight, LoaderCircle, Send } from 'lucide-react';
 import { usePaciente } from './core/PacienteContext.jsx';
 import {
   alertaUrgente,
@@ -853,7 +854,8 @@ export default function PreConsulta({
             : extraAntesDeEnviar}
         </div>
         <button type="button" className="pc-guardar pc-enviar" onClick={enviar} disabled={enviando} aria-busy={enviando}>
-          {onEnviar ? (enviando ? 'Enviando…' : 'Enviar cuestionario y estudios') : 'Guardar respuestas'}
+          {enviando ? <LoaderCircle className="pc-boton-cargando" aria-hidden="true" /> : <Send aria-hidden="true" />}
+          <span>{onEnviar ? (enviando ? 'Enviando…' : 'Enviar cuestionario y estudios') : 'Guardar respuestas'}</span>
         </button>
         <div className="pc-acciones-nota">Al enviar, recibirás una confirmación clara en esta misma pantalla.</div>
         {guardado && !onEnviar && <div className="pc-ok">Tus respuestas quedaron guardadas.</div>}
@@ -874,8 +876,17 @@ export default function PreConsulta({
           aria-valuemax="100"
           aria-valuenow={progreso}
         >
-          <div className="pc-progreso-meta"><span>{progreso}% completado</span><b>{paso.titulo}</b></div>
-          <div className="pc-progreso-pista"><span style={{ width: `${progreso}%` }} /></div>
+          <div className="pc-progreso-meta">
+            <div className="pc-progreso-identidad">
+              <img src="/marca/isotipo_verde.svg" alt="" aria-hidden="true" />
+              <span>Paso {indice + 1} de {pasos.length}</span>
+            </div>
+            <b>{paso.titulo}</b>
+          </div>
+          <div className="pc-progreso-linea">
+            <div className="pc-progreso-pista"><span style={{ width: `${progreso}%` }} /></div>
+            <span>{progreso}%</span>
+          </div>
         </div>
 
         <section className="pc-paso" ref={pasoRef} tabIndex={-1} aria-labelledby="pc-paso-titulo">
@@ -889,8 +900,12 @@ export default function PreConsulta({
 
           {paso.id !== 'envio' && (
             <nav className="pc-navegacion" aria-label="Navegación del cuestionario">
-              <button type="button" className="pc-anterior" onClick={anterior} disabled={indice === 0}>Anterior</button>
-              <button type="button" className="pc-siguiente" onClick={siguiente}>Continuar</button>
+              <button type="button" className="pc-anterior" onClick={anterior} disabled={indice === 0}>
+                <ArrowLeft aria-hidden="true" /><span>Anterior</span>
+              </button>
+              <button type="button" className="pc-siguiente" onClick={siguiente}>
+                <span>Continuar</span><ArrowRight aria-hidden="true" />
+              </button>
             </nav>
           )}
         </section>
