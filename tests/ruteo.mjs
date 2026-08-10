@@ -58,14 +58,7 @@ const r12 = instrumentosPara({
   paciente: { edad: 31 },
   autoReporte: { hc: { etapaReproductiva: 'posparto', senalesMaternas: ['cefalea_vision'] } },
 });
-t('señal materna urgente llega como bandera al tablero',
-  r12.banderas.some((x) => x.tipo === 'roja' && /materna urgente/i.test(x.mensaje)));
-const r13 = instrumentosPara({
-  paciente: { edad: 31 },
-  autoReporte: { hc: { etapaReproductiva: 'posparto', senalesMaternas: ['ideas_dano'] } },
-});
-t('señal materna de salud mental queda identificada en la bandera',
-  r13.banderas.some((x) => x.tipo === 'roja' && /salud mental/i.test(x.mensaje)));
+t('datos obstétricos heredados no crean banderas nuevas', r12.banderas.length === 0);
 
 // 5) Pureza: misma entrada -> misma salida, sin timestamp dentro
 const a = JSON.stringify(instrumentosPara({ paciente: { edad: 50 }, autoReporte: {} }));

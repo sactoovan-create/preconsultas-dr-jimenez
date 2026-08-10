@@ -6,7 +6,7 @@ import {
   normalizarTelefonoMexicano,
   pasosPara,
   porcentajePaso,
-  reconciliarPosibleEmbarazo,
+  TEMAS_CONSULTA,
   telefonoValido,
   validarPaso,
 } from '../core/preconsultaFlow.js';
@@ -41,6 +41,11 @@ t('paso de motivo exige tema clínico', !validarPaso('motivo', { ...base, hc: { 
 t('solo agrega el módulo elegido', pasosPara(base).some((p) => p.id === 'sangrado')
   && !pasosPara(base).some((p) => p.id === 'climaterio'));
 t('anticoncepción agrega plan reproductivo', pasosPara({ ...base, hc: { ...base.hc, temasConsulta: ['anticoncepcion'] } }).some((p) => p.id === 'plan-reproductivo'));
+t('el portal ya no ofrece embarazo o posparto como motivo',
+  !TEMAS_CONSULTA.some((tema) => tema.id === 'embarazo'));
+t('un tema obstétrico heredado no abre plan reproductivo',
+  !pasosPara({ ...base, hc: { ...base.hc, temasConsulta: ['embarazo'] } })
+    .some((p) => p.id === 'plan-reproductivo'));
 t('elegir temas no hace retroceder el progreso del paso motivo',
   porcentajePaso('motivo', pasosPara({ ...base, hc: { ...base.hc, temasConsulta: ['control'] } }))
   === porcentajePaso('motivo', pasosPara({ ...base, hc: { ...base.hc, temasConsulta: ['sangrado', 'dolor', 'climaterio', 'mama'] } })));
@@ -108,62 +113,49 @@ const urgente = alertaUrgente({
 });
 t('embarazo posible con dolor de hombro muestra orientación urgente', urgente.urgente && urgente.embarazoConSintomas);
 t('ninguna señal no genera alerta', !alertaUrgente({ hc: { posibleEmbarazo: 'no', senalesUrgencia: ['ninguna'] } }).urgente);
-const alertaMaterna = alertaUrgente({
-  hc: { posibleEmbarazo: 'confirmado', senalesUrgencia: ['ninguna'], senalesMaternas: ['cefalea_vision'] },
+const alertaMaternaHeredada = alertaUrgente({
+  hc: { posibleEmbarazo: 'no', senalesUrgencia: ['ninguna'], senalesMaternas: ['cefalea_vision'] },
 });
-t('señal materna muestra orientación urgente', alertaMaterna.urgente && alertaMaterna.senalesMaternas.includes('cefalea_vision'));
-const alertaSangradoEmbarazo = alertaUrgente({
-  hc: { posibleEmbarazo: 'confirmado', senalesUrgencia: ['ninguna'], senalesMaternas: ['sangrado_embarazo'] },
-});
-t('sangrado mayor que manchado durante embarazo muestra orientación urgente',
-  alertaSangradoEmbarazo.urgente && alertaSangradoEmbarazo.senalesMaternas.includes('sangrado_embarazo'));
-const embarazoConfirmado = reconciliarPosibleEmbarazo({
-  etapaReproductiva: 'posparto',
-  semanasPosparto: 6,
-  lactancia: true,
-}, 'confirmado');
-t('embarazo confirmado normaliza la etapa y limpia datos posparto',
-  embarazoConfirmado.etapaReproductiva === 'embarazada'
-  && embarazoConfirmado.semanasPosparto == null
-  && embarazoConfirmado.lactancia == null);
-const embarazoDescartado = reconciliarPosibleEmbarazo({
+t('las señales maternas heredadas ya no activan una ruta obstétrica',
+  !alertaMaternaHeredada.urgente && alertaMaternaHeredada.senalesMaternas.length === 0);
+const historiaObstetricaHeredada = filtrarHistoriaActiva({
+  temasConsulta: ['embarazo', 'control'],
   etapaReproductiva: 'embarazada',
   semanasEmbarazo: 10,
+  semanasPosparto: 6,
+  lactancia: true,
   senalesMaternas: ['cefalea_vision'],
-}, 'no');
-t('descartar embarazo limpia la etapa incompatible y sus señales ocultas',
-  embarazoDescartado.etapaReproductiva == null
-  && embarazoDescartado.semanasEmbarazo == null
-  && embarazoDescartado.senalesMaternas.length === 0);
+  posibleEmbarazo: 'confirmado',
+  objetivoReproductivo: 'embarazada',
+});
+t('los borradores obstétricos se limpian sin borrar el resto de la historia',
+  historiaObstetricaHeredada.temasConsulta.length === 1
+  && historiaObstetricaHeredada.temasConsulta[0] === 'control'
+  && historiaObstetricaHeredada.etapaReproductiva == null
+  && historiaObstetricaHeredada.posibleEmbarazo === 'posible'
+  && historiaObstetricaHeredada.semanasEmbarazo == null
+  && historiaObstetricaHeredada.semanasPosparto == null
+  && historiaObstetricaHeredada.lactancia == null
+  && historiaObstetricaHeredada.senalesMaternas.length === 0
+  && historiaObstetricaHeredada.objetivoReproductivo == null);
 t('validación rechaza etapa embarazada cuando la posibilidad se marcó como no',
   !validarPaso('contexto', {
     ...base,
     hc: { ...base.hc, etapaReproductiva: 'embarazada', posibleEmbarazo: 'no' },
   }).ok);
-t('validación rechaza embarazo confirmado con una etapa distinta',
-  !validarPaso('contexto', {
-    ...base,
-    hc: { ...base.hc, etapaReproductiva: 'menstrua_regular', posibleEmbarazo: 'confirmado' },
-  }).ok);
-t('ruta de embarazo exige revisar señales maternas',
+t('validación rechaza el valor heredado de embarazo confirmado',
   !validarPaso('seguridad', {
     ...base,
-    hc: {
-      ...base.hc,
-      temasConsulta: ['embarazo'],
-      posibleEmbarazo: 'confirmado',
-      senalesUrgencia: ['ninguna'],
-    },
+    hc: { ...base.hc, posibleEmbarazo: 'confirmado', senalesUrgencia: ['ninguna'] },
   }).ok);
-t('ruta de embarazo pasa con señales maternas revisadas',
+t('el filtro mínimo de seguridad pasa sin cuestionario obstétrico adicional',
   validarPaso('seguridad', {
     ...base,
     hc: {
       ...base.hc,
-      temasConsulta: ['embarazo'],
-      posibleEmbarazo: 'confirmado',
+      temasConsulta: ['control'],
+      posibleEmbarazo: 'no',
       senalesUrgencia: ['ninguna'],
-      senalesMaternas: ['ninguna'],
     },
   }).ok);
 
