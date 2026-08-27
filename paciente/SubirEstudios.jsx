@@ -19,6 +19,7 @@ import {
   Upload,
 } from 'lucide-react';
 import {
+  confirmarEstudiosSubidos,
   eliminarEstudioPaciente,
   subirEstudio,
   validarArchivoEstudio,
@@ -34,7 +35,9 @@ import './SubirEstudios.css';
 
 const ICONO = {
   pendiente: { texto: 'En espera', clase: 'espera', Icono: Clock3 },
+  en_cola: { texto: 'En espera', clase: 'espera', Icono: Clock3 },
   subiendo: { texto: 'Subiendo…', clase: 'subiendo', Icono: LoaderCircle },
+  verificando: { texto: 'Verificando…', clase: 'subiendo', Icono: LoaderCircle },
   listo: { texto: 'Recibido', clase: 'listo', Icono: CircleCheck },
   error: { texto: 'No se pudo', clase: 'error', Icono: CircleAlert },
 };
@@ -42,6 +45,7 @@ const ICONO = {
 function detalleError(error) {
   if (error?.code === 'grande') return 'Pesa demasiado; intenta una foto más pequeña';
   if (error?.code === 'formato') return error.message;
+  if (error?.code === 'confirmacion') return 'No pudimos confirmar el archivo completo; presiona Reintentar';
   return 'Revisa tu conexión y presiona Reintentar';
 }
 
@@ -71,7 +75,7 @@ const SubirEstudios = forwardRef(function SubirEstudios(
     inicialesRef.current = archivosIniciales.map((resultado, indice) => ({
       id: `recuperado-${indice}-${resultado.path}`,
       nombre: resultado.nombre,
-      estado: 'listo',
+      estado: 'verificando',
       resultado,
       file: null,
     }));
@@ -79,12 +83,17 @@ const SubirEstudios = forwardRef(function SubirEstudios(
   const [items, setItems] = useState(inicialesRef.current);
   const itemsRef = useRef(inicialesRef.current);
   const subidasRef = useRef(new Map());
+  const colaRef = useRef(Promise.resolve());
   const vivoRef = useRef(true);
   const [decision, setDecision] = useState(() => (archivosIniciales.length ? 'si' : null));
   const [aviso, setAviso] = useState('');
 
-  const subiendo = items.some((i) => i.estado === 'subiendo');
+  const subiendo = items.some((i) => ['en_cola', 'subiendo', 'verificando'].includes(i.estado));
   const itemsSubidos = items.filter((i) => i.estado === 'listo' && i.resultado);
+  // Conserva el comprobante también mientras se verifica o espera reintento. Si
+  // la paciente recarga en ese instante, el portal puede volver a consultar el
+  // mismo objeto en vez de perder su ruta y dejarlo huérfano.
+  const itemsPersistibles = items.filter((i) => i.resultado);
   const listos = itemsSubidos.length;
   const pendientes = items.filter((i) => i.estado === 'pendiente').length;
   const errores = items.filter((i) => i.estado === 'error').length;
@@ -108,6 +117,54 @@ const SubirEstudios = forwardRef(function SubirEstudios(
   }, []);
 
   useEffect(() => {
+    const recuperados = itemsRef.current.filter(
+      (item) => item.estado === 'verificando' && item.resultado && !item.file,
+    );
+    if (!recuperados.length) return undefined;
+    let activo = true;
+
+    confirmarEstudiosSubidos(folder, recuperados.map((item) => item.resultado))
+      .then((confirmados) => {
+        if (!activo) return;
+        const porPath = new Map(confirmados.map((resultado) => [resultado.path, resultado]));
+        cambiarItems((lista) => lista.map((item) => (
+          porPath.has(item.resultado?.path)
+            ? { ...item, estado: 'listo', resultado: porPath.get(item.resultado.path), detalle: undefined }
+            : item
+        )));
+      })
+      .catch((error) => {
+        if (!activo) return;
+        const definitivo = error?.code === 'confirmacion' && !error?.cause;
+        const rutas = new Set(error?.rutas || []);
+        const confirmadoEn = new Date().toISOString();
+        cambiarItems((lista) => lista.map((item) => {
+          if (!recuperados.some((recuperado) => recuperado.id === item.id)) return item;
+          const afectado = !rutas.size || rutas.has(item.resultado?.path);
+          if (!afectado) {
+            return {
+              ...item,
+              estado: 'listo',
+              resultado: { ...item.resultado, confirmadoEn },
+              detalle: undefined,
+              requiereSeleccion: false,
+            };
+          }
+          return {
+            ...item,
+            estado: 'error',
+            detalle: definitivo
+              ? 'Ya no encontramos este archivo completo; quítalo y vuelve a seleccionarlo'
+              : detalleError(error),
+            requiereSeleccion: definitivo,
+          };
+        }));
+      });
+
+    return () => { activo = false; };
+  }, [cambiarItems, folder]);
+
+  useEffect(() => {
     if (!onEstadoCambio) return;
     onEstadoCambio({
       total: items.length,
@@ -116,12 +173,12 @@ const SubirEstudios = forwardRef(function SubirEstudios(
       pendientes,
       errores,
       decision,
-      archivos: itemsSubidos.map((i) => i.resultado),
+      archivos: itemsPersistibles.map((i) => i.resultado),
     });
   }, [decision, errores, items, listos, onEstadoCambio, pendientes, subiendo]);
 
   const iniciarSubida = useCallback((item) => {
-    if (!item?.file) {
+    if (!item?.file && !item?.resultado) {
       cambiarItems((lista) => lista.map((actual) => (
         actual.id === item?.id
           ? { ...actual, estado: 'error', detalle: 'Vuelve a seleccionar este archivo' }
@@ -132,33 +189,77 @@ const SubirEstudios = forwardRef(function SubirEstudios(
     const existente = subidasRef.current.get(item.id);
     if (existente) return existente;
 
+    // Una sola subida activa evita que Safari/iOS agote memoria al convertir y
+    // enviar varias fotos clínicas grandes al mismo tiempo.
     cambiarItems((lista) => lista.map((actual) => (
       actual.id === item.id
-        ? { ...actual, estado: 'subiendo', detalle: undefined, quitando: false }
+        ? { ...actual, estado: 'en_cola', detalle: undefined, quitando: false }
         : actual
     )));
-
-    const tarea = (async () => {
+    const ejecutar = async () => {
+      let resultado = item.forzarResubida ? undefined : item.resultado;
       try {
-        const resultado = await subirEstudio(folder, item.file);
+        if (item.forzarResubida && item.resultado?.path) {
+          await eliminarEstudioPaciente(item.resultado.path).catch(() => {});
+        }
+        if (!resultado) {
+          cambiarItems((lista) => lista.map((actual) => (
+            actual.id === item.id
+              ? { ...actual, estado: 'subiendo', detalle: undefined, quitando: false }
+              : actual
+          )));
+          resultado = await subirEstudio(folder, item.file);
+        }
         cambiarItems((lista) => lista.map((actual) => (
           actual.id === item.id
-            ? { ...actual, estado: 'listo', resultado, detalle: undefined }
+            ? {
+              ...actual,
+              estado: 'verificando',
+              resultado,
+              detalle: undefined,
+              quitando: false,
+              forzarResubida: false,
+              requiereSeleccion: false,
+            }
             : actual
         )));
-        return resultado;
-      } catch (error) {
+        const [confirmado] = await confirmarEstudiosSubidos(folder, [resultado]);
         cambiarItems((lista) => lista.map((actual) => (
           actual.id === item.id
-            ? { ...actual, estado: 'error', detalle: detalleError(error), resultado: undefined }
+            ? {
+              ...actual,
+              estado: 'listo',
+              resultado: confirmado,
+              detalle: undefined,
+              forzarResubida: false,
+              requiereSeleccion: false,
+            }
+            : actual
+        )));
+        return confirmado;
+      } catch (error) {
+        const definitivo = error?.code === 'confirmacion' && !error?.cause;
+        cambiarItems((lista) => lista.map((actual) => (
+          actual.id === item.id
+            ? {
+              ...actual,
+              estado: 'error',
+              detalle: definitivo && !item.file
+                ? 'Ya no encontramos este archivo completo; quítalo y vuelve a seleccionarlo'
+                : detalleError(error),
+              resultado,
+              forzarResubida: definitivo && !!item.file,
+              requiereSeleccion: definitivo && !item.file,
+            }
             : actual
         )));
         return null;
-      } finally {
-        subidasRef.current.delete(item.id);
       }
-    })();
+    };
+    const tarea = colaRef.current.then(ejecutar, ejecutar);
+    colaRef.current = tarea.catch(() => null);
     subidasRef.current.set(item.id, tarea);
+    tarea.finally(() => subidasRef.current.delete(item.id));
     return tarea;
   }, [cambiarItems, folder]);
 
@@ -169,7 +270,7 @@ const SubirEstudios = forwardRef(function SubirEstudios(
       if (subidasRef.current.size) {
         await Promise.allSettled(Array.from(subidasRef.current.values()));
       }
-      const actuales = itemsRef.current;
+      let actuales = itemsRef.current;
       const fallidos = actuales.filter((item) => item.estado === 'error');
       if (fallidos.length) {
         const fallo = new Error(
@@ -179,6 +280,46 @@ const SubirEstudios = forwardRef(function SubirEstudios(
         );
         fallo.code = 'estudios';
         throw fallo;
+      }
+      const listosActuales = actuales.filter((item) => item.estado === 'listo' && item.resultado);
+      if (listosActuales.length) {
+        cambiarItems((lista) => lista.map((item) => (
+          item.estado === 'listo' && item.resultado
+            ? { ...item, estado: 'verificando', detalle: undefined }
+            : item
+        )));
+        try {
+          const confirmados = await confirmarEstudiosSubidos(
+            folder,
+            listosActuales.map((item) => item.resultado),
+          );
+          const porPath = new Map(confirmados.map((resultado) => [resultado.path, resultado]));
+          cambiarItems((lista) => lista.map((item) => (
+            porPath.has(item.resultado?.path)
+              ? { ...item, estado: 'listo', resultado: porPath.get(item.resultado.path), detalle: undefined }
+              : item
+          )));
+        } catch (error) {
+          const rutas = new Set(error?.rutas || []);
+          const definitivo = error?.code === 'confirmacion' && !error?.cause;
+          cambiarItems((lista) => lista.map((item) => (
+            item.resultado && (!rutas.size || rutas.has(item.resultado.path))
+              ? {
+                ...item,
+                estado: 'error',
+                detalle: definitivo && !item.file
+                  ? 'Ya no encontramos este archivo completo; quítalo y vuelve a seleccionarlo'
+                  : detalleError(error),
+                forzarResubida: definitivo && !!item.file,
+                requiereSeleccion: definitivo && !item.file,
+              }
+              : item
+          )));
+          const fallo = new Error('El almacenamiento no confirmó todos los estudios. Reintenta o quita el que indique error.');
+          fallo.code = 'estudios';
+          throw fallo;
+        }
+        actuales = itemsRef.current;
       }
       return actuales
         .filter((item) => item.estado === 'listo' && item.resultado)
@@ -198,12 +339,15 @@ const SubirEstudios = forwardRef(function SubirEstudios(
 
   const quitar = async (item) => {
     setAviso('');
+    const estadoAnterior = item.estado;
     if (item.resultado?.path) {
       cambiarItems((l) => l.map((it) => (it.id === item.id ? { ...it, estado: 'subiendo', quitando: true } : it)));
       try {
         await eliminarEstudioPaciente(item.resultado.path);
       } catch (_) {
-        cambiarItems((l) => l.map((it) => (it.id === item.id ? { ...it, estado: 'listo', quitando: false } : it)));
+        cambiarItems((l) => l.map((it) => (
+          it.id === item.id ? { ...it, estado: estadoAnterior, quitando: false } : it
+        )));
         setAviso('No pudimos quitar ese archivo. Inténtalo de nuevo.');
         return;
       }
@@ -332,13 +476,15 @@ const SubirEstudios = forwardRef(function SubirEstudios(
               </span>
               <span className="pc-estudios-archivo-controles">
                 <span className={`pc-estudios-estado is-${estado.clase}`}>
-                  <EstadoIcono className={it.estado === 'subiendo' ? 'is-spinning' : ''} aria-hidden="true" />
+                  <EstadoIcono className={['subiendo', 'verificando'].includes(it.estado) ? 'is-spinning' : ''} aria-hidden="true" />
                   {it.quitando ? 'Quitando…' : estado.texto}
                 </span>
                 {it.estado === 'error' && it.detalle && (
                   <span className="pc-estudios-error-detalle">{it.detalle}</span>
                 )}
-                {it.estado === 'error' && it.file && !bloqueado && (
+                {it.estado === 'error'
+                  && (it.file || (it.resultado && !it.requiereSeleccion))
+                  && !bloqueado && (
                   <button
                     type="button"
                     onClick={() => iniciarSubida(it)}
@@ -349,7 +495,7 @@ const SubirEstudios = forwardRef(function SubirEstudios(
                     <RotateCw aria-hidden="true" />
                   </button>
                 )}
-                {it.estado !== 'subiendo' && !bloqueado && (
+                {!['en_cola', 'subiendo', 'verificando'].includes(it.estado) && !bloqueado && (
                   <button
                     type="button"
                     onClick={() => quitar(it)}
