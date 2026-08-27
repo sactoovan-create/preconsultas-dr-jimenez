@@ -33,12 +33,17 @@ const MIME_HEIC = new Set([
   'image/heic-sequence',
   'image/heif-sequence',
 ]);
+const ESPERAS_CONFIRMACION_MS = [0, 180, 450, 900];
 
 export function buzonActivo() {
   return !!(import.meta.env && import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
 }
 function bucket() {
   return import.meta.env.VITE_ESTUDIOS_BUCKET || 'estudios';
+}
+
+function esperar(ms) {
+  return ms ? new Promise((resolve) => setTimeout(resolve, ms)) : Promise.resolve();
 }
 
 let _clientePaciente = null;
@@ -144,6 +149,76 @@ export function bloqueoEnvioEstudios(estado = {}) {
   if (estado.subiendo || estado.pendientes > 0) return 'Espera a que todos tus estudios indiquen “Recibido” antes de enviar.';
   if (estado.decision === 'si' && !(estado.listos > 0)) return 'Agrega por lo menos un estudio o elige “No los tengo ahora”.';
   return '';
+}
+
+/** Compara los comprobantes locales contra un listado real del bucket. Esta parte
+ * es pura para poder probar que nunca se muestre "Recibido" por una respuesta de
+ * upload que después no exista o tenga cero bytes. */
+export function revisarConfirmacionEstudios(folder, resultados = [], listado = []) {
+  const prefijo = `${String(folder || '')}/`;
+  const porNombre = new Map(
+    (listado || [])
+      .filter((objeto) => objeto?.name && !objeto.name.startsWith('.'))
+      .map((objeto) => [objeto.name, objeto]),
+  );
+
+  return (resultados || []).flatMap((resultado) => {
+    const path = String(resultado?.path || '');
+    const nombre = path.startsWith(prefijo) ? path.slice(prefijo.length) : '';
+    if (!nombre || nombre.includes('/')) return [{ ...resultado, motivo: 'ruta' }];
+
+    const remoto = porNombre.get(nombre);
+    if (!remoto) return [{ ...resultado, motivo: 'ausente' }];
+
+    const bytesRemotos = Number(remoto?.metadata?.size ?? remoto?.size ?? 0);
+    const bytesEsperados = Number(resultado?.size || 0);
+    if (bytesRemotos <= 0) return [{ ...resultado, motivo: 'vacio' }];
+    if (bytesEsperados > 0 && bytesRemotos !== bytesEsperados) {
+      return [{ ...resultado, motivo: 'tamano', bytesRemotos }];
+    }
+    return [];
+  });
+}
+
+/** Vuelve a consultar el bucket privado y exige nombre + tamaño antes de aceptar
+ * los archivos. Los reintentos cortos absorben la latencia eventual de Storage. */
+export async function confirmarEstudiosSubidos(
+  folder,
+  resultados = [],
+  { esperas = ESPERAS_CONFIRMACION_MS } = {},
+) {
+  if (!resultados.length) return [];
+  const sb = await clientePacienteEstudios();
+  let pendientes = resultados;
+  let ultimoError = null;
+
+  for (const demora of esperas) {
+    await esperar(demora);
+    const { data, error } = await sb.storage.from(bucket()).list(folder, {
+      limit: 100,
+      sortBy: { column: 'name', order: 'asc' },
+    });
+    if (error) {
+      ultimoError = error;
+      continue;
+    }
+    pendientes = revisarConfirmacionEstudios(folder, resultados, data || []);
+    if (!pendientes.length) {
+      const confirmadoEn = new Date().toISOString();
+      return resultados.map((resultado) => ({ ...resultado, confirmadoEn }));
+    }
+  }
+
+  const error = new Error(
+    ultimoError
+      ? 'No pudimos volver a consultar el almacenamiento privado.'
+      : 'El almacenamiento no confirmó uno o más archivos completos.',
+  );
+  error.code = 'confirmacion';
+  error.rutas = pendientes.map((resultado) => resultado.path).filter(Boolean);
+  error.detalles = pendientes;
+  error.cause = ultimoError || undefined;
+  throw error;
 }
 
 /** Comprime una imagen en el navegador. Si no mejora, deja el original. */

@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Suite de instrumentos clínicos de ginecología. Motores puros verificables.",
   "scripts": {
-    "test": "node tests/suite.mjs && node tests/ruteo.mjs && node tests/precarga.mjs && node tests/agenda.mjs && node tests/correcciones.mjs && node tests/profundos.mjs && node tests/preconsulta-flow.mjs && node tests/borradores.mjs && node tests/clinical-knowledge.mjs",
+    "test": "node tests/suite.mjs && node tests/ruteo.mjs && node tests/precarga.mjs && node tests/agenda.mjs && node tests/correcciones.mjs && node tests/profundos.mjs && node tests/preconsulta-flow.mjs && node tests/estudios.mjs && node tests/borradores.mjs && node tests/clinical-knowledge.mjs",
     "knowledge:build": "node scripts/build-clinical-knowledge.mjs",
     "knowledge:check": "node scripts/build-clinical-knowledge.mjs --check",
     "dev": "vite",
