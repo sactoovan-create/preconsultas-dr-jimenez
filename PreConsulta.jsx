@@ -52,13 +52,6 @@ const ETAPAS = [
   { valor: 'no_se', etiqueta: 'No estoy segura' },
 ];
 
-const POSIBLE_EMBARAZO = [
-  { valor: 'no', etiqueta: 'No' },
-  { valor: 'posible', etiqueta: 'Sí, es posible' },
-  { valor: 'no_se', etiqueta: 'No estoy segura' },
-  { valor: 'no_aplica', etiqueta: 'No aplica en mi caso' },
-];
-
 const SENALES_URGENCIA = [
   { id: 'dolor_subito_intenso', etiqueta: 'Dolor súbito o muy intenso en abdomen o pelvis' },
   { id: 'sangrado_abundante', etiqueta: 'Sangrado que empapa una toalla o tampón cada hora durante 2 horas o más' },
@@ -365,22 +358,7 @@ export default function PreConsulta({
     };
     if (valor === 'menstrua_regular') cambio.reglasRegulares = true;
     if (valor === 'menstrua_irregular') cambio.reglasRegulares = false;
-    if (['menopausia', 'histerectomia'].includes(valor)) cambio.posibleEmbarazo = 'no_aplica';
-    setHc((p) => {
-      if (
-        ['menstrua_regular', 'menstrua_irregular', 'sin_regla_menos_12m', 'no_se'].includes(valor)
-        && p.posibleEmbarazo === 'no_aplica'
-      ) {
-        cambio.posibleEmbarazo = null;
-      }
-      return { ...p, ...cambio };
-    });
-    setGuardado(false);
-    limpiarError();
-  };
-
-  const setPosibleEmbarazo = (valor) => {
-    setHc((p) => ({ ...p, posibleEmbarazo: valor }));
+    setHc((p) => ({ ...p, ...cambio }));
     setGuardado(false);
     limpiarError();
   };
@@ -564,18 +542,13 @@ export default function PreConsulta({
     if (paso.id === 'seguridad') return (
       <>
         <p className="pc-paso-intro">Estas preguntas no diagnostican. Sirven para avisarte si no conviene esperar a que el consultorio revise el formulario.</p>
-        <GrupoOpciones id="posibleEmbarazo" etiqueta="¿Hay posibilidad de embarazo ahora?" requerido opciones={POSIBLE_EMBARAZO} valor={hc.posibleEmbarazo} onChange={setPosibleEmbarazo} />
-        {['posible', 'no_se'].includes(hc.posibleEmbarazo) && (
-          <p className="pc-paso-intro">Si tienes una prueba positiva, busca valoración obstétrica. Este consultorio no ofrece control prenatal.</p>
-        )}
         <GrupoMultiple id="senalesUrgencia" etiqueta="¿Tienes hoy alguna de estas señales?" requerido opciones={SENALES_URGENCIA} valor={hc.senalesUrgencia} onChange={(v) => setH('senalesUrgencia', v)} />
         {avisoUrgenteTexto(alerta)}
       </>
     );
 
     if (paso.id === 'contexto') {
-      const muestraFecha = ['menstrua_regular', 'menstrua_irregular', 'sin_regla_menos_12m'].includes(hc.etapaReproductiva)
-        || ['posible', 'no_se'].includes(hc.posibleEmbarazo);
+      const muestraFecha = ['menstrua_regular', 'menstrua_irregular', 'sin_regla_menos_12m'].includes(hc.etapaReproductiva);
       return (
         <>
           <GrupoOpciones id="etapaReproductiva" etiqueta="¿Cuál opción describe mejor tu situación actual?" requerido opciones={ETAPAS} valor={hc.etapaReproductiva} onChange={setEtapa} />
