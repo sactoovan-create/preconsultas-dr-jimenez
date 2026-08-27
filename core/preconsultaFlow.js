@@ -6,7 +6,7 @@
  * portal debe mostrar una orientación de seguridad inmediata.
  */
 
-export const FORMULARIO_VERSION = '2026.08.1';
+export const FORMULARIO_VERSION = '2026.08.2';
 
 export const TEMAS_CONSULTA = [
   { id: 'control', etiqueta: 'Revisión o chequeo ginecológico' },
@@ -46,8 +46,6 @@ const ETAPAS_NO_OBSTETRICAS = new Set([
   'menstrua_regular', 'menstrua_irregular', 'sin_regla_menos_12m',
   'menopausia', 'histerectomia', 'no_se',
 ]);
-const POSIBILIDAD_EMBARAZO_VALIDA = new Set(['no', 'posible', 'no_se', 'no_aplica']);
-
 function lista(valor) {
   return Array.isArray(valor) ? valor : [];
 }
@@ -74,7 +72,7 @@ export function filtrarHistoriaActiva(hc = {}) {
   if (['embarazada', 'posparto'].includes(limpia.etapaReproductiva)) {
     limpia.etapaReproductiva = null;
   }
-  if (limpia.posibleEmbarazo === 'confirmado') limpia.posibleEmbarazo = 'posible';
+  limpia.posibleEmbarazo = null;
   if (limpia.objetivoReproductivo === 'embarazada') limpia.objetivoReproductivo = null;
   limpia.senalesMaternas = [];
   limpia.semanasEmbarazo = null;
@@ -276,9 +274,6 @@ export function validarPaso(id, { demografia, hc, mrs, dolor } = {}) {
   }
 
   if (id === 'seguridad') {
-    if (!POSIBILIDAD_EMBARAZO_VALIDA.has(historia.posibleEmbarazo)) {
-      return error('Indica si existe posibilidad de embarazo.', 'posibleEmbarazo');
-    }
     if (!lista(historia.senalesUrgencia).length) {
       return error('Marca si tienes alguna señal de alarma o elige “Ninguna de estas”.', 'senalesUrgencia');
     }
@@ -287,9 +282,6 @@ export function validarPaso(id, { demografia, hc, mrs, dolor } = {}) {
   if (id === 'contexto') {
     if (!ETAPAS_NO_OBSTETRICAS.has(historia.etapaReproductiva)) {
       return error('Elige la opción que mejor describe tu etapa actual.', 'etapaReproductiva');
-    }
-    if (!POSIBILIDAD_EMBARAZO_VALIDA.has(historia.posibleEmbarazo)) {
-      return error('Indica si existe posibilidad de embarazo.', 'posibleEmbarazo');
     }
   }
 
@@ -345,7 +337,6 @@ export function validarPaso(id, { demografia, hc, mrs, dolor } = {}) {
 export function alertaUrgente({ hc, dolor } = {}) {
   const historia = hc || {};
   const senales = lista(historia.senalesUrgencia).filter((x) => x !== SENAL_NINGUNA);
-  const embarazo = ['posible', 'no_se'].includes(historia.posibleEmbarazo);
   const dolorImportante = senales.includes('dolor_subito_intenso')
     || Number((dolor || {}).intensidad) >= 9;
   const sangrado = senales.includes('sangrado_abundante');
@@ -353,12 +344,9 @@ export function alertaUrgente({ hc, dolor } = {}) {
     'desmayo_mareo', 'dificultad_respirar', 'dolor_hombro',
   ].includes(x));
   const infeccion = senales.includes('fiebre_dolor');
-  const embarazoConSintomas = embarazo && (dolorImportante || sangrado || inestabilidad);
-
   return {
-    urgente: dolorImportante || sangrado || inestabilidad || infeccion
-      || embarazoConSintomas,
-    embarazoConSintomas,
+    urgente: dolorImportante || sangrado || inestabilidad || infeccion,
+    embarazoConSintomas: false,
     saludMental: false,
     senales,
     senalesMaternas: [],

@@ -119,13 +119,13 @@ t('antecedentes exige selección explícita o ninguna',
   !validarPaso('antecedentes', { ...base, hc: { ...base.hc, antecedentesRevisados: true, antecedentesSeleccionados: [] } }).ok);
 
 const urgente = alertaUrgente({
-  hc: { posibleEmbarazo: 'posible', senalesUrgencia: ['dolor_hombro'] },
+  hc: { senalesUrgencia: ['dolor_hombro'] },
   dolor: { intensidad: 7 },
 });
-t('embarazo posible con dolor de hombro muestra orientación urgente', urgente.urgente && urgente.embarazoConSintomas);
-t('ninguna señal no genera alerta', !alertaUrgente({ hc: { posibleEmbarazo: 'no', senalesUrgencia: ['ninguna'] } }).urgente);
+t('dolor de hombro muestra orientación urgente sin ruta obstétrica', urgente.urgente && !urgente.embarazoConSintomas);
+t('ninguna señal no genera alerta', !alertaUrgente({ hc: { senalesUrgencia: ['ninguna'] } }).urgente);
 const alertaMaternaHeredada = alertaUrgente({
-  hc: { posibleEmbarazo: 'no', senalesUrgencia: ['ninguna'], senalesMaternas: ['cefalea_vision'] },
+  hc: { senalesUrgencia: ['ninguna'], senalesMaternas: ['cefalea_vision'] },
 });
 t('las señales maternas heredadas ya no activan una ruta obstétrica',
   !alertaMaternaHeredada.urgente && alertaMaternaHeredada.senalesMaternas.length === 0);
@@ -143,7 +143,7 @@ t('los borradores obstétricos se limpian sin borrar el resto de la historia',
   historiaObstetricaHeredada.temasConsulta.length === 1
   && historiaObstetricaHeredada.temasConsulta[0] === 'control'
   && historiaObstetricaHeredada.etapaReproductiva == null
-  && historiaObstetricaHeredada.posibleEmbarazo === 'posible'
+  && historiaObstetricaHeredada.posibleEmbarazo == null
   && historiaObstetricaHeredada.semanasEmbarazo == null
   && historiaObstetricaHeredada.semanasPosparto == null
   && historiaObstetricaHeredada.lactancia == null
@@ -152,22 +152,21 @@ t('los borradores obstétricos se limpian sin borrar el resto de la historia',
 t('validación rechaza etapa embarazada cuando la posibilidad se marcó como no',
   !validarPaso('contexto', {
     ...base,
-    hc: { ...base.hc, etapaReproductiva: 'embarazada', posibleEmbarazo: 'no' },
+    hc: { ...base.hc, etapaReproductiva: 'embarazada' },
   }).ok);
-t('validación rechaza el valor heredado de embarazo confirmado',
-  !validarPaso('seguridad', {
-    ...base,
-    hc: { ...base.hc, posibleEmbarazo: 'confirmado', senalesUrgencia: ['ninguna'] },
-  }).ok);
-t('el filtro mínimo de seguridad pasa sin cuestionario obstétrico adicional',
+t('el filtro de seguridad pasa sin preguntar por embarazo',
   validarPaso('seguridad', {
     ...base,
     hc: {
       ...base.hc,
       temasConsulta: ['control'],
-      posibleEmbarazo: 'no',
       senalesUrgencia: ['ninguna'],
     },
+  }).ok);
+t('el contexto no depende de una respuesta de embarazo',
+  validarPaso('contexto', {
+    ...base,
+    hc: { ...base.hc, etapaReproductiva: 'menstrua_regular' },
   }).ok);
 
 console.log(`\nResultado flujo v2: ${ok} pasan, ${fail} fallan.`);
