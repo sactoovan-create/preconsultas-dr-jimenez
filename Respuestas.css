@@ -143,7 +143,7 @@
 /* Botón para abrir un estudio (firma el enlace al hacer clic). */
 .resp-abrir-estudio {
   font-family: var(--sans, 'Inter', sans-serif); font-size: 12px; font-weight: 700; cursor: pointer;
-  background: transparent; color: var(--verde, #1F3A2E); border: none; padding: 0;
+  background: transparent; color: var(--verde, #1F3A2E); border: none; padding: 0; text-decoration: none;
 }
 .resp-abrir-estudio:hover:not(:disabled) b { text-decoration: underline; }
 .resp-abrir-estudio:disabled { opacity: .6; cursor: default; }

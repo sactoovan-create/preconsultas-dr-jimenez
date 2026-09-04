@@ -298,6 +298,35 @@ export async function firmarEstudio(ruta, expiraSegundos = 3600) {
   return data.signedUrl;
 }
 
+/** Abre una pestaña dentro del gesto del clic sin usar la opción `noopener` de
+ * window.open. Chrome puede devolver `null` cuando esa opción se pasa en el tercer
+ * argumento, aunque sí haya abierto la pestaña. Se corta `opener` inmediatamente
+ * antes de navegarla para conservar el aislamiento. */
+export function prepararVisorEstudio(abrirVentana = null) {
+  const abrir = abrirVentana || ((...args) => window.open(...args));
+  const visor = abrir('about:blank', '_blank');
+  if (!visor) return null;
+  try { visor.opener = null; } catch (_) { /* navegador sin acceso al opener */ }
+  return visor;
+}
+
+/** Navega la pestaña previamente abierta. Devuelve false cuando el navegador la
+ * cerró o bloqueó; la interfaz puede entonces mostrar un enlace normal de respaldo. */
+export function navegarVisorEstudio(visor, url) {
+  if (!visor || !url) return false;
+  try {
+    visor.location.replace(url);
+    return true;
+  } catch (_) {
+    try {
+      visor.location.href = url;
+      return true;
+    } catch (_error) {
+      return false;
+    }
+  }
+}
+
 /** Borra un estudio desde el panel médico autenticado. */
 export async function eliminarEstudio(ruta) {
   if (!ruta || !buzonActivo()) return;

@@ -1,4 +1,8 @@
-import { revisarConfirmacionEstudios } from '../core/estudios.js';
+import {
+  navegarVisorEstudio,
+  prepararVisorEstudio,
+  revisarConfirmacionEstudios,
+} from '../core/estudios.js';
 
 let ok = 0;
 let fail = 0;
@@ -36,6 +40,29 @@ const otro = { path: 'folder-qa/1700000000001-ultrasonido.jpg', nombre: 'ultraso
 t('un archivo ausente no invalida los demás de la misma selección',
   revisarConfirmacionEstudios('folder-qa', [resultado, otro], [remoto]).map((fila) => fila.path)
     .join(',') === otro.path);
+
+let argumentosVentana = [];
+const visor = {
+  opener: { origen: 'panel' },
+  location: {
+    destino: '',
+    replace(url) { this.destino = url; },
+  },
+};
+const visorPreparado = prepararVisorEstudio((...args) => {
+  argumentosVentana = args;
+  return visor;
+});
+t('abre una pestaña utilizable sin el tercer argumento que hace devolver null a Chrome',
+  visorPreparado === visor
+  && argumentosVentana.join('|') === 'about:blank|_blank');
+t('corta el acceso al panel antes de navegar el visor', visor.opener === null);
+t('navega el visor al enlace firmado',
+  navegarVisorEstudio(visor, 'https://storage.example/firmado')
+  && visor.location.destino === 'https://storage.example/firmado');
+t('un bloqueador de ventanas activa la ruta de respaldo',
+  prepararVisorEstudio(() => null) === null
+  && navegarVisorEstudio(null, 'https://storage.example/firmado') === false);
 
 console.log(`\nResultado estudios: ${ok} pasan, ${fail} fallan.`);
 if (fail) process.exit(1);

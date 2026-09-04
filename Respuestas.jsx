@@ -1,6 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { listarRespuestas, eliminarRespuesta, modoAlmacenamiento, sesion, iniciarSesion, cerrarSesion } from './core/respuestas.js';
-import { listarEstudios, firmarEstudio, eliminarEstudio, eliminarCarpeta } from './core/estudios.js';
+import {
+  eliminarCarpeta,
+  eliminarEstudio,
+  firmarEstudio,
+  listarEstudios,
+  navegarVisorEstudio,
+  prepararVisorEstudio,
+} from './core/estudios.js';
 import { ruteoDesdeRespuesta } from './core/precarga.js';
 import { evaluarProfundizacion, MODULOS as PROFUNDOS } from './core/profundos/index.js';
 import { agendaDeHoy, cruzarAgenda } from './core/agenda.js';
@@ -463,25 +470,43 @@ function EstudiosAdjuntos({ folder }) {
 // Genera el enlace firmado al hacer clic (no al listar), para que no caduque si la
 // pestaña queda abierta mucho tiempo. Si la firma falla, avisa y permite reintentar.
 function AbrirEstudio({ ruta }) {
-  const [estado, setEstado] = useState('listo'); // 'listo' | 'abriendo' | 'error'
+  const [estado, setEstado] = useState('listo'); // 'listo' | 'abriendo' | 'enlace' | 'error'
+  const [enlace, setEnlace] = useState('');
 
   const abrir = async () => {
     setEstado('abriendo');
-    // Se abre la pestaña de forma síncrona dentro del gesto del clic (Safari bloquea
-    // window.open que ocurre después de un await) y luego se le asigna el enlace ya
-    // firmado. Si el navegador la bloqueó (devuelve null), se avisa con estado error.
-    const win = window.open('', '_blank', 'noopener,noreferrer');
+    setEnlace('');
+    // La pestaña se crea dentro del gesto del clic. El helper corta `opener` sin
+    // activar el falso `null` que Chrome devuelve con la opción `noopener`.
+    const visor = prepararVisorEstudio();
     try {
       const url = await firmarEstudio(ruta);
-      if (win) { win.location = url; setEstado('listo'); }
-      else { setEstado('error'); }
+      if (navegarVisorEstudio(visor, url)) {
+        setEstado('listo');
+      } else {
+        // Un bloqueador de ventanas no vuelve inaccesible el archivo: el siguiente
+        // clic usa un enlace real, con el URL firmado que acabamos de obtener.
+        setEnlace(url);
+        setEstado('enlace');
+      }
     } catch (_) {
-      if (win) win.close();
+      try { visor?.close(); } catch (_error) { /* la pestaña ya no existe */ }
       setEstado('error');
     }
   };
 
-  if (estado === 'error') return <button className="resp-abrir-estudio error" onClick={abrir}><b>No disponible, reintentar</b></button>;
+  if (estado === 'enlace') return (
+    <a
+      className="resp-abrir-estudio"
+      href={enlace}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => { setEstado('listo'); setEnlace(''); }}
+    >
+      <b>Abrir estudio</b>
+    </a>
+  );
+  if (estado === 'error') return <button className="resp-abrir-estudio error" onClick={abrir}><b>No se pudo abrir, reintentar</b></button>;
   return <button className="resp-abrir-estudio" onClick={abrir} disabled={estado === 'abriendo'}><b>{estado === 'abriendo' ? 'Abriendo…' : 'Abrir'}</b></button>;
 }
 
