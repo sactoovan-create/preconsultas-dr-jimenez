@@ -15,6 +15,7 @@ import { usePaciente } from './core/PacienteContext.jsx';
 import { INSTRUMENTOS } from './registry.js';
 import { MRS_ITEMS } from './instruments/menopausia/engine.js';
 import './Respuestas.css';
+import { CANALES_RESERVA, FUENTES_DECLARADAS, etiquetaAtribucion } from './core/atribucion.js';
 
 /**
  * Panel del médico con las respuestas que las pacientes enviaron desde el portal.
@@ -333,6 +334,14 @@ function Detalle({ r, onEliminar }) {
         </p>
       </div>
 
+      {r.atribucion && (
+        <section className="resp-sec">
+          <h3>Origen y reserva</h3>
+          <p>Canal de reserva: {etiquetaAtribucion(r.atribucion.booking_channel, CANALES_RESERVA)}</p>
+          <p>Fuente declarada: {etiquetaAtribucion(r.atribucion.patient_reported_source, FUENTES_DECLARADAS)}</p>
+          <p>Fuente automática: {r.atribucion.acquisition_source === 'unknown' ? 'Sin dato' : r.atribucion.acquisition_source}</p>
+        </section>
+      )}
       <Profundos profundos={r.autoReporte?.profundos} />
 
       <section className="resp-sec">

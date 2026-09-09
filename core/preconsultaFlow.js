@@ -6,7 +6,7 @@
  * portal debe mostrar una orientación de seguridad inmediata.
  */
 
-export const FORMULARIO_VERSION = '2026.08.2';
+export const FORMULARIO_VERSION = '2026.09.1';
 
 export const TEMAS_CONSULTA = [
   { id: 'control', etiqueta: 'Revisión o chequeo ginecológico' },

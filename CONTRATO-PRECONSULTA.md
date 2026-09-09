@@ -5,7 +5,7 @@
 > liga al expediente). Este documento congela la forma de los datos para que ambos
 > evolucionen sin romperse. **Si cambias la forma, sube `version` y actualiza aquí.**
 
-Estado: **versión 2** (formulario actual `2026.08.1`). Producido por
+Estado: **versión 3** (formulario actual `2026.09.1`). Producido por
 `paciente/PortalPaciente.jsx` (`construirRegistro`) y `core/resumenPaciente.js`.
 Almacenado por `core/respuestas.js`.
 
@@ -15,6 +15,14 @@ ambigüedades de v1: escala incompleta frente a cero real, consentimiento
 auditable, hora de servidor frente a reloj del teléfono y carpeta frente a
 archivos realmente recibidos.
 
+La versión 3 añade `atribucion` sin cambiar los campos clínicos anteriores.
+`booking_channel` identifica el canal de reserva; `acquisition_source` conserva
+la evidencia automática del enlace; `patient_reported_source` guarda la respuesta
+opcional de la paciente. Una reserva en Doctoralia o un enlace de WhatsApp no
+demuestran por sí solos dónde conoció al médico. Los clics y UTM se conservan
+en este objeto privado; no se envían eventos a plataformas publicitarias.
+El ERP existente conserva todo el sobre en `raw_content`, sin migración.
+
 ---
 
 ## 1. Forma canónica de una respuesta
@@ -23,8 +31,17 @@ Cada envío de una paciente es **un objeto JSON** con esta forma:
 
 ```jsonc
 {
-  "version": 2,
-  "formularioVersion": "2026.08.1",
+  "version": 3,
+  "formularioVersion": "2026.09.1",
+  "atribucion": {
+    "version": 1,
+    "booking_channel": "whatsapp",
+    "acquisition_source": "google_ads",
+    "patient_reported_source": "recomendacion",
+    "attribution_captured_at": "2026-09-08T10:00:00Z",
+    "lead_id": "uuid-si-el-enlace-lo-incluye",
+    "gclid": "identificador-del-click-si-existe"
+  },
   "submittedAtClient": "2026-08-01T20:10:50.000Z",
   "id": "uuid|loc_...",         // id único estable del envío
   "creado": "2026-06-23T20:11:05.123Z",  // ISO 8601 UTC, lo asigna el almacén

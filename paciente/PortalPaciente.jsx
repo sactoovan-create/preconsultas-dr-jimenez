@@ -19,6 +19,7 @@ import { instrumentosPara } from '../core/ruteoClinico.js';
 import { CREDITO } from '../core/marca.js';
 import SubirEstudios from './SubirEstudios.jsx';
 import { FORMULARIO_VERSION } from '../core/preconsultaFlow.js';
+import { normalizarAtribucion } from '../core/atribucion.js';
 import {
   borrarIntentoEnvio,
   cargarIntentoEnvio,
@@ -53,10 +54,11 @@ export function construirRegistro(datos, estudiosFolder, archivos = [], respuest
   const registro = {
     // v2 conserva los campos canónicos de v1 para una migración gradual, pero
     // distingue respuesta parcial, consentimiento, reloj del cliente y adjuntos.
-    version: 2,
+    version: 3,
     id: respuestaId,
     formularioVersion: datos.formularioVersion || FORMULARIO_VERSION,
     submittedAtClient,
+    atribucion: normalizarAtribucion(datos.atribucion),
     paciente: {
       nombre: datos.demografia?.nombre || null,
       edad: datos.demografia?.edad ?? null,

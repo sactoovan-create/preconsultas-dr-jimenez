@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import { atribucionDesdeEnlace, normalizarAtribucion } from '../core/atribucion.js';
+const viaWhatsapp = atribucionDesdeEnlace('?booking_channel=whatsapp&utm_source=whatsapp');
+assert.equal(viaWhatsapp.booking_channel, 'whatsapp');
+assert.equal(viaWhatsapp.acquisition_source, 'unknown');
+assert.equal(viaWhatsapp.patient_reported_source, '');
+const paid = atribucionDesdeEnlace('?booking_channel=doctoralia&gclid=synthetic-click&utm_source=google&utm_campaign=synthetic');
+assert.equal(paid.booking_channel, 'doctoralia');
+assert.equal(paid.acquisition_source, 'google_ads');
+assert.equal(paid.gclid, 'synthetic-click');
+const reported = normalizarAtribucion({ ...paid, patient_reported_source: 'recomendacion' });
+assert.equal(reported.acquisition_source, 'google_ads');
+assert.equal(reported.patient_reported_source, 'recomendacion');
+assert.equal(normalizarAtribucion({ booking_channel: '<script>', patient_reported_source: 'inventado' }).booking_channel, '');
+assert.equal(normalizarAtribucion(null).acquisition_source, 'unknown');
+assert.deepEqual(normalizarAtribucion(JSON.parse(JSON.stringify(reported))), reported);
+console.log('Atribución: canal, origen automático, declaración y borrador verificados.');

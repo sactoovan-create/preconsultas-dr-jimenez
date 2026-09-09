@@ -27,6 +27,7 @@ import {
   GrupoOpciones,
 } from './paciente/CamposPreconsulta.jsx';
 import './PreConsulta.css';
+import { atribucionDesdeEnlace, normalizarAtribucion, CANALES_RESERVA, FUENTES_DECLARADAS } from './core/atribucion.js';
 
 const MRS = [
   ['mrs_bochornos', 'Bochornos o sudoraciones repentinas'],
@@ -214,6 +215,7 @@ export default function PreConsulta({
   const ar = paciente.autoReporte || {};
   const borradorRef = useRef(onEnviar ? (borradorInicial || leerBorrador()) : null);
   const borrador = borradorRef.current;
+  const [atribucion, setAtribucion] = useState(() => normalizarAtribucion(borrador?.atribucion || atribucionDesdeEnlace()));
   const [mrs, setMrs] = useState(() => ({ ...(ar.mrs || {}), ...(borrador?.mrs || {}) }));
   const [dolor, setDolor] = useState(() => ({
     ...(ar.dolor || {}),
@@ -276,11 +278,12 @@ export default function PreConsulta({
     const contenido = {
       demografia: { nombre: dem.nombre || '', edad: dem.edad ?? null },
       mrs, dolor, hc, profundos: profundosSeguros, pasoId,
+      atribucion,
       formularioVersion: FORMULARIO_VERSION,
     };
     guardarBorrador(contenido);
     onBorradorCambio?.(contenido);
-  }, [dem.edad, dem.nombre, dolor, hc, mrs, onBorradorCambio, onEnviar, pasoId, profundosSeguros]);
+  }, [atribucion, dem.edad, dem.nombre, dolor, hc, mrs, onBorradorCambio, onEnviar, pasoId, profundosSeguros]);
 
   useEffect(() => {
     if (!pasos.some((p) => p.id === pasoId)) setPasoId(pasos[Math.min(indice, pasos.length - 1)].id);
@@ -413,6 +416,7 @@ export default function PreConsulta({
     profundos: profundosSeguros,
     pasoId: paso.id,
     formularioVersion: FORMULARIO_VERSION,
+    atribucion,
   });
 
   const enviar = async () => {
@@ -454,6 +458,7 @@ export default function PreConsulta({
         consentimiento: true,
         consentimientoFecha: new Date().toISOString(),
         formularioVersion: FORMULARIO_VERSION,
+        atribucion: normalizarAtribucion(atribucion),
         alertaSeguridad: alerta,
       });
       borrarBorrador();
@@ -803,6 +808,17 @@ export default function PreConsulta({
       <>
         {avisoUrgenteTexto(alerta)}
         <ResumenEnvio dem={dem} hc={hc} pasos={pasos} irPaso={irPaso} estudiosEstado={estudiosEstado} />
+        {onEnviar && (
+          <details className="pc-campo pc-full">
+            <summary>Tu cita y cómo nos conociste (opcional)</summary>
+            <GrupoOpciones etiqueta="¿Por dónde reservaste tu cita?" opciones={CANALES_RESERVA}
+              valor={atribucion.booking_channel}
+              onChange={(valor) => setAtribucion((p) => ({ ...p, booking_channel: valor }))} />
+            <GrupoOpciones etiqueta="¿Dónde conociste al Dr. Jiménez?" opciones={FUENTES_DECLARADAS}
+              valor={atribucion.patient_reported_source}
+              onChange={(valor) => setAtribucion((p) => ({ ...p, patient_reported_source: valor }))} />
+          </details>
+        )}
         {onEnviar && (
           <>
             <label className="pc-consent" id="consentimiento">
