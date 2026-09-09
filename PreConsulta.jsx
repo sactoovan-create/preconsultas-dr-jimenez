@@ -27,7 +27,7 @@ import {
   GrupoOpciones,
 } from './paciente/CamposPreconsulta.jsx';
 import './PreConsulta.css';
-import { atribucionDesdeEnlace, normalizarAtribucion, CANALES_RESERVA, FUENTES_DECLARADAS } from './core/atribucion.js';
+import { atribucionDesdeEnlace, normalizarAtribucion, validarAtribucion, CANALES_RESERVA, FUENTES_DECLARADAS } from './core/atribucion.js';
 
 const MRS = [
   ['mrs_bochornos', 'Bochornos o sudoraciones repentinas'],
@@ -430,6 +430,10 @@ export default function PreConsulta({
       const resultado = validarPaso(p.id, { demografia: dem, hc, mrs, dolor });
       if (!resultado.ok) { setPasoId(p.id); mostrarError(resultado); return; }
     }
+    if (onEnviar) {
+      const resultado = validarAtribucion(atribucion);
+      if (!resultado.ok) { setPasoId('envio'); mostrarError(resultado); return; }
+    }
     if (onEnviar && !acepto) {
       mostrarError({
         mensaje: 'Marca la autorización para poder enviar tus respuestas y estudios.',
@@ -809,15 +813,16 @@ export default function PreConsulta({
         {avisoUrgenteTexto(alerta)}
         <ResumenEnvio dem={dem} hc={hc} pasos={pasos} irPaso={irPaso} estudiosEstado={estudiosEstado} />
         {onEnviar && (
-          <details className="pc-campo pc-full">
-            <summary>Tu cita y cómo nos conociste (opcional)</summary>
-            <GrupoOpciones etiqueta="¿Por dónde reservaste tu cita?" opciones={CANALES_RESERVA}
+          <section className="pc-campo pc-full" aria-labelledby="tituloAtribucion">
+            <h3 id="tituloAtribucion">Tu cita y cómo nos conociste</h3>
+            <p className="pc-grupo-ayuda">Selecciona una respuesta en cada pregunta. Si no recuerdas o prefieres no compartir este dato, puedes indicarlo.</p>
+            <GrupoOpciones id="canalReserva" requerido etiqueta="¿Por dónde reservaste tu cita?" opciones={CANALES_RESERVA}
               valor={atribucion.booking_channel}
-              onChange={(valor) => setAtribucion((p) => ({ ...p, booking_channel: valor }))} />
-            <GrupoOpciones etiqueta="¿Dónde conociste al Dr. Jiménez?" opciones={FUENTES_DECLARADAS}
+              onChange={(valor) => { setAtribucion((p) => ({ ...p, booking_channel: valor })); limpiarError(); }} />
+            <GrupoOpciones id="fuenteDeclarada" requerido etiqueta="¿Dónde conociste al Dr. Jiménez?" opciones={FUENTES_DECLARADAS}
               valor={atribucion.patient_reported_source}
-              onChange={(valor) => setAtribucion((p) => ({ ...p, patient_reported_source: valor }))} />
-          </details>
+              onChange={(valor) => { setAtribucion((p) => ({ ...p, patient_reported_source: valor })); limpiarError(); }} />
+          </section>
         )}
         {onEnviar && (
           <>

@@ -5,7 +5,7 @@
 > liga al expediente). Este documento congela la forma de los datos para que ambos
 > evolucionen sin romperse. **Si cambias la forma, sube `version` y actualiza aquí.**
 
-Estado: **versión 3** (formulario actual `2026.09.1`). Producido por
+Estado: **versión 3** (formulario actual `2026.09.2`). Producido por
 `paciente/PortalPaciente.jsx` (`construirRegistro`) y `core/resumenPaciente.js`.
 Almacenado por `core/respuestas.js`.
 
@@ -18,7 +18,11 @@ archivos realmente recibidos.
 La versión 3 añade `atribucion` sin cambiar los campos clínicos anteriores.
 `booking_channel` identifica el canal de reserva; `acquisition_source` conserva
 la evidencia automática del enlace; `patient_reported_source` guarda la respuesta
-opcional de la paciente. Una reserva en Doctoralia o un enlace de WhatsApp no
+de la paciente. Desde el formulario `2026.09.2`, ambas preguntas requieren una
+opción antes del envío, incluida «No recuerdo / Prefiero no responder»
+(`no_recuerdo_prefiero_no_responder`). No se completan ni reescriben respuestas
+históricas: un borrador sin esos campos solicitará completarlos al enviar.
+Una reserva en Doctoralia o un enlace de WhatsApp no
 demuestran por sí solos dónde conoció al médico. Los clics y UTM se conservan
 en este objeto privado; no se envían eventos a plataformas publicitarias.
 El ERP existente conserva todo el sobre en `raw_content`, sin migración.
@@ -32,7 +36,7 @@ Cada envío de una paciente es **un objeto JSON** con esta forma:
 ```jsonc
 {
   "version": 3,
-  "formularioVersion": "2026.09.1",
+  "formularioVersion": "2026.09.2",
   "atribucion": {
     "version": 1,
     "booking_channel": "whatsapp",

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { atribucionDesdeEnlace, normalizarAtribucion } from '../core/atribucion.js';
+import { atribucionDesdeEnlace, normalizarAtribucion, validarAtribucion, CANALES_RESERVA, FUENTES_DECLARADAS } from '../core/atribucion.js';
 const viaWhatsapp = atribucionDesdeEnlace('?booking_channel=whatsapp&utm_source=whatsapp');
 assert.equal(viaWhatsapp.booking_channel, 'whatsapp');
 assert.equal(viaWhatsapp.acquisition_source, 'unknown');
@@ -14,4 +14,26 @@ assert.equal(reported.patient_reported_source, 'recomendacion');
 assert.equal(normalizarAtribucion({ booking_channel: '<script>', patient_reported_source: 'inventado' }).booking_channel, '');
 assert.equal(normalizarAtribucion(null).acquisition_source, 'unknown');
 assert.deepEqual(normalizarAtribucion(JSON.parse(JSON.stringify(reported))), reported);
-console.log('Atribución: canal, origen automático, declaración y borrador verificados.');
+assert.deepEqual(validarAtribucion(reported), { ok: true });
+assert.equal(validarAtribucion({}).campo, 'canalReserva');
+assert.equal(validarAtribucion(null).ok, false);
+assert.equal(validarAtribucion(viaWhatsapp).campo, 'fuenteDeclarada');
+assert.equal(validarAtribucion({ patient_reported_source: 'recomendacion' }).campo, 'canalReserva');
+assert.equal(validarAtribucion({ booking_channel: '<script>', patient_reported_source: 'inventado' }).ok, false);
+assert.equal(validarAtribucion({ booking_channel: 'whatsapp', patient_reported_source: 'inventado' }).ok, false);
+const optOut = 'no_recuerdo_prefiero_no_responder';
+const declined = normalizarAtribucion({ ...paid, booking_channel: optOut, patient_reported_source: optOut });
+assert.deepEqual(validarAtribucion(declined), { ok: true });
+assert.equal(declined.acquisition_source, 'google_ads');
+assert.equal(declined.gclid, 'synthetic-click');
+assert.equal(CANALES_RESERVA.find((x) => x.valor === optOut)?.etiqueta, 'No recuerdo / Prefiero no responder');
+assert.equal(FUENTES_DECLARADAS.find((x) => x.valor === optOut)?.etiqueta, 'No recuerdo / Prefiero no responder');
+// Los borradores previos permanecen sin dato y deben completarse antes del envío.
+const legacyDraft = normalizarAtribucion({ acquisition_source: 'google_ads', gclid: 'old-synthetic-click' });
+assert.equal(legacyDraft.booking_channel, '');
+assert.equal(legacyDraft.patient_reported_source, '');
+assert.equal(validarAtribucion(legacyDraft).ok, false);
+assert.equal(legacyDraft.gclid, 'old-synthetic-click');
+// No se reescriben las respuestas históricas que ya usaban "otro".
+assert.deepEqual(validarAtribucion({ booking_channel: 'otro', patient_reported_source: 'otro' }), { ok: true });
+console.log('Atribución: canal y declaración obligatorios con opción de no responder; origen automático y borradores preservados.');

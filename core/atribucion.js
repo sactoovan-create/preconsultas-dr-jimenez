@@ -6,6 +6,7 @@ export const CANALES_RESERVA = [
   { valor: 'telefono', etiqueta: 'Teléfono' },
   { valor: 'consultorio', etiqueta: 'En el consultorio' },
   { valor: 'otro', etiqueta: 'Otro' },
+  { valor: 'no_recuerdo_prefiero_no_responder', etiqueta: 'No recuerdo / Prefiero no responder' },
 ];
 export const FUENTES_DECLARADAS = [
   { valor: 'google_ads', etiqueta: 'Un anuncio en Google' },
@@ -15,7 +16,8 @@ export const FUENTES_DECLARADAS = [
   { valor: 'doctoralia', etiqueta: 'Doctoralia' },
   { valor: 'recomendacion', etiqueta: 'Recomendación' },
   { valor: 'paciente_previa', etiqueta: 'Ya era paciente' },
-  { valor: 'otro', etiqueta: 'Otro / no lo recuerdo' },
+  { valor: 'otro', etiqueta: 'Otro' },
+  { valor: 'no_recuerdo_prefiero_no_responder', etiqueta: 'No recuerdo / Prefiero no responder' },
 ];
 const TRACKING = ['gclid', 'wbraid', 'gbraid', 'fbclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'campaign_id', 'ad_group_id', 'creative_id'];
 const text = (value, length = 300) => typeof value === 'string' ? value.trim().slice(0, length) : '';
@@ -32,6 +34,21 @@ export function normalizarAtribucion(value = {}) {
   };
   TRACKING.forEach((key) => { if (text(input[key])) output[key] = text(input[key]); });
   return output;
+}
+
+export function validarAtribucion(value) {
+  const atribucion = normalizarAtribucion(value);
+  if (!atribucion.booking_channel) return {
+    ok: false,
+    campo: 'canalReserva',
+    mensaje: 'Selecciona por dónde reservaste tu cita. También puedes elegir “No recuerdo / Prefiero no responder”.',
+  };
+  if (!atribucion.patient_reported_source) return {
+    ok: false,
+    campo: 'fuenteDeclarada',
+    mensaje: 'Selecciona dónde conociste al Dr. Jiménez. También puedes elegir “No recuerdo / Prefiero no responder”.',
+  };
+  return { ok: true };
 }
 
 export function atribucionDesdeEnlace(search = globalThis.location?.search || '') {
