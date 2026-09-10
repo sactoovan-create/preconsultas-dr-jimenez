@@ -23,8 +23,8 @@ function Escala({ texto, valor, onChange, niveles = 6, etiquetas }) {
 }
 
 const SEV_PILL = { ok: 'ok', aviso: 'aviso', alerta: 'alerta' };
-const FREC_ETQ = ['Nunca', 'Una vez por semana', 'Dos o tres por semana', 'Una vez al día', 'Varias al día', 'Continuo'];
-const CANT_ETQ = ['Nada', 'Gotas', 'Poca', 'Moderada o mucha'];
+const FREC_ETQ = ['Nunca', 'Una vez por semana o menos', 'Dos o tres por semana', 'Una vez al día', 'Varias al día', 'Continuo'];
+const CANT_ETQ = ['Nada', 'Muy poca', 'Moderada', 'Mucha'];
 
 export default function Incontinencia() {
   const { paciente, actualizar, publicarResumen } = usePaciente();

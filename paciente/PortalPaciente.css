@@ -4,7 +4,7 @@
   position: relative;
   min-height: 100vh;
   overflow-x: clip;
-  background: #F3F5F2;
+  background: #fff;
   color: var(--verde);
   font-family: var(--sans);
 }
@@ -14,6 +14,7 @@
 .portal *::after { box-sizing: border-box; }
 
 .portal-grano {
+  display: none;
   position: fixed;
   inset: 0;
   z-index: 9;
@@ -26,21 +27,21 @@
 /* Cabecera compacta: la marca se ve primero sin retrasar el cuestionario. */
 .portal-hero {
   position: relative;
-  padding: 0 24px 104px;
+  padding: 0 24px 20px;
   background: var(--verde);
   color: var(--crema);
 }
-.portal-hero-inner { width: min(100%, 980px); margin: 0 auto; }
+.portal-hero-inner { width: min(100%, 1100px); margin: 0 auto; }
 .portal-masthead {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 92px;
+  min-height: 76px;
   border-bottom: 1px solid rgba(241, 234, 219, .16);
 }
 .portal-hero-logo {
   display: block;
-  width: 224px;
+  width: 190px;
   height: auto;
   margin: 0;
 }
@@ -51,7 +52,8 @@
   letter-spacing: .16em;
   text-transform: uppercase;
 }
-.portal-hero-copy { max-width: 720px; padding-top: 44px; }
+.portal-hero-copy { max-width: 720px; padding-top: 16px; }
+.portal-masthead a { display: inline-flex; align-items: center; gap: 8px; color: #fff; font-size: 13px; min-height: 44px; }
 .portal-hero-eyebrow {
   display: inline-flex;
   align-items: center;
@@ -72,14 +74,14 @@
 }
 .portal-hero-titulo {
   max-width: 680px;
-  margin: 0 0 16px;
+  margin: 0;
   color: var(--crema);
   font-family: var(--display);
-  font-size: 58px;
+  font-size: 26px;
   font-variation-settings: 'opsz' 120;
   font-weight: 300;
   letter-spacing: 0;
-  line-height: 1.02;
+  line-height: 1.2;
   animation: portal-entrada .55s ease both;
 }
 .portal-hero-titulo em { font-style: italic; }
@@ -179,9 +181,9 @@
 .portal-form {
   position: relative;
   z-index: 2;
-  max-width: 780px;
-  margin: -58px auto 0;
-  padding: 0 20px 48px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 40px;
 }
 .portal-form .pc { min-height: auto; background: transparent; }
 .portal-form .pc-cuerpo { max-width: none; margin: 0; padding: 0; }
@@ -302,17 +304,18 @@
 .portal-tarjeta-fin .portal-credito { margin-top: 24px; }
 
 @media (max-width: 640px) {
-  .portal-hero { padding: 0 18px 78px; }
-  .portal-masthead { min-height: 74px; }
-  .portal-hero-logo { width: 178px; }
+  .portal-hero { padding: 0 16px 16px; }
+  .portal-masthead { min-height: 66px; gap: 12px; }
+  .portal-hero-logo { width: 150px; }
+  .portal-masthead a { font-size: 12px; max-width: 110px; line-height: 1.4; }
   .portal-masthead > span { font-size: 9px; }
-  .portal-hero-copy { padding-top: 28px; }
+  .portal-hero-copy { padding-top: 12px; }
   .portal-hero-eyebrow { margin-bottom: 13px; }
-  .portal-hero-titulo { max-width: 340px; margin-bottom: 14px; font-size: 42px; line-height: 1.04; }
+  .portal-hero-titulo { margin: 0; font-size: 24px; line-height: 1.2; }
   .portal-hero-sub { max-width: 350px; font-size: 14.5px; line-height: 1.6; }
   .portal-hero-datos { gap: 9px 15px; margin-top: 20px; padding-top: 15px; }
   .portal-hero-datos span { font-size: 11.5px; }
-  .portal-form { margin-top: -44px; padding: 0 12px 36px; }
+  .portal-form { margin-top: 0; padding: 8px 16px 28px; }
   .portal-colofon { padding-top: 30px; }
   .portal-tarjeta-fin { padding: 38px 24px; }
   .portal-logo { width: 188px; }

@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { alternarOpcion } from '../core/preconsultaFlow.js';
+import AreaClinica from '../core/AreaClinica.jsx';
+import { estiloArea } from '../core/areasClinicas.js';
 
 export function CampoTexto({
   etiqueta, valor, onChange, placeholder, area = false, tipo = 'text',
   requerido = false, ayuda, id,
 }) {
-  const inputId = id || undefined;
+  const generado = useId();
+  const inputId = id || generado;
   return (
     <label className="pc-campo pc-full" htmlFor={inputId}>
       <span>{etiqueta}{requerido && <b className="pc-requerido"> *</b>}</span>
@@ -13,7 +16,8 @@ export function CampoTexto({
       {area ? (
         <textarea
           id={inputId}
-          rows={4}
+          rows={3}
+          aria-required={requerido}
           value={valor || ''}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
@@ -22,6 +26,8 @@ export function CampoTexto({
         <input
           id={inputId}
           type={tipo}
+          aria-required={requerido}
+          autoComplete={{ nombre: 'name', telefono: 'tel', correo: 'email' }[id]}
           value={valor ?? ''}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
@@ -34,12 +40,16 @@ export function CampoTexto({
 export function CampoNumero({
   etiqueta, valor, onChange, min = 0, max, placeholder, requerido = false, id,
 }) {
+  const generado = useId();
+  id = id || generado;
   return (
     <label className="pc-campo" htmlFor={id}>
       <span>{etiqueta}{requerido && <b className="pc-requerido"> *</b>}</span>
       <input
         id={id}
         type="number"
+        inputMode="numeric"
+        aria-required={requerido}
         min={min}
         max={max}
         value={valor ?? ''}
@@ -48,6 +58,18 @@ export function CampoNumero({
       />
     </label>
   );
+}
+
+export function CampoSelect({ id, etiqueta, opciones, valor, onChange, requerido = false }) {
+  const generado = useId();
+  const controlId = id || generado;
+  return <label className="pc-campo" htmlFor={controlId}>
+    <span>{etiqueta}{requerido && <b className="pc-requerido"> *</b>}</span>
+    <select id={controlId} aria-required={requerido} value={valor || ''} onChange={e => onChange(e.target.value)}>
+      <option value="" disabled>Selecciona una opción</option>
+      {opciones.map(o => <option key={o.valor} value={o.valor}>{o.etiqueta}</option>)}
+    </select>
+  </label>;
 }
 
 export function GrupoOpciones({
@@ -95,10 +117,12 @@ export function GrupoMultiple({
               type="button"
               key={opcion.id}
               className={'pc-eleccion multiple' + (activa ? ' on' : '')}
+              style={id === 'temasConsulta' ? estiloArea(opcion.id) : undefined}
               aria-pressed={activa}
               onClick={() => onChange(alternarOpcion(elegidas, opcion.id, exclusiva))}
             >
               <span className="pc-check-marca" aria-hidden="true" />
+              {id === 'temasConsulta' && <AreaClinica id={opcion.id} corta />}
               <span>
                 <b>{opcion.etiqueta}</b>
                 {opcion.ayuda && <small>{opcion.ayuda}</small>}

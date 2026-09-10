@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import './ui.css';
 
 /** Sección con título numerado, contenedor de campos. */
@@ -17,25 +17,28 @@ export function Seccion({ indice, titulo, nota, children }) {
 
 /** Campo numérico controlado. valor null = vacío. */
 export function CampoNumero({ etiqueta, unidad, valor, onChange, min, max, step, full, nota }) {
+  const id = useId();
   return (
     <div className={'ui-campo' + (full ? ' full' : '')}>
-      <label>{etiqueta} {unidad && <span className="u">({unidad})</span>}</label>
+      <label htmlFor={id}>{etiqueta} {unidad && <span className="u">({unidad})</span>}</label>
       <input
+        id={id} aria-describedby={nota ? `${id}-nota` : undefined}
         type="number" min={min} max={max} step={step}
         value={valor ?? ''}
         onChange={(e) => onChange(e.target.value === '' ? null : parseFloat(e.target.value))}
       />
-      {nota && <div className="ui-mini">{nota}</div>}
+      {nota && <div id={`${id}-nota`} className="ui-mini">{nota}</div>}
     </div>
   );
 }
 
 /** Campo de texto controlado. */
 export function CampoTexto({ etiqueta, valor, onChange, placeholder, full }) {
+  const id = useId();
   return (
     <div className={'ui-campo' + (full ? ' full' : '')}>
-      <label>{etiqueta}</label>
-      <input type="text" value={valor ?? ''} placeholder={placeholder}
+      <label htmlFor={id}>{etiqueta}</label>
+      <input id={id} type="text" value={valor ?? ''} placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)} />
     </div>
   );
@@ -43,10 +46,11 @@ export function CampoTexto({ etiqueta, valor, onChange, placeholder, full }) {
 
 /** Selector controlado. opciones: [{ valor, etiqueta }] */
 export function Selector({ etiqueta, valor, onChange, opciones, full }) {
+  const id = useId();
   return (
     <div className={'ui-campo' + (full ? ' full' : '')}>
-      <label>{etiqueta}</label>
-      <select value={valor} onChange={(e) => onChange(e.target.value)}>
+      <label htmlFor={id}>{etiqueta}</label>
+      <select id={id} value={valor ?? ''} onChange={(e) => onChange(e.target.value)}>
         {opciones.map((o) => <option key={o.valor} value={o.valor}>{o.etiqueta}</option>)}
       </select>
     </div>
@@ -55,12 +59,13 @@ export function Selector({ etiqueta, valor, onChange, opciones, full }) {
 
 /** Interruptor No / Sí (tres estados: null, false, true). alerta resalta el "Sí". */
 export function ToggleSiNo({ etiqueta, unidad, valor, onChange, full, alerta }) {
+  const id = useId();
   return (
     <div className={'ui-campo' + (full ? ' full' : '')}>
-      <label>{etiqueta} {unidad && <span className="u">({unidad})</span>}</label>
-      <div className="ui-seg">
-        <button className={valor === false ? 'on' : ''} onClick={() => onChange(false)}>No</button>
-        <button className={(valor === true ? 'on' : '') + (alerta ? ' alerta' : '')} onClick={() => onChange(true)}>Sí</button>
+      <label id={id}>{etiqueta} {unidad && <span className="u">({unidad})</span>}</label>
+      <div className="ui-seg" role="group" aria-labelledby={id}>
+        <button type="button" aria-pressed={valor === false} className={valor === false ? 'on' : ''} onClick={() => onChange(false)}>No</button>
+        <button type="button" aria-pressed={valor === true} className={(valor === true ? 'on' : '') + (alerta ? ' alerta' : '')} onClick={() => onChange(true)}>Sí</button>
       </div>
     </div>
   );

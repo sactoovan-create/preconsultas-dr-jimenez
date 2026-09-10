@@ -5,6 +5,7 @@ import { INSTRUMENTOS } from './registry.js';
 import Respuestas from './Respuestas.jsx';
 import ResumenPaciente from './ResumenPaciente.jsx';
 import PreConsulta from './PreConsulta.jsx';
+import MarcoInstrumento from './core/MarcoInstrumento.jsx';
 import './core/designTokens.css';
 import './InstrumentosModule.css';
 
@@ -31,6 +32,6 @@ function PacienteIntegrado({ instrumentoId, onVolver }) {
   const Instrumento = INSTRUMENTOS.find(i => i.id === instrumentoId)?.Componente;
   return <div className="resp consulta-integrada">
     <header className="resp-record-head"><h1>{paciente.demografia?.nombre || 'Paciente del expediente'}</h1><p className="resp-muted">Contexto recibido del expediente</p></header>
-    {Instrumento || instrumentoId === 'preconsulta' ? <><button className="resp-button" onClick={onVolver}><ArrowLeft size={17} />Volver a la valoración</button><div className="consulta-instrumento">{Instrumento ? <Instrumento /> : <PreConsulta />}</div></> : <ResumenPaciente />}
+    {Instrumento || instrumentoId === 'preconsulta' ? <><button className="resp-button" onClick={onVolver}><ArrowLeft size={17} />Volver a la valoración</button><div className="consulta-instrumento">{Instrumento ? <MarcoInstrumento id={instrumentoId}><Instrumento /></MarcoInstrumento> : <PreConsulta />}</div></> : <ResumenPaciente />}
   </div>;
 }

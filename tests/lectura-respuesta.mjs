@@ -121,11 +121,13 @@ prueba('no duplica motivo, contacto, metadatos ni respuestas visibles de entrevi
     creado: '2026-09-09', submittedAtClient: '2026-09-09', consentimiento: true, atribucion: {},
   };
   for (const q of CAMPOS_ENTREVISTA) hc[q.id] = q.tipo === 'multiple' ? [q.opciones[0].id]
-    : q.tipo === 'texto' ? 'Respuesta sint\u00e9tica' : q.opciones[0].valor;
+    : q.tipo === 'texto' ? 'Respuesta sint\u00e9tica' : q.tipo === 'numero' ? q.min : q.opciones[0].valor;
   hc.etapaReproductiva = 'sin_regla_12m';
   const mostradas = new Set(resumenEntrevista(hc).flatMap(g => ids(g.respuestas)));
-  assert.equal(mostradas.size, CAMPOS_ENTREVISTA.length);
-  assert.deepEqual(ids(filas(hc)), ['etapaReproductiva']);
+  const restantes = ids(filas(hc));
+  assert.ok(restantes.includes('etapaReproductiva'));
+  assert.ok(restantes.every(id => !mostradas.has(id)), 'No duplica las preguntas visibles');
+  assert.ok(CAMPOS_ENTREVISTA.every(q => mostradas.has(q.id) || restantes.includes(q.id)), 'Conserva todos los datos históricos, incluso de ramas ahora ocultas');
 });
 
 prueba('respuesta condicional antigua no visible en entrevista se rescata en otros', () => {

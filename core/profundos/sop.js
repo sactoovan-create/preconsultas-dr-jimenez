@@ -8,9 +8,9 @@
 
 export const ID = 'sop';
 export const TITULO = "Cómo te afecta el día a día";
-export const FUENTE = "Dominios del PCOSQ (Polycystic Ovary Syndrome Questionnaire; Cronin y cols., 1998) con el dominio de acné del PCOSQ modificado (Barnard y cols., 2007). Se usan los seis dominios como preguntas de impacto en calidad de vida. NO es el PCOSQ de 26/30 reactivos puntuado ni un test diagnóstico: es una versión breve, orientativa, de autoinforme. No existe versión validada al español; el texto es una adaptación propia y debe tratarse como tal.";
+export const FUENTE = "Dominios del PCOSQ (Polycystic Ovary Syndrome Questionnaire; Cronin y cols., 1998) con el dominio de acné del PCOSQ modificado (Barnard y cols., 2007). Se usan los seis dominios como preguntas de impacto en calidad de vida. NO es el PCOSQ de 26/30 reactivos puntuado ni un test diagnóstico: es una versión breve, orientativa, de autoinforme. Esta implementación no ha verificado una traducción autorizada ni equivalencia psicométrica; el texto es una adaptación propia.";
 
-function num(x) { const n = Number(x); return Number.isFinite(n) ? n : null; }
+function num(x) { if (x == null || x === '' || typeof x === 'boolean') return null; const n = Number(x); return Number.isFinite(n) ? n : null; }
 
 export function disparador(ar) {
   const hc = (ar && ar.hc) || {};
@@ -307,12 +307,8 @@ const PRIOR_N = { animo: 'su estado de ánimo', vello: 'el vello no deseado', pe
 
 export function evaluar(resp) {
   const r = resp || {};
-  const cont = DOMINIOS.filter((d) => { const v = num(r[d.k]); return v != null && v >= 0; });
-  if (!cont.length) return { instrumento: 'PCOSQ', completo: false, resumen: null };
-
-  const suma = cont.reduce((s, d) => s + num(r[d.k]), 0);
-  const prom = Math.round((suma / cont.length) * 10) / 10;
-  const banda = prom === 0 ? 'sin impacto' : (prom < 1 ? 'leve' : (prom < 2 ? 'moderado' : (prom < 3 ? 'alto' : 'muy alto')));
+  const cont = DOMINIOS.filter((d) => { const v = num(r[d.k]); return Number.isInteger(v) && v >= 0 && v <= 4; });
+  if (!cont.length) return { instrumento: 'Impacto local por dominios', version: 2, validado: false, completo: false, resumen: null };
 
   const mx = Math.max(...cont.map((d) => num(r[d.k])));
   const dominantes = mx >= 2 ? cont.filter((d) => num(r[d.k]) === mx).map((d) => d.n) : [];
@@ -324,6 +320,6 @@ export function evaluar(resp) {
   const animoV = num(r.animo);
   const banderaAnimo = (animoV != null && animoV >= 3) ? ` Ánimo muy afectado (${animoV}/4): valorar tamizaje formal de ánimo.` : '';
 
-  const resumen = `Impacto en calidad de vida del síndrome poliendocrino (dominios del PCOSQ, autoinforme): impacto global ${banda} (${prom} de 4; ${cont.length} de 6 áreas). ${domTxt} Quiere trabajar primero: ${prioridad}.${banderaAnimo} Orientativo; basal para repetir a las 8-12 semanas.`;
-  return { instrumento: 'PCOSQ', completo: cont.length >= 5, resumen, estado: (banda === 'alto' || banda === 'muy alto') ? 'aviso' : 'ok' };
+  const resumen = `Impacto local por dominios (${cont.length} de 6 áreas contestadas). ${domTxt} Quiere trabajar primero: ${prioridad}.${banderaAnimo} No es el PCOSQ puntuado ni confirma un diagnóstico.`;
+  return { instrumento: 'Impacto local por dominios', version: 2, validado: false, completo: cont.length === 6 || (cont.length === 5 && num(r.fertilidad) === -1), resumen, estado: mx >= 3 ? 'aviso' : 'ok' };
 }

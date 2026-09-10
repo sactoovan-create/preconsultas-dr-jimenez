@@ -10,7 +10,7 @@ export const ID = 'dolor-pelvico';
 export const TITULO = "Mapa de tu dolor pélvico";
 export const FUENTE = "ENDOPAIN-4D (Puchar A, et al. J Clin Med. 2021;10(15):3216) para las cuatro dimensiones del dolor asociado a endometriosis; escala numérica de 11 puntos (0-10) recomendada por la American Society for Reproductive Medicine y por el consenso Art and Science of Endometriosis para medir el dolor por dimensión. No se localizó una versión validada al español al momento de construir el módulo; es una adaptación clínica al español de México del marco de cuatro dimensiones, con umbrales de severidad tomados de la escala numérica estándar. Se cita al médico como marco de referencia, no como prueba validada en español.";
 
-function num(x) { const n = Number(x); return Number.isFinite(n) ? n : null; }
+function num(x) { if (x == null || x === '' || typeof x === 'boolean') return null; const n = Number(x); return Number.isInteger(n) && n >= -1 && n <= 10 ? n : null; }
 
 export function disparador(ar) {
   const dolor = (ar && ar.dolor) || {};
@@ -259,10 +259,11 @@ export function evaluar(resp) {
     { k: 'genitourinario', n: 'dolor al obrar u orinar', v: D4 },
   ];
   const conDolor = dims.filter((x) => x.v != null && x.v >= 1);
-  if (!conDolor.length) return { instrumento: 'ENDOPAIN-4D', completo: true, resumen: 'Mapa del dolor pélvico: sin dolor mapeable con los datos de hoy.', estado: 'ok' };
-
-  const carga = dims.reduce((s, x) => s + (x.v || 0), 0);
-  const bandaCarga = carga <= 9 ? 'leve' : (carga <= 19 ? 'moderada' : (carga <= 29 ? 'alta' : 'muy alta'));
+  const completo = [0, 1].includes(num(r.dismenorrea_aplica)) && [-1, 0, 1].includes(num(r.dispareunia_aplica))
+    && (num(r.dismenorrea_aplica) === 0 || D1 != null) && D2 != null
+    && (num(r.dispareunia_aplica) !== 1 || D3 != null) && disq != null && disu != null;
+  if (!conDolor.length) return { instrumento: 'Mapa local de dolor', version: 2, validado: false, completo,
+    resumen: completo ? 'Mapa del dolor pélvico: sin dolor en las dimensiones contestadas.' : null, estado: completo ? 'ok' : 'neutro' };
 
   const mx = Math.max(...conDolor.map((x) => x.v));
   const top = conDolor.filter((x) => x.v === mx);
@@ -285,6 +286,6 @@ export function evaluar(resp) {
   const impacto = num(r.impacto);
   const dimsTxt = dims.filter((x) => x.v != null).map((x) => `${x.n} ${x.v}/10 (${banda(x.v)})`).join('; ');
   const estado = dominante.v >= 7 ? 'alerta' : (dominante.v >= 4 ? 'aviso' : 'ok');
-  const resumen = `Mapa del dolor pélvico (orientativo): patrón dominante ${dominante.n}${dominante.v ? ` (${dominante.v}/10)` : ''}. Dimensiones: ${dimsTxt}.${impacto != null ? ` Impacto ${impacto}/10.` : ''} Carga del mapa ${carga}/40 (${bandaCarga}).${bTxt.length ? ` Banderas: ${bTxt.join(', ')}.` : ''} Basal para repetir a las 8-12 semanas.`;
-  return { instrumento: 'ENDOPAIN-4D', completo: true, dominante: dominante.k, carga, resumen, estado };
+  const resumen = `Mapa local del dolor pélvico${completo ? '' : ' (parcial)'}: patrón dominante entre las respuestas disponibles, ${dominante.n} (${dominante.v}/10). Dimensiones: ${dimsTxt}.${impacto != null ? ` Impacto ${impacto}/10.` : ''}${bTxt.length ? ` Banderas: ${bTxt.join(', ')}.` : ''} No es una puntuación oficial ENDOPAIN-4D ni diagnostica endometriosis.`;
+  return { instrumento: 'Mapa local de dolor', version: 2, validado: false, completo, dominante: dominante.k, carga: null, resumen, estado };
 }

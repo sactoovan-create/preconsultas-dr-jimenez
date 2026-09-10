@@ -5,7 +5,7 @@
 > liga al expediente). Este documento congela la forma de los datos para que ambos
 > evolucionen sin romperse. **Si cambias la forma, sube `version` y actualiza aquí.**
 
-Estado: **versión 3** (formulario actual `2026.09.2`). Producido por
+Estado: **versión 3** (formulario preparado localmente `2026.09.4`; publicación no verificada). Producido por
 `paciente/PortalPaciente.jsx` (`construirRegistro`) y `core/resumenPaciente.js`.
 Almacenado por `core/respuestas.js`.
 
@@ -36,7 +36,7 @@ Cada envío de una paciente es **un objeto JSON** con esta forma:
 ```jsonc
 {
   "version": 3,
-  "formularioVersion": "2026.09.2",
+  "formularioVersion": "2026.09.4",
   "atribucion": {
     "version": 1,
     "booking_channel": "whatsapp",
@@ -106,7 +106,7 @@ Cada envío de una paciente es **un objeto JSON** con esta forma:
   ],
 
   "ruteoClinico": {              // opcional/aditivo. Sugerencias, no diagnóstico.
-    "version": 3,
+    "version": 5,
     "generadoEn": "2026-06-27T00:00:00.000Z",
     "instrumentosSugeridos": [
       {
@@ -220,13 +220,62 @@ tratarlos como datos heredados de solo lectura.
 Las opciones explícitas `ninguna`, `no_se`, `no_aplica` y `prefiero_no` son datos;
 una clave ausente sigue significando **no contestada**, no “No”.
 
+### Ampliación local `2026.09.3`: entrevista dirigida
+
+No cambia el sobre v3. `autoReporte.hc.entrevistaVersion` vale `1.0.0`.
+El catálogo exacto, etiquetas y opciones viven en `core/entrevista.js`;
+captura, revisión y lector usan esos mismos IDs, sin interpretar el texto libre.
+Fuentes, alcance y pendientes en `docs/ENTREVISTA-2026-09.md`.
+
+| Módulo | Campos en `hc` |
+|---|---|
+| Motivo | `consultaTipo`, `consultaPrioridad` |
+| Contexto | `causaAusenciaRegla` |
+| Sangrado | `sangradoCambios[]`, `sangradoImpacto`, `sangradoTratamientos` |
+| Dolor | `dolorFrecuencia`, `dolorImpacto`, `dolorTratamientos` |
+| Ciclos | `ciclosInicio`, `ciclosDiagnostico` |
+| Climaterio | `climaterioPrioridad`, `climaterioTratamientos` |
+| Urinario | `urinarioDesde`, `urinarioVaciado[]`, `urinarioTratamientos` |
+| Intimidad | `intimidadImpacto`, `intimidadContexto` |
+| Mama | `mamaEstudios` |
+| Cervical | `cervicalPruebas[]`, `cervicalFecha`, `cervicalResultado`, `cervicalTratamientoPrevio`, `cervicalTratamientoDetalle`, `cervicalSeguimiento` |
+| Vulvar | `vulvarSintomas[]`, `vulvarDesde`, `vulvarRepite`, `vulvarUbicacion`, `vulvarExposicion`, `vulvarTratamientos` |
+| Metabólico | `metabolicoObjetivos[]`, `metabolicoEvolucion`, `metabolicoTratamiento`, `metabolicoTolerancia` |
+| Piso pélvico | `pisoSintomas[]`, `pisoDesde`, `pisoImpacto`, `pisoTratamientos` |
+
+`[]` indica array de IDs, no parte del nombre de la clave. Los demás campos son
+cadenas: texto libre o un ID de las opciones enumeradas por el catálogo. No son
+diagnósticos. Ausente/vacío no equivale a negativo ni a escala completa.
+Los campos de ramas desmarcadas o condicionales ocultas no se envían.
+`cervicalTratamientoDetalle` solo se envía con `cervicalTratamientoPrevio=si`.
+
+Se añaden temas `cervical`, `vulvar`, `piso-pelvico`; `metabolico` ya existía y
+ahora tiene entrevista propia. `etapaReproductiva=sin_regla_12m` registra tiempo
+sin menstruación, no menopausia confirmada. `causaAusenciaRegla` admite
+`menopausia_confirmada`, `hormonas`, `cirugia`, `en_estudio`, `no_se`, `no_aplica`.
+El valor histórico `menopausia` se conserva para lectura; no se migran respuestas.
+Al retomar un borrador, ese ID antiguo se convierte a `sin_regla_12m` y se ofrece
+la pregunta sobre causa, sin modificar el registro original ya enviado.
+En el código actual tampoco se pregunta `posibleEmbarazo`: la descripción previa
+de `2026.08.1` es histórica; los envíos actuales la dejan en null.
+
+`cervicalFecha`, `ultimoPapFecha` y `ultimaMastografiaFecha` permiten texto de mes
+y año aproximados; el consumidor no debe asumir ISO ni fabricar un día. Las
+fechas ISO históricas siguen siendo cadenas válidas. No se modifican fechas de
+citas ni `ultimaMenstruacion`.
+
+El ruteo nuevo tiene versión **4**: conserva la sugerencia guardada en registros
+previos y solo calcula cuando falta. La solicitud metabólica puede sugerir
+valoración, y `metabolicoTratamiento` complementa `medicamentos` para reconocer
+tratamientos reportados. No hay persistencia longitudinal nueva en el portal.
+
 > Nota: `hc` también lleva `telefono` y `correo` cuando se capturan; la fuente
 > autoritativa de contacto es `paciente.telefono` / `paciente.correo`.
 
 ### `profundos` — módulos dirigidos opcionales
 
 Objeto cuyas claves son los módulos que realmente seguían activos al enviar
-(`incontinencia`, `genitourinario`, `salud-sexual`, `dolor` o `sop`). El portal
+(`incontinencia`, `genitourinario`, `salud-sexual`, `dolor-pelvico` o `sop`). El portal
 elimina las respuestas de un módulo si la paciente desmarca el tema que lo abrió.
 `resumen.profundizaciones` congela su lectura orientativa para que el ERP no tenga
 que recalcular con reglas futuras.
@@ -308,7 +357,34 @@ la consulta.
 ---
 
 ## 5. Política de versión
-- `version` es entero. Hoy = **2**.
+
+### Ampliación local 2026.09.4 (no publicada)
+
+- Sobre v3 conservado; `autoReporte.hc.entrevistaVersion=2.0.0`,
+  `formularioVersion=2026.09.4`, ruteo v5. La sección 2026.09.3 anterior es historial.
+- 36 campos opcionales nuevos, tipos y opciones exactos en
+  `docs/INVENTARIO-PREGUNTAS-2026-09.json` y `core/entrevista.js`.
+  Incluyen fracturas/caídas, antecedentes familiares mamarios específicos,
+  tratamientos cardiometabólicos, patrón de dolor y conteos menstruales/urinarios.
+- Binarios nuevos: `true` / `false` / `no_se` / `prefiero_no`.
+  No convertir los dos últimos a `false`. Valores numéricos desconocidos:
+  omitidos o `null`, nunca cero de relleno.
+- `resumen.profundizaciones` contiene lecturas nuevas con `version:2` y
+  `validado:false`; son descripciones locales, no aplicaciones oficiales de
+  FSFI, ENDOPAIN, PCOSQ o DIVA/VSQ. FSFI local no emite total/corte positivo;
+  mapa de dolor ya no emite carga global /40. Un consumidor debe leer la versión
+  y no suponer un campo numérico. Los registros históricos no se reescriben.
+- MRS médica parcial devuelve `total:null` y severidad pendiente. No tratar
+  `null` como cero ni publicar severidad mínima por falta de respuestas.
+- La precarga clínica v2 reside en trabajo médico, no cambia el autorreporte
+  enviado: `paciente.procedencia.campos[]` contiene destino, valor, fuente y
+  etiqueta; la transformación por instrumento se obtiene de
+  `precargaInstrumento`. `datosInstrumentos[id].__revisionPrecarga` guarda
+  versión, fecha y huella de datos revisados; no es firma electrónica.
+- Las respuestas se leen sin mutarlas; prevalece cualquier valor médico guardado.
+  No hay migración SQL ni verificación del consumidor ERP en esta tarea.
+
+- `version` del sobre es entero. Hoy = **3**. No confundir con `ruteoClinico.version` ni las versiones de cada resumen.
 - **Cambios compatibles** (agregar campos opcionales): no subas la versión; el ERP
   ignora lo que no conoce.
 - **Cambios incompatibles** (renombrar/quitar campos, cambiar tipos o escalas): sube

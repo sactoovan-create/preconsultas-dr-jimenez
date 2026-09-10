@@ -2,15 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { profundizacionesSugeridas } from '../core/profundos/index.js';
 import './Profundizaciones.css';
 
-/**
- * Profundizaciones adaptativas de la pre-consulta. A partir de lo que la paciente
- * ya contestó en el tamizaje, ofrece —de forma OPCIONAL— unas preguntas más
- * específicas y validadas para la rama que salió positiva (por ejemplo, escapes de
- * orina si reportó molestias de vejiga). Se ofrece, no se impone; la paciente
- * decide si las contesta. Sube mucho la certeza que llega al médico.
- *
- * `tamizaje` = { mrs, dolor, hc } (lo ya contestado). `valor` = respuestas por id.
- */
+/** Preguntas complementarias opcionales. `tamizaje` contiene lo ya reportado;
+ * `valor` conserva las respuestas por módulo. No son pruebas diagnósticas. */
 export default function Profundizaciones({ tamizaje, valor, onChange, soloId = null }) {
   const sugeridas = profundizacionesSugeridas(tamizaje || {})
     .filter((profundizacion) => !soloId || profundizacion.id === soloId);
@@ -41,8 +34,9 @@ function cumple(cond, resp) {
   if (!cond) return true;
   const r = resp || {};
   // { campos: [...], min }: se cumple si cualquiera de esos campos llega al mínimo.
-  if (cond.campos) return cond.campos.some((c) => { const n = Number(r[c]); return Number.isFinite(n) && n >= (cond.min == null ? 1 : cond.min); });
+  if (cond.campos) return cond.campos.some((c) => r[c] != null && r[c] !== '' && typeof r[c] !== 'boolean' && Number.isFinite(Number(r[c])) && Number(r[c]) >= (cond.min == null ? 1 : cond.min));
   const v = r[cond.campo];
+  if (v == null || v === '' || typeof v === 'boolean') return false;
   const n = Number(v);
   if (cond.en) return cond.en.includes(v) || cond.en.includes(n);
   if (cond.min != null) return Number.isFinite(n) && n >= cond.min;
@@ -61,7 +55,11 @@ function Bloque({ def, respuestas, onRespuestas }) {
   // como opción de "lo que más te molesta".
   useEffect(() => {
     const visibles = new Set(def.preguntas.filter((q) => cumple(q.mostrarSi, respuestas)).map((q) => q.id));
-    const sobrantes = Object.keys(respuestas).filter((id) => !visibles.has(id));
+    const sobrantes = Object.keys(respuestas).filter((id) => {
+      if (!visibles.has(id)) return true;
+      const q = def.preguntas.find(p => p.id === id);
+      return q.tipo === 'opcion' && !q.opciones.some(o => o.valor === respuestas[id] && cumple(o.mostrarSi, respuestas));
+    });
     if (sobrantes.length) {
       const limpio = { ...respuestas };
       sobrantes.forEach((id) => delete limpio[id]);
@@ -73,7 +71,7 @@ function Bloque({ def, respuestas, onRespuestas }) {
     return (
       <div className="pf-oferta">
         <div className="pf-oferta-t">{def.titulo}</div>
-        <div className="pf-oferta-d">Puedes responder una escala dirigida de {def.preguntas.length} preguntas. Es opcional y puedes continuar sin abrirla.</div>
+        <div className="pf-oferta-d">Preguntas opcionales sobre estas molestias.</div>
         <button type="button" className="pf-oferta-btn" onClick={() => setAbierto(true)}>Sí, contestar unas preguntas más</button>
       </div>
     );
@@ -82,6 +80,7 @@ function Bloque({ def, respuestas, onRespuestas }) {
   return (
     <div className="pf-bloque">
       <div className="pc-seccion-t">{def.titulo}</div>
+      <p className="pc-seccion-d">Entrevista complementaria, no diagnóstico.</p>
       <div className="pc-seccion-d">Contesta con calma. Nada de esto es un diagnóstico; le ayuda a tu doctor a entenderte mejor.</div>
       <div className="pf-preguntas">
         {def.preguntas.filter((q) => cumple(q.mostrarSi, respuestas)).map((q) => (
@@ -95,8 +94,8 @@ function Bloque({ def, respuestas, onRespuestas }) {
 function Pregunta({ q, respuestas, valor, onChange }) {
   const opciones = (q.opciones || []).filter((o) => cumple(o.mostrarSi, respuestas));
   return (
-    <div className="pf-pregunta">
-      <div className="pf-pregunta-t">{q.texto}</div>
+    <fieldset className="pf-pregunta">
+      <legend className="pf-pregunta-t">{q.texto}</legend>
       {q.ayuda && <div className="pf-pregunta-ayuda">{q.ayuda}</div>}
 
       {q.tipo === 'opcion' && (
@@ -106,6 +105,7 @@ function Pregunta({ q, respuestas, valor, onChange }) {
               type="button"
               key={o.valor}
               className={'pf-op' + (valor === o.valor ? ' on' : '')}
+              aria-pressed={valor === o.valor}
               onClick={() => onChange(o.valor)}
             >{o.etiqueta}</button>
           ))}
@@ -121,6 +121,8 @@ function Pregunta({ q, respuestas, valor, onChange }) {
                 type="button"
                 key={n}
                 className={'pf-num' + (valor === n ? ' on' : '')}
+                aria-label={`${q.texto}: ${n} de ${q.max}`}
+                aria-pressed={valor === n}
                 onClick={() => onChange(n)}
               >{n}</button>
             ))}
@@ -139,6 +141,7 @@ function Pregunta({ q, respuestas, valor, onChange }) {
                 type="button"
                 key={o.id}
                 className={'pf-check' + (on ? ' on' : '')}
+                aria-pressed={on}
                 onClick={() => {
                   const esNinguna = /ninguna|ninguno/i.test(o.id);
                   if (esNinguna) {
@@ -156,6 +159,6 @@ function Pregunta({ q, respuestas, valor, onChange }) {
           })}
         </div>
       )}
-    </div>
+    </fieldset>
   );
 }

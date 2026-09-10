@@ -1,0 +1,2565 @@
+{
+  "formulario": "2026.09.4",
+  "alcance": "Captura base, 11 dominios de síntomas, entrevista dirigida y módulos complementarios; excluye consentimiento, honeypot y controles de navegación. No es conteo de preguntas obligatorias ni certificación clínica.",
+  "conteo": {
+    "controlesBase": 49,
+    "mrs": 11,
+    "entrevistaDirigida": 75,
+    "complementarias": 38
+  },
+  "base": [
+    {
+      "etiqueta": "Nombre y apellidos",
+      "control": "CampoTexto",
+      "id": "nombre",
+      "archivo": "PreConsulta.jsx",
+      "linea": 457,
+      "valor": "{dem.nombre}"
+    },
+    {
+      "etiqueta": "Edad",
+      "control": "CampoNumero",
+      "id": "edad",
+      "archivo": "PreConsulta.jsx",
+      "linea": 458,
+      "valor": "{dem.edad}"
+    },
+    {
+      "etiqueta": "Teléfono o WhatsApp de México",
+      "control": "CampoTexto",
+      "id": "telefono",
+      "archivo": "PreConsulta.jsx",
+      "linea": 459,
+      "valor": "{hc.telefono}"
+    },
+    {
+      "etiqueta": "Correo (opcional)",
+      "control": "CampoTexto",
+      "id": "correo",
+      "archivo": "PreConsulta.jsx",
+      "linea": 460,
+      "valor": "{hc.correo}"
+    },
+    {
+      "etiqueta": "¿Qué te gustaría resolver en esta consulta?",
+      "control": "CampoTexto",
+      "id": "motivo",
+      "archivo": "PreConsulta.jsx",
+      "linea": 468,
+      "valor": "{hc.motivo}"
+    },
+    {
+      "etiqueta": "¿Qué temas quieres revisar?",
+      "control": "GrupoMultiple",
+      "id": "temasConsulta",
+      "archivo": "PreConsulta.jsx",
+      "linea": 469,
+      "valor": "{hc.temasConsulta}"
+    },
+    {
+      "etiqueta": "¿Tienes hoy alguna de estas señales?",
+      "control": "GrupoMultiple",
+      "id": "senalesUrgencia",
+      "archivo": "PreConsulta.jsx",
+      "linea": 529,
+      "valor": "{hc.senalesUrgencia}"
+    },
+    {
+      "etiqueta": "¿Cuál opción describe mejor tu situación actual?",
+      "control": "GrupoOpciones",
+      "id": "etapaReproductiva",
+      "archivo": "PreConsulta.jsx",
+      "linea": 538,
+      "valor": "{hc.etapaReproductiva}"
+    },
+    {
+      "etiqueta": "Primer día de tu última menstruación (si lo recuerdas)",
+      "control": "CampoTexto",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 539,
+      "valor": "{hc.ultimaMenstruacion}"
+    },
+    {
+      "etiqueta": "Método anticonceptivo u hormonas que usas (opcional)",
+      "control": "CampoTexto",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 540,
+      "valor": "{hc.anticonceptivo}"
+    },
+    {
+      "etiqueta": "¿Qué cambio de sangrado has notado?",
+      "control": "GrupoMultiple",
+      "id": "sangradoTipos",
+      "archivo": "PreConsulta.jsx",
+      "linea": 547,
+      "valor": "{hc.sangradoTipos}"
+    },
+    {
+      "etiqueta": "¿Estás sangrando hoy?",
+      "control": "GrupoOpciones",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 563,
+      "valor": "{hc.sangradoAhora}"
+    },
+    {
+      "etiqueta": "¿Cuántos días suele durar?",
+      "control": "CampoNumero",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 565,
+      "valor": "{hc.sangradoDuracionDias}"
+    },
+    {
+      "etiqueta": "¿Desde cuándo cambió?",
+      "control": "CampoTexto",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 566,
+      "valor": "{hc.sangradoDesde}"
+    },
+    {
+      "etiqueta": "¿Qué tan fuerte ha sido el dolor en su peor momento?",
+      "control": "EscalaNumerica",
+      "id": "dolorIntensidad",
+      "archivo": "PreConsulta.jsx",
+      "linea": 574,
+      "valor": "{dolor.intensidad}"
+    },
+    {
+      "etiqueta": "¿Cómo comenzó?",
+      "control": "GrupoOpciones",
+      "id": "dolorInicio",
+      "archivo": "PreConsulta.jsx",
+      "linea": 575,
+      "valor": "{dolor.inicio}"
+    },
+    {
+      "etiqueta": "¿Desde hace cuántos meses?",
+      "control": "CampoNumero",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 582,
+      "valor": "{dolor.meses}"
+    },
+    {
+      "etiqueta": "¿En qué parte lo sientes?",
+      "control": "CampoTexto",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 583,
+      "valor": "{dolor.localizacion}"
+    },
+    {
+      "etiqueta": "¿Cuándo aparece o qué lo acompaña?",
+      "control": "GrupoMultiple",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 585,
+      "valor": "{dolor.asociados}"
+    },
+    {
+      "etiqueta": "En los últimos 12 meses, ¿tus ciclos han sido regulares?",
+      "control": "GrupoOpciones",
+      "id": "reglasRegulares",
+      "archivo": "PreConsulta.jsx",
+      "linea": 606,
+      "valor": "{hc.reglasRegulares}"
+    },
+    {
+      "etiqueta": "Edad de tu primera menstruación",
+      "control": "CampoNumero",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 613,
+      "valor": "{hc.edadMenarca}"
+    },
+    {
+      "etiqueta": "Días entre una menstruación y otra",
+      "control": "CampoNumero",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 614,
+      "valor": "{hc.diasEntreReglas}"
+    },
+    {
+      "etiqueta": "¿Has notado alguno de estos cambios?",
+      "control": "GrupoMultiple",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 616,
+      "valor": "{hc.cambiosAndrogenicos}"
+    },
+    {
+      "etiqueta": "¿Qué has notado en las últimas 4 semanas?",
+      "control": "GrupoMultiple",
+      "id": "sintomasUrinarios",
+      "archivo": "PreConsulta.jsx",
+      "linea": 635,
+      "valor": "{hc.sintomasUrinarios}"
+    },
+    {
+      "etiqueta": "Algo más que quieras contar sobre estas molestias (opcional)",
+      "control": "CampoTexto",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 643,
+      "valor": "{hc.urinarioDetalle}"
+    },
+    {
+      "etiqueta": "¿Qué te gustaría revisar?",
+      "control": "GrupoMultiple",
+      "id": "molestiasIntimas",
+      "archivo": "PreConsulta.jsx",
+      "linea": 650,
+      "valor": "{hc.molestiasIntimas}"
+    },
+    {
+      "etiqueta": "¿Qué has notado recientemente?",
+      "control": "GrupoMultiple",
+      "id": "sintomasMama",
+      "archivo": "PreConsulta.jsx",
+      "linea": 662,
+      "valor": "{hc.sintomasMama}"
+    },
+    {
+      "etiqueta": "¿De qué lado y desde cuándo? (opcional)",
+      "control": "CampoTexto",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 669,
+      "valor": "{hc.mamaDetalle}"
+    },
+    {
+      "etiqueta": "Respecto a un embarazo, ¿qué te gustaría en este momento?",
+      "control": "GrupoOpciones",
+      "id": "objetivoReproductivo",
+      "archivo": "PreConsulta.jsx",
+      "linea": 675,
+      "valor": "{hc.objetivoReproductivo}"
+    },
+    {
+      "etiqueta": "¿Desde hace cuántos meses lo intentas?",
+      "control": "CampoNumero",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 683,
+      "valor": "{hc.mesesBuscandoEmbarazo}"
+    },
+    {
+      "etiqueta": "Método anticonceptivo actual (si usas alguno)",
+      "control": "CampoTexto",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 685,
+      "valor": "{hc.anticonceptivo}"
+    },
+    {
+      "etiqueta": "¿Te han diagnosticado alguna de estas condiciones?",
+      "control": "GrupoMultiple",
+      "id": "antecedentes",
+      "archivo": "PreConsulta.jsx",
+      "linea": 703,
+      "valor": "{hc.antecedentesSeleccionados}"
+    },
+    {
+      "etiqueta": "Embarazos previos",
+      "control": "CampoNumero",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 718,
+      "valor": "{hc.embarazos}"
+    },
+    {
+      "etiqueta": "Partos",
+      "control": "CampoNumero",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 719,
+      "valor": "{hc.partos}"
+    },
+    {
+      "etiqueta": "Cesáreas",
+      "control": "CampoNumero",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 720,
+      "valor": "{hc.cesareas}"
+    },
+    {
+      "etiqueta": "Pérdidas o abortos",
+      "control": "CampoNumero",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 721,
+      "valor": "{hc.abortos}"
+    },
+    {
+      "etiqueta": "Cirugías que has tenido (opcional)",
+      "control": "CampoTexto",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 723,
+      "valor": "{hc.cirugias}"
+    },
+    {
+      "etiqueta": "Medicamentos, vitaminas o suplementos (opcional)",
+      "control": "CampoTexto",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 724,
+      "valor": "{hc.medicamentos}"
+    },
+    {
+      "etiqueta": "Alergias a medicamentos (opcional)",
+      "control": "CampoTexto",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 725,
+      "valor": "{hc.alergias}"
+    },
+    {
+      "etiqueta": "Tabaco",
+      "control": "GrupoOpciones",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 726,
+      "valor": "{hc.tabacoEstado}"
+    },
+    {
+      "etiqueta": "¿Conservas el cuello de la matriz (cuello uterino)?",
+      "control": "GrupoOpciones",
+      "id": "tieneCuelloUterino",
+      "archivo": "PreConsulta.jsx",
+      "linea": 740,
+      "valor": "{hc.tieneCuelloUterino}"
+    },
+    {
+      "etiqueta": "Fecha aproximada de tu última prueba cervical",
+      "control": "CampoTexto",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 747,
+      "valor": "{hc.ultimoPapFecha}"
+    },
+    {
+      "etiqueta": "¿Qué resultado tuvo?",
+      "control": "GrupoOpciones",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 748,
+      "valor": "{hc.ultimoPapResultado}"
+    },
+    {
+      "etiqueta": "Fecha aproximada de tu última mastografía",
+      "control": "CampoTexto",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 758,
+      "valor": "{hc.ultimaMastografiaFecha}"
+    },
+    {
+      "etiqueta": "¿Qué resultado tuvo?",
+      "control": "GrupoOpciones",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 759,
+      "valor": "{hc.ultimaMastografiaResultado}"
+    },
+    {
+      "etiqueta": "Antecedentes de cáncer en familiares de sangre",
+      "control": "GrupoMultiple",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 767,
+      "valor": "{hc.cancerFamiliarTipos}"
+    },
+    {
+      "etiqueta": "¿Quién lo tuvo y a qué edad? (si lo sabes)",
+      "control": "CampoTexto",
+      "id": null,
+      "archivo": "PreConsulta.jsx",
+      "linea": 780,
+      "valor": "{hc.cancerFamiliarDetalle}"
+    },
+    {
+      "etiqueta": "¿Por dónde reservaste?",
+      "control": "CampoSelect",
+      "id": "canalReserva",
+      "archivo": "PreConsulta.jsx",
+      "linea": 814,
+      "valor": "{atribucion.booking_channel}"
+    },
+    {
+      "etiqueta": "¿Dónde conociste al doctor?",
+      "control": "CampoSelect",
+      "id": "fuenteDeclarada",
+      "archivo": "PreConsulta.jsx",
+      "linea": 816,
+      "valor": "{atribucion.patient_reported_source}"
+    }
+  ],
+  "mrs": [
+    {
+      "id": "mrs_bochornos",
+      "etiqueta": "Bochornos o sudoraciones repentinas"
+    },
+    {
+      "id": "mrs_cardiaco",
+      "etiqueta": "Palpitaciones o sensación de latidos fuertes"
+    },
+    {
+      "id": "mrs_sueno",
+      "etiqueta": "Dificultad para dormir"
+    },
+    {
+      "id": "mrs_musculo",
+      "etiqueta": "Dolores de músculos o articulaciones"
+    },
+    {
+      "id": "mrs_animo",
+      "etiqueta": "Sentirte triste o desanimada"
+    },
+    {
+      "id": "mrs_irritable",
+      "etiqueta": "Irritabilidad o cambios de humor"
+    },
+    {
+      "id": "mrs_ansiedad",
+      "etiqueta": "Nerviosismo o ansiedad"
+    },
+    {
+      "id": "mrs_agotamiento",
+      "etiqueta": "Cansancio físico o mental"
+    },
+    {
+      "id": "mrs_sexual",
+      "etiqueta": "Cambios o molestias en tu vida sexual"
+    },
+    {
+      "id": "mrs_vejiga",
+      "etiqueta": "Molestias al orinar o para controlar la orina"
+    },
+    {
+      "id": "mrs_sequedad",
+      "etiqueta": "Sequedad vaginal"
+    }
+  ],
+  "dirigida": [
+    {
+      "grupo": "motivo",
+      "fuenteObsidian": "MP-006 / Checklist 71",
+      "id": "consultaTipo",
+      "etiqueta": "¿Qué necesitas de esta visita?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": "primera",
+          "etiqueta": "Valorar una molestia por primera vez"
+        },
+        {
+          "valor": "seguimiento",
+          "etiqueta": "Revisar cómo voy con un tratamiento"
+        },
+        {
+          "valor": "resultados",
+          "etiqueta": "Entender mis estudios o resultados"
+        },
+        {
+          "valor": "segunda_opinion",
+          "etiqueta": "Una segunda opinión"
+        },
+        {
+          "valor": "prevencion",
+          "etiqueta": "Revisión preventiva"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "motivo",
+      "fuenteObsidian": "MP-006 / Checklist 71",
+      "id": "consultaPrioridad",
+      "etiqueta": "¿Hay algo que te preocupe especialmente o que no quieras dejar pendiente?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "contexto",
+      "fuenteObsidian": "Libro maestro 12 y 20",
+      "id": "causaAusenciaRegla",
+      "etiqueta": "Si no menstruas, ¿qué explicación te han dado?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": "menopausia_confirmada",
+          "etiqueta": "Mi médico confirmó menopausia"
+        },
+        {
+          "valor": "hormonas",
+          "etiqueta": "Uso de anticonceptivo u otro tratamiento hormonal"
+        },
+        {
+          "valor": "cirugia",
+          "etiqueta": "Cirugía"
+        },
+        {
+          "valor": "en_estudio",
+          "etiqueta": "Se está estudiando"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No sé"
+        },
+        {
+          "valor": "no_aplica",
+          "etiqueta": "Sí menstruo"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": true,
+      "obligatoria": false
+    },
+    {
+      "grupo": "contexto",
+      "fuenteObsidian": "Libro maestro 12 y 20",
+      "id": "histerectomiaConfirmada",
+      "etiqueta": "¿Te han retirado el útero en una cirugía?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "contexto",
+      "fuenteObsidian": "Libro maestro 12 y 20",
+      "id": "edadMenopausiaReportada",
+      "etiqueta": "¿A qué edad te confirmaron la menopausia? (si lo recuerdas)",
+      "tipo": "numero",
+      "opciones": null,
+      "min": 10,
+      "max": 70,
+      "condicional": true,
+      "obligatoria": false
+    },
+    {
+      "grupo": "sangrado",
+      "fuenteObsidian": "MP-001 / Checklist 71",
+      "id": "sangradoCambios",
+      "etiqueta": "En un día de sangrado, ¿qué ha cambiado respecto a lo habitual?",
+      "tipo": "multiple",
+      "opciones": [
+        {
+          "id": "proteccion",
+          "etiqueta": "Necesito cambiar la protección mucho más seguido"
+        },
+        {
+          "id": "nocturno",
+          "etiqueta": "Me levanto de noche a cambiarme"
+        },
+        {
+          "id": "mancha",
+          "etiqueta": "Mancho ropa o sábanas"
+        },
+        {
+          "id": "coagulos",
+          "etiqueta": "Expulso coágulos"
+        },
+        {
+          "id": "ninguna",
+          "etiqueta": "Ninguna de estas"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "sangrado",
+      "fuenteObsidian": "MP-001 / Checklist 71",
+      "id": "sangradoImpacto",
+      "etiqueta": "¿Cómo afecta el sangrado a tus actividades?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": "ninguno",
+          "etiqueta": "No cambia mis actividades"
+        },
+        {
+          "valor": "molesta",
+          "etiqueta": "Me molesta, pero puedo continuar"
+        },
+        {
+          "valor": "limita",
+          "etiqueta": "He reducido o evitado actividades"
+        },
+        {
+          "valor": "impide",
+          "etiqueta": "Me impide trabajar, dormir o hacer actividades"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "sangrado",
+      "fuenteObsidian": "MP-001 / Checklist 71",
+      "id": "sangradoTratamientos",
+      "etiqueta": "¿Qué has usado para controlarlo y qué ocurrió?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "sangrado",
+      "fuenteObsidian": "MP-001 / Checklist 71",
+      "id": "sangradoIntervaloDias",
+      "etiqueta": "Días desde el inicio de una regla hasta el inicio de la siguiente (aproximados)",
+      "tipo": "numero",
+      "opciones": null,
+      "min": 10,
+      "max": 180,
+      "condicional": true,
+      "obligatoria": false
+    },
+    {
+      "grupo": "sangrado",
+      "fuenteObsidian": "MP-001 / Checklist 71",
+      "id": "sangradoDesdeMenarca",
+      "etiqueta": "¿Tus reglas han sido muy abundantes desde que comenzaste a menstruar?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "sangrado",
+      "fuenteObsidian": "MP-001 / Checklist 71",
+      "id": "sangradoOtrosSitios",
+      "etiqueta": "Además de la regla, ¿has tenido sangrado difícil de detener?",
+      "tipo": "multiple",
+      "opciones": [
+        {
+          "id": "dental",
+          "etiqueta": "Después de una extracción dental"
+        },
+        {
+          "id": "cirugia",
+          "etiqueta": "Después de una cirugía"
+        },
+        {
+          "id": "nariz",
+          "etiqueta": "De nariz, repetidamente"
+        },
+        {
+          "id": "moretones",
+          "etiqueta": "Moretones frecuentes sin golpe claro"
+        },
+        {
+          "id": "ninguna",
+          "etiqueta": "Ninguno de estos"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "dolor",
+      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis",
+      "id": "dolorFrecuencia",
+      "etiqueta": "¿Con qué frecuencia tienes dolor?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": "diario",
+          "etiqueta": "Todos o casi todos los días"
+        },
+        {
+          "valor": "episodios",
+          "etiqueta": "Por episodios, con días sin dolor"
+        },
+        {
+          "valor": "ciclo",
+          "etiqueta": "En momentos parecidos de cada ciclo"
+        },
+        {
+          "valor": "primera",
+          "etiqueta": "Es la primera vez"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No estoy segura"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "dolor",
+      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis",
+      "id": "dolorImpacto",
+      "etiqueta": "¿Qué tanto ha cambiado tus actividades?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": "ninguno",
+          "etiqueta": "No cambia mis actividades"
+        },
+        {
+          "valor": "molesta",
+          "etiqueta": "Me molesta, pero puedo continuar"
+        },
+        {
+          "valor": "limita",
+          "etiqueta": "He reducido o evitado actividades"
+        },
+        {
+          "valor": "impide",
+          "etiqueta": "Me impide trabajar, dormir o hacer actividades"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "dolor",
+      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis",
+      "id": "dolorTratamientos",
+      "etiqueta": "¿Qué has intentado y cuánto te ayudó?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "dolor",
+      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis",
+      "id": "dolorRelacionCiclo",
+      "etiqueta": "En los últimos 3 meses, ¿cómo se relacionó el dolor con tu regla?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": "solo_regla",
+          "etiqueta": "Aparece solo con la regla"
+        },
+        {
+          "valor": "empeora_regla",
+          "etiqueta": "Existe otros días y empeora con la regla"
+        },
+        {
+          "valor": "sin_relacion",
+          "etiqueta": "No noto relación con la regla"
+        },
+        {
+          "valor": "no_menstruo",
+          "etiqueta": "No menstruo"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No estoy segura"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "dolor",
+      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis",
+      "id": "dolorProfundoPenetracion",
+      "etiqueta": "Cuando hay penetración, ¿sientes dolor profundo dentro de la pelvis?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        },
+        {
+          "valor": "no_aplica",
+          "etiqueta": "No he tenido penetración recientemente"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "dolor",
+      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis",
+      "id": "dolorEvacuarCiclico",
+      "etiqueta": "¿El dolor al evacuar aparece o empeora alrededor de la menstruación?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "dolor",
+      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis",
+      "id": "dolorOrinarCiclico",
+      "etiqueta": "¿El dolor al orinar aparece o empeora alrededor de la menstruación?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "dolor",
+      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis",
+      "id": "dolorMejoraVaciar",
+      "etiqueta": "¿El dolor aumenta al llenarse la vejiga y mejora al orinar?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "dolor",
+      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis",
+      "id": "dolorMovimiento",
+      "etiqueta": "¿El dolor cambia al caminar, sentarte, hacer ejercicio o cambiar de postura?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "ciclos",
+      "fuenteObsidian": "Libro maestro 12 / PMOS 2026",
+      "id": "ciclosInicio",
+      "etiqueta": "¿Desde cuándo notas el cambio en tus ciclos, piel o vello?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": "dias",
+          "etiqueta": "Hace días"
+        },
+        {
+          "valor": "semanas",
+          "etiqueta": "Hace semanas"
+        },
+        {
+          "valor": "meses",
+          "etiqueta": "Hace meses"
+        },
+        {
+          "valor": "anios",
+          "etiqueta": "Hace años"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No recuerdo"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "ciclos",
+      "fuenteObsidian": "Libro maestro 12 / PMOS 2026",
+      "id": "ciclosDiagnostico",
+      "etiqueta": "¿Ya te estudiaron estos cambios o te dieron un diagnóstico?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "ciclos",
+      "fuenteObsidian": "Libro maestro 12 / PMOS 2026",
+      "id": "reglasUltimoAnio",
+      "etiqueta": "¿Cuántas menstruaciones tuviste en los últimos 12 meses? (aproximadas)",
+      "tipo": "numero",
+      "opciones": null,
+      "min": 0,
+      "max": 30,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "ciclos",
+      "fuenteObsidian": "Libro maestro 12 / PMOS 2026",
+      "id": "cicloMayor90",
+      "etiqueta": "En ese año, ¿pasaste más de 90 días seguidos sin menstruar?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "ciclos",
+      "fuenteObsidian": "Libro maestro 12 / PMOS 2026",
+      "id": "cambiosRapidosVozVello",
+      "etiqueta": "¿El vello aumentó rápidamente o tu voz cambió en pocos meses?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "climaterio",
+      "fuenteObsidian": "Libro maestro 20 y 71",
+      "id": "climaterioPrioridad",
+      "etiqueta": "De estas molestias, ¿cuál te gustaría mejorar primero?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "climaterio",
+      "fuenteObsidian": "Libro maestro 20 y 71",
+      "id": "climaterioTratamientos",
+      "etiqueta": "¿Has usado algún tratamiento para estas molestias?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "urinario",
+      "fuenteObsidian": "Walters-Karram capítulo 09 / MP-004",
+      "id": "urinarioDesde",
+      "etiqueta": "¿Desde cuándo tienes estas molestias?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": "dias",
+          "etiqueta": "Hace días"
+        },
+        {
+          "valor": "semanas",
+          "etiqueta": "Hace semanas"
+        },
+        {
+          "valor": "meses",
+          "etiqueta": "Hace meses"
+        },
+        {
+          "valor": "anios",
+          "etiqueta": "Hace años"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No recuerdo"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "urinario",
+      "fuenteObsidian": "Walters-Karram capítulo 09 / MP-004",
+      "id": "urinarioVaciado",
+      "etiqueta": "Al orinar o después, ¿qué notas?",
+      "tipo": "multiple",
+      "opciones": [
+        {
+          "id": "vaciado",
+          "etiqueta": "Siento que no termino de vaciar la vejiga"
+        },
+        {
+          "id": "esfuerzo",
+          "etiqueta": "Necesito hacer fuerza para orinar"
+        },
+        {
+          "id": "continuo",
+          "etiqueta": "La pérdida es casi continua"
+        },
+        {
+          "id": "noche",
+          "etiqueta": "Me despierto repetidamente para orinar"
+        },
+        {
+          "id": "ninguna",
+          "etiqueta": "Ninguna de estas"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "urinario",
+      "fuenteObsidian": "Walters-Karram capítulo 09 / MP-004",
+      "id": "urinarioTratamientos",
+      "etiqueta": "¿Qué tratamientos o estudios has tenido por este problema?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "urinario",
+      "fuenteObsidian": "Walters-Karram capítulo 09 / MP-004",
+      "id": "urinarioProteccion",
+      "etiqueta": "¿Usas toalla o protector por los escapes de orina?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": true,
+      "obligatoria": false
+    },
+    {
+      "grupo": "urinario",
+      "fuenteObsidian": "Walters-Karram capítulo 09 / MP-004",
+      "id": "miccionesDia",
+      "etiqueta": "En un día habitual, ¿cuántas veces orinas mientras estás despierta?",
+      "tipo": "numero",
+      "opciones": null,
+      "min": 0,
+      "max": 40,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "urinario",
+      "fuenteObsidian": "Walters-Karram capítulo 09 / MP-004",
+      "id": "miccionesNoche",
+      "etiqueta": "¿Cuántas veces te despiertas del sueño para orinar?",
+      "tipo": "numero",
+      "opciones": null,
+      "min": 0,
+      "max": 15,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "intimidad",
+      "fuenteObsidian": "Libro maestro 22 y 71",
+      "id": "intimidadImpacto",
+      "etiqueta": "¿Cómo te sientes con estos cambios?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": "preocupa",
+          "etiqueta": "Me preocupan y quiero ayuda"
+        },
+        {
+          "valor": "preguntas",
+          "etiqueta": "Quiero saber si son esperables"
+        },
+        {
+          "valor": "sin_malestar",
+          "etiqueta": "No me generan malestar"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero hablarlo en persona"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "intimidad",
+      "fuenteObsidian": "Libro maestro 22 y 71",
+      "id": "intimidadContexto",
+      "etiqueta": "¿Hay algo que ayude a entender cómo comenzaron?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "mama",
+      "fuenteObsidian": "MP-007 / Checklist 71",
+      "id": "mamaEstudios",
+      "etiqueta": "¿Te han estudiado esta molestia o tomado una biopsia?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "mama",
+      "fuenteObsidian": "MP-007 / Checklist 71",
+      "id": "mamaFamiliarPrimerGradoMenor50",
+      "etiqueta": "¿Tu madre, hermana o hija tuvo cáncer de mama antes de los 50 años?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "mama",
+      "fuenteObsidian": "MP-007 / Checklist 71",
+      "id": "mamaDosFamiliares",
+      "etiqueta": "¿Dos o más familiares de tu familia biológica tuvieron cáncer de mama?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "mama",
+      "fuenteObsidian": "MP-007 / Checklist 71",
+      "id": "mamaFamiliarOvario",
+      "etiqueta": "¿Algún familiar de tu familia biológica tuvo cáncer de ovario?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "mama",
+      "fuenteObsidian": "MP-007 / Checklist 71",
+      "id": "mamaFamiliarHombre",
+      "etiqueta": "¿Algún hombre de tu familia biológica tuvo cáncer de mama?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "mama",
+      "fuenteObsidian": "MP-007 / Checklist 71",
+      "id": "mamaVarianteConfirmada",
+      "etiqueta": "¿Un estudio genético tuyo confirmó una variante de riesgo para cáncer de mama, como BRCA1 o BRCA2?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "mama",
+      "fuenteObsidian": "MP-007 / Checklist 71",
+      "id": "mamaFamiliaDetalle",
+      "etiqueta": "Si respondiste sí, ¿qué familiar y a qué edad? (si lo sabes)",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "cervical",
+      "fuenteObsidian": "MP-005 / Libro maestro 31",
+      "id": "cervicalPruebas",
+      "etiqueta": "¿Qué estudios quieres revisar?",
+      "tipo": "multiple",
+      "opciones": [
+        {
+          "id": "pap",
+          "etiqueta": "Papanicolaou / citología"
+        },
+        {
+          "id": "vph",
+          "etiqueta": "Prueba del virus del papiloma humano (VPH)"
+        },
+        {
+          "id": "colposcopia",
+          "etiqueta": "Colposcopia"
+        },
+        {
+          "id": "biopsia",
+          "etiqueta": "Biopsia / resultado de patología"
+        },
+        {
+          "id": "no_se",
+          "etiqueta": "No sé qué tipo de estudio es"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "cervical",
+      "fuenteObsidian": "MP-005 / Libro maestro 31",
+      "id": "cervicalFecha",
+      "etiqueta": "¿Cuándo se realizó el resultado que quieres revisar?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "cervical",
+      "fuenteObsidian": "MP-005 / Libro maestro 31",
+      "id": "cervicalResultado",
+      "etiqueta": "¿Qué te dijeron del resultado?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "cervical",
+      "fuenteObsidian": "MP-005 / Libro maestro 31",
+      "id": "cervicalTratamientoPrevio",
+      "etiqueta": "¿Te han tratado alguna lesión del cuello uterino?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": "si",
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": "no",
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No estoy segura"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "cervical",
+      "fuenteObsidian": "MP-005 / Libro maestro 31",
+      "id": "cervicalTratamientoDetalle",
+      "etiqueta": "¿Qué tratamiento y aproximadamente cuándo?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": true,
+      "obligatoria": false
+    },
+    {
+      "grupo": "cervical",
+      "fuenteObsidian": "MP-005 / Libro maestro 31",
+      "id": "cervicalSeguimiento",
+      "etiqueta": "¿Qué siguiente paso te indicaron y está pendiente?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "vulvar",
+      "fuenteObsidian": "MP-003 / CDC: sintomas vaginales",
+      "id": "vulvarSintomas",
+      "etiqueta": "¿Qué has notado?",
+      "tipo": "multiple",
+      "opciones": [
+        {
+          "id": "flujo",
+          "etiqueta": "Cambio de flujo"
+        },
+        {
+          "id": "olor",
+          "etiqueta": "Olor diferente"
+        },
+        {
+          "id": "comezon",
+          "etiqueta": "Comezón"
+        },
+        {
+          "id": "ardor",
+          "etiqueta": "Ardor o irritación"
+        },
+        {
+          "id": "piel",
+          "etiqueta": "Mancha, herida o cambio de la piel"
+        },
+        {
+          "id": "bulto",
+          "etiqueta": "Bulto o verruga"
+        },
+        {
+          "id": "no_se",
+          "etiqueta": "No sé cómo describirlo"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "vulvar",
+      "fuenteObsidian": "MP-003 / CDC: sintomas vaginales",
+      "id": "vulvarDesde",
+      "etiqueta": "¿Desde cuándo empezó este episodio?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": "dias",
+          "etiqueta": "Hace días"
+        },
+        {
+          "valor": "semanas",
+          "etiqueta": "Hace semanas"
+        },
+        {
+          "valor": "meses",
+          "etiqueta": "Hace meses"
+        },
+        {
+          "valor": "anios",
+          "etiqueta": "Hace años"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No recuerdo"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "vulvar",
+      "fuenteObsidian": "MP-003 / CDC: sintomas vaginales",
+      "id": "vulvarRepite",
+      "etiqueta": "¿Es la primera vez o ha regresado?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": "primera",
+          "etiqueta": "Es la primera vez"
+        },
+        {
+          "valor": "recurrente",
+          "etiqueta": "Se quita y vuelve"
+        },
+        {
+          "valor": "persistente",
+          "etiqueta": "No se ha quitado"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No estoy segura"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "vulvar",
+      "fuenteObsidian": "MP-003 / CDC: sintomas vaginales",
+      "id": "vulvarUbicacion",
+      "etiqueta": "¿Dónde lo notas y ha cambiado de aspecto?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "vulvar",
+      "fuenteObsidian": "MP-003 / CDC: sintomas vaginales",
+      "id": "vulvarExposicion",
+      "etiqueta": "¿Usaste algún producto o medicamento nuevo antes de que empezara?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "vulvar",
+      "fuenteObsidian": "MP-003 / CDC: sintomas vaginales",
+      "id": "vulvarTratamientos",
+      "etiqueta": "¿Qué usaste para tratarlo y cuánto duró la mejoría?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "metabolico",
+      "fuenteObsidian": "MP-007 / Libro maestro 12",
+      "id": "metabolicoObjetivos",
+      "etiqueta": "¿Qué quieres revisar?",
+      "tipo": "multiple",
+      "opciones": [
+        {
+          "id": "peso",
+          "etiqueta": "Cambio de peso"
+        },
+        {
+          "id": "glucosa",
+          "etiqueta": "Glucosa, diabetes o resistencia a la insulina"
+        },
+        {
+          "id": "lipidos",
+          "etiqueta": "Colesterol o triglicéridos"
+        },
+        {
+          "id": "presion",
+          "etiqueta": "Presión arterial"
+        },
+        {
+          "id": "tratamiento",
+          "etiqueta": "Seguimiento de un tratamiento"
+        },
+        {
+          "id": "fuerza",
+          "etiqueta": "Fuerza, músculo o cansancio"
+        },
+        {
+          "id": "no_se",
+          "etiqueta": "Necesito orientación"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "metabolico",
+      "fuenteObsidian": "MP-007 / Libro maestro 12",
+      "id": "metabolicoEvolucion",
+      "etiqueta": "¿Qué ha cambiado y desde cuándo?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "metabolico",
+      "fuenteObsidian": "MP-007 / Libro maestro 12",
+      "id": "metabolicoTratamiento",
+      "etiqueta": "¿Qué tratamiento usas actualmente para peso, glucosa o presión?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "metabolico",
+      "fuenteObsidian": "MP-007 / Libro maestro 12",
+      "id": "metabolicoTolerancia",
+      "etiqueta": "¿Cómo te ha ido con ese tratamiento?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "metabolico",
+      "fuenteObsidian": "MP-007 / Libro maestro 12",
+      "id": "tomaAntihipertensivo",
+      "etiqueta": "¿Tomas actualmente algún medicamento indicado para bajar la presión?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "metabolico",
+      "fuenteObsidian": "MP-007 / Libro maestro 12",
+      "id": "tomaEstatina",
+      "etiqueta": "¿Tomas una estatina para el colesterol (por ejemplo, atorvastatina o rosuvastatina)?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "metabolico",
+      "fuenteObsidian": "MP-007 / Libro maestro 12",
+      "id": "eventoCardiovascularConfirmado",
+      "etiqueta": "¿Un médico te ha confirmado infarto del corazón, enfermedad de sus arterias o un evento vascular cerebral?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "piso-pelvico",
+      "fuenteObsidian": "Walters-Karram capítulo 09",
+      "id": "pisoSintomas",
+      "etiqueta": "¿Qué has notado?",
+      "tipo": "multiple",
+      "opciones": [
+        {
+          "id": "bulto",
+          "etiqueta": "Bulto o algo que baja por la vagina"
+        },
+        {
+          "id": "presion",
+          "etiqueta": "Presión o pesadez vaginal"
+        },
+        {
+          "id": "orina",
+          "etiqueta": "Dificultad para vaciar la vejiga"
+        },
+        {
+          "id": "evacuar",
+          "etiqueta": "Dificultad para evacuar"
+        },
+        {
+          "id": "apoyo",
+          "etiqueta": "Necesito presionar o acomodar la zona para vaciar"
+        },
+        {
+          "id": "no_se",
+          "etiqueta": "No sé cómo describirlo"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "piso-pelvico",
+      "fuenteObsidian": "Walters-Karram capítulo 09",
+      "id": "pisoDesde",
+      "etiqueta": "¿Desde cuándo lo notas?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": "dias",
+          "etiqueta": "Hace días"
+        },
+        {
+          "valor": "semanas",
+          "etiqueta": "Hace semanas"
+        },
+        {
+          "valor": "meses",
+          "etiqueta": "Hace meses"
+        },
+        {
+          "valor": "anios",
+          "etiqueta": "Hace años"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No recuerdo"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "piso-pelvico",
+      "fuenteObsidian": "Walters-Karram capítulo 09",
+      "id": "pisoImpacto",
+      "etiqueta": "¿Cómo afecta tu vida diaria?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": "ninguno",
+          "etiqueta": "No cambia mis actividades"
+        },
+        {
+          "valor": "molesta",
+          "etiqueta": "Me molesta, pero puedo continuar"
+        },
+        {
+          "valor": "limita",
+          "etiqueta": "He reducido o evitado actividades"
+        },
+        {
+          "valor": "impide",
+          "etiqueta": "Me impide trabajar, dormir o hacer actividades"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "piso-pelvico",
+      "fuenteObsidian": "Walters-Karram capítulo 09",
+      "id": "pisoTratamientos",
+      "etiqueta": "¿Has usado pesario, fisioterapia o tenido cirugía por esto?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "historia",
+      "fuenteObsidian": "Checklist 71 / U.S. MEC 2024",
+      "id": "cigarrillosDia",
+      "etiqueta": "¿Cuántos cigarrillos fumas en un día habitual?",
+      "tipo": "numero",
+      "opciones": null,
+      "min": 1,
+      "max": 100,
+      "condicional": true,
+      "obligatoria": false
+    },
+    {
+      "grupo": "osea",
+      "fuenteObsidian": "FRAX / Menopausia AMOLCA 24",
+      "id": "fracturaBajoImpacto",
+      "etiqueta": "Después de los 40 años, ¿te fracturaste al caer desde tu propia altura o con un golpe leve?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "osea",
+      "fuenteObsidian": "FRAX / Menopausia AMOLCA 24",
+      "id": "fracturaCaderaVertebra",
+      "etiqueta": "¿Esa fractura fue de cadera o de una vértebra?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": true,
+      "obligatoria": false
+    },
+    {
+      "grupo": "osea",
+      "fuenteObsidian": "FRAX / Menopausia AMOLCA 24",
+      "id": "fracturaCaderaProgenitor",
+      "etiqueta": "¿Tu madre o padre tuvo una fractura de cadera?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "osea",
+      "fuenteObsidian": "FRAX / Menopausia AMOLCA 24",
+      "id": "corticoidesTresMeses",
+      "etiqueta": "¿Has tomado cortisona por boca, como prednisona, durante 3 meses o más?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "osea",
+      "fuenteObsidian": "FRAX / Menopausia AMOLCA 24",
+      "id": "artritisReumatoideConfirmada",
+      "etiqueta": "¿Un médico te ha diagnosticado artritis reumatoide?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "osea",
+      "fuenteObsidian": "FRAX / Menopausia AMOLCA 24",
+      "id": "caidasUltimoAnio",
+      "etiqueta": "¿Cuántas caídas tuviste en los últimos 12 meses?",
+      "tipo": "numero",
+      "opciones": null,
+      "min": 0,
+      "max": 100,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "osea",
+      "fuenteObsidian": "FRAX / Menopausia AMOLCA 24",
+      "id": "oseaEstudios",
+      "etiqueta": "¿Tienes densitometría o tratamiento para los huesos?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": false,
+      "obligatoria": false
+    },
+    {
+      "grupo": "plan-reproductivo",
+      "fuenteObsidian": "U.S. MEC 2024 / Checklist 71",
+      "id": "anticoncepcionPrioridades",
+      "etiqueta": "¿Qué es importante para ti al elegir un método?",
+      "tipo": "multiple",
+      "opciones": [
+        {
+          "id": "eficacia",
+          "etiqueta": "Evitar un embarazo con alta eficacia"
+        },
+        {
+          "id": "sin_hormonas",
+          "etiqueta": "No usar hormonas"
+        },
+        {
+          "id": "sangrado",
+          "etiqueta": "Mejorar el sangrado o los cólicos"
+        },
+        {
+          "id": "olvidos",
+          "etiqueta": "No tener que recordarlo todos los días"
+        },
+        {
+          "id": "reversible",
+          "etiqueta": "Poder suspenderlo cuando lo decida"
+        },
+        {
+          "id": "no_se",
+          "etiqueta": "Quiero conocer las opciones"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": true,
+      "obligatoria": false
+    },
+    {
+      "grupo": "plan-reproductivo",
+      "fuenteObsidian": "U.S. MEC 2024 / Checklist 71",
+      "id": "anticoncepcionExperiencia",
+      "etiqueta": "¿Qué métodos probaste y por qué los suspendiste?",
+      "tipo": "texto",
+      "opciones": null,
+      "min": null,
+      "max": null,
+      "condicional": true,
+      "obligatoria": false
+    }
+  ],
+  "complementarias": [
+    {
+      "modulo": "incontinencia",
+      "id": "frecuencia",
+      "texto": "¿Con qué frecuencia se le escapa la orina?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Entrevista urinaria local basada en dominios ICIQ-UI SF. Versión oficial española y permiso de uso pendientes de cotejo; no equivale a una implementación validada.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "incontinencia",
+      "id": "cantidad",
+      "texto": "En general, ¿qué cantidad de orina se le escapa?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Entrevista urinaria local basada en dominios ICIQ-UI SF. Versión oficial española y permiso de uso pendientes de cotejo; no equivale a una implementación validada.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "incontinencia",
+      "id": "afectacion",
+      "texto": "¿Qué tanto afectan estos escapes tu vida diaria?",
+      "tipo": "escala",
+      "condicional": false,
+      "fuente": "Entrevista urinaria local basada en dominios ICIQ-UI SF. Versión oficial española y permiso de uso pendientes de cotejo; no equivale a una implementación validada.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "incontinencia",
+      "id": "cuando",
+      "texto": "¿Cuándo se te escapa la orina?",
+      "tipo": "multiple",
+      "condicional": false,
+      "fuente": "Entrevista urinaria local basada en dominios ICIQ-UI SF. Versión oficial española y permiso de uso pendientes de cotejo; no equivale a una implementación validada.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "genitourinario",
+      "id": "sequedad",
+      "texto": "En las últimas semanas, ¿cómo has sentido la sequedad vaginal?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Escala de severidad de síntomas tipo MsFLASH (0 a 3) + lista del síntoma más molesto del consorcio COMMA + impacto en calidad de vida tipo DIVA (Day-to-Day Impact of Vaginal Aging); apoyado en el cuestionario de síntomas vulvovaginales (VSQ) y en el Cervantes-GSM (validado en español). No incluye el índice de salud vaginal (VHI), que lo mide el médico en la exploración.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "genitourinario",
+      "id": "comezon",
+      "texto": "¿Y comezón o irritación en la zona íntima (vulva o entrada de la vagina)?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Escala de severidad de síntomas tipo MsFLASH (0 a 3) + lista del síntoma más molesto del consorcio COMMA + impacto en calidad de vida tipo DIVA (Day-to-Day Impact of Vaginal Aging); apoyado en el cuestionario de síntomas vulvovaginales (VSQ) y en el Cervantes-GSM (validado en español). No incluye el índice de salud vaginal (VHI), que lo mide el médico en la exploración.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "genitourinario",
+      "id": "ardor",
+      "texto": "¿Sientes ardor o dolor en la vulva o la vagina fuera de las relaciones (por ejemplo al caminar, sentarte o con la ropa)?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Escala de severidad de síntomas tipo MsFLASH (0 a 3) + lista del síntoma más molesto del consorcio COMMA + impacto en calidad de vida tipo DIVA (Day-to-Day Impact of Vaginal Aging); apoyado en el cuestionario de síntomas vulvovaginales (VSQ) y en el Cervantes-GSM (validado en español). No incluye el índice de salud vaginal (VHI), que lo mide el médico en la exploración.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "genitourinario",
+      "id": "dolor_sexo",
+      "texto": "Durante o después de las relaciones sexuales, ¿tienes dolor o molestia?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Escala de severidad de síntomas tipo MsFLASH (0 a 3) + lista del síntoma más molesto del consorcio COMMA + impacto en calidad de vida tipo DIVA (Day-to-Day Impact of Vaginal Aging); apoyado en el cuestionario de síntomas vulvovaginales (VSQ) y en el Cervantes-GSM (validado en español). No incluye el índice de salud vaginal (VHI), que lo mide el médico en la exploración.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "genitourinario",
+      "id": "urinario",
+      "texto": "¿Tienes ardor al orinar, o ganas urgentes o muy frecuentes de ir al baño?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Escala de severidad de síntomas tipo MsFLASH (0 a 3) + lista del síntoma más molesto del consorcio COMMA + impacto en calidad de vida tipo DIVA (Day-to-Day Impact of Vaginal Aging); apoyado en el cuestionario de síntomas vulvovaginales (VSQ) y en el Cervantes-GSM (validado en español). No incluye el índice de salud vaginal (VHI), que lo mide el médico en la exploración.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "genitourinario",
+      "id": "evita_intimidad",
+      "texto": "¿Has dejado o evitas la intimidad por estas molestias?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Escala de severidad de síntomas tipo MsFLASH (0 a 3) + lista del síntoma más molesto del consorcio COMMA + impacto en calidad de vida tipo DIVA (Day-to-Day Impact of Vaginal Aging); apoyado en el cuestionario de síntomas vulvovaginales (VSQ) y en el Cervantes-GSM (validado en español). No incluye el índice de salud vaginal (VHI), que lo mide el médico en la exploración.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "genitourinario",
+      "id": "mbs",
+      "texto": "De todo lo anterior, ¿qué es lo que MÁS te molesta hoy?",
+      "tipo": "opcion",
+      "condicional": true,
+      "fuente": "Escala de severidad de síntomas tipo MsFLASH (0 a 3) + lista del síntoma más molesto del consorcio COMMA + impacto en calidad de vida tipo DIVA (Day-to-Day Impact of Vaginal Aging); apoyado en el cuestionario de síntomas vulvovaginales (VSQ) y en el Cervantes-GSM (validado en español). No incluye el índice de salud vaginal (VHI), que lo mide el médico en la exploración.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "genitourinario",
+      "id": "impacto_dia",
+      "texto": "¿Qué tanto afectan estas molestias tu vida diaria (dormir, sentarte, hacer ejercicio, tu ropa)?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Escala de severidad de síntomas tipo MsFLASH (0 a 3) + lista del síntoma más molesto del consorcio COMMA + impacto en calidad de vida tipo DIVA (Day-to-Day Impact of Vaginal Aging); apoyado en el cuestionario de síntomas vulvovaginales (VSQ) y en el Cervantes-GSM (validado en español). No incluye el índice de salud vaginal (VHI), que lo mide el médico en la exploración.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "genitourinario",
+      "id": "impacto_animo",
+      "texto": "¿Qué tanto afectan tu ánimo o cómo te sientes contigo misma?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Escala de severidad de síntomas tipo MsFLASH (0 a 3) + lista del síntoma más molesto del consorcio COMMA + impacto en calidad de vida tipo DIVA (Day-to-Day Impact of Vaginal Aging); apoyado en el cuestionario de síntomas vulvovaginales (VSQ) y en el Cervantes-GSM (validado en español). No incluye el índice de salud vaginal (VHI), que lo mide el médico en la exploración.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "genitourinario",
+      "id": "impacto_intimidad",
+      "texto": "¿Qué tanto afectan tu vida en pareja o tu intimidad?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Escala de severidad de síntomas tipo MsFLASH (0 a 3) + lista del síntoma más molesto del consorcio COMMA + impacto en calidad de vida tipo DIVA (Day-to-Day Impact of Vaginal Aging); apoyado en el cuestionario de síntomas vulvovaginales (VSQ) y en el Cervantes-GSM (validado en español). No incluye el índice de salud vaginal (VHI), que lo mide el médico en la exploración.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "salud-sexual",
+      "id": "ss_intro",
+      "texto": "Estas preguntas son sobre tu vida sexual en las últimas 4 semanas. Contéstalas con calma; tus respuestas son privadas y le ayudan a tu médico a entenderte mejor. No hace falta que hayas tenido actividad sexual reciente para responder: cuando una pregunta no aplique porque no tuviste actividad, hay una opción para decirlo. Aquí no hay respuestas correctas ni incorrectas.",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Entrevista local de función sexual, con dominios del FSFI como referencia. No es una versión española autorizada/verificada de FSFI-6 y no se aplica un punto de corte diagnóstico.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "salud-sexual",
+      "id": "ss_deseo",
+      "texto": "En las últimas 4 semanas, ¿cómo calificarías tu nivel de deseo o interés sexual?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Entrevista local de función sexual, con dominios del FSFI como referencia. No es una versión española autorizada/verificada de FSFI-6 y no se aplica un punto de corte diagnóstico.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "salud-sexual",
+      "id": "ss_excitacion",
+      "texto": "En las últimas 4 semanas, cuando hubo actividad sexual, ¿cómo calificarías tu nivel de excitación (sentirte prendida)?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Entrevista local de función sexual, con dominios del FSFI como referencia. No es una versión española autorizada/verificada de FSFI-6 y no se aplica un punto de corte diagnóstico.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "salud-sexual",
+      "id": "ss_lubricacion",
+      "texto": "En las últimas 4 semanas, durante la actividad sexual, ¿con qué frecuencia sentiste lubricación (humedad)?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Entrevista local de función sexual, con dominios del FSFI como referencia. No es una versión española autorizada/verificada de FSFI-6 y no se aplica un punto de corte diagnóstico.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "salud-sexual",
+      "id": "ss_orgasmo",
+      "texto": "En las últimas 4 semanas, cuando tuviste estimulación sexual o relaciones, ¿con qué frecuencia llegaste al orgasmo (clímax)?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Entrevista local de función sexual, con dominios del FSFI como referencia. No es una versión española autorizada/verificada de FSFI-6 y no se aplica un punto de corte diagnóstico.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "salud-sexual",
+      "id": "ss_satisfaccion",
+      "texto": "En las últimas 4 semanas, ¿qué tan satisfecha te sentiste con tu vida sexual en general?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Entrevista local de función sexual, con dominios del FSFI como referencia. No es una versión española autorizada/verificada de FSFI-6 y no se aplica un punto de corte diagnóstico.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "salud-sexual",
+      "id": "ss_dolor",
+      "texto": "En las últimas 4 semanas, ¿con qué frecuencia sentiste molestia o dolor durante la penetración vaginal?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Entrevista local de función sexual, con dominios del FSFI como referencia. No es una versión española autorizada/verificada de FSFI-6 y no se aplica un punto de corte diagnóstico.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "dolor-pelvico",
+      "id": "dismenorrea_aplica",
+      "texto": "¿Todavía tienes tu regla (menstruación)?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "ENDOPAIN-4D (Puchar A, et al. J Clin Med. 2021;10(15):3216) para las cuatro dimensiones del dolor asociado a endometriosis; escala numérica de 11 puntos (0-10) recomendada por la American Society for Reproductive Medicine y por el consenso Art and Science of Endometriosis para medir el dolor por dimensión. No se localizó una versión validada al español al momento de construir el módulo; es una adaptación clínica al español de México del marco de cuatro dimensiones, con umbrales de severidad tomados de la escala numérica estándar. Se cita al médico como marco de referencia, no como prueba validada en español.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "dolor-pelvico",
+      "id": "dismenorrea_int",
+      "texto": "Cuando estás en tu regla, ¿qué tan fuerte es el dolor de cólico?",
+      "tipo": "escala",
+      "condicional": true,
+      "fuente": "ENDOPAIN-4D (Puchar A, et al. J Clin Med. 2021;10(15):3216) para las cuatro dimensiones del dolor asociado a endometriosis; escala numérica de 11 puntos (0-10) recomendada por la American Society for Reproductive Medicine y por el consenso Art and Science of Endometriosis para medir el dolor por dimensión. No se localizó una versión validada al español al momento de construir el módulo; es una adaptación clínica al español de México del marco de cuatro dimensiones, con umbrales de severidad tomados de la escala numérica estándar. Se cita al médico como marco de referencia, no como prueba validada en español.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "dolor-pelvico",
+      "id": "no_menstrual_int",
+      "texto": "Fuera de tu regla, en tu día a día, ¿qué tan fuerte es el dolor en la parte baja del vientre?",
+      "tipo": "escala",
+      "condicional": false,
+      "fuente": "ENDOPAIN-4D (Puchar A, et al. J Clin Med. 2021;10(15):3216) para las cuatro dimensiones del dolor asociado a endometriosis; escala numérica de 11 puntos (0-10) recomendada por la American Society for Reproductive Medicine y por el consenso Art and Science of Endometriosis para medir el dolor por dimensión. No se localizó una versión validada al español al momento de construir el módulo; es una adaptación clínica al español de México del marco de cuatro dimensiones, con umbrales de severidad tomados de la escala numérica estándar. Se cita al médico como marco de referencia, no como prueba validada en español.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "dolor-pelvico",
+      "id": "dispareunia_aplica",
+      "texto": "En los últimos meses, ¿has tenido relaciones sexuales con penetración?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "ENDOPAIN-4D (Puchar A, et al. J Clin Med. 2021;10(15):3216) para las cuatro dimensiones del dolor asociado a endometriosis; escala numérica de 11 puntos (0-10) recomendada por la American Society for Reproductive Medicine y por el consenso Art and Science of Endometriosis para medir el dolor por dimensión. No se localizó una versión validada al español al momento de construir el módulo; es una adaptación clínica al español de México del marco de cuatro dimensiones, con umbrales de severidad tomados de la escala numérica estándar. Se cita al médico como marco de referencia, no como prueba validada en español.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "dolor-pelvico",
+      "id": "dispareunia_int",
+      "texto": "Durante las relaciones, ¿qué tan fuerte es el dolor profundo (adentro, no en la entrada)?",
+      "tipo": "escala",
+      "condicional": true,
+      "fuente": "ENDOPAIN-4D (Puchar A, et al. J Clin Med. 2021;10(15):3216) para las cuatro dimensiones del dolor asociado a endometriosis; escala numérica de 11 puntos (0-10) recomendada por la American Society for Reproductive Medicine y por el consenso Art and Science of Endometriosis para medir el dolor por dimensión. No se localizó una versión validada al español al momento de construir el módulo; es una adaptación clínica al español de México del marco de cuatro dimensiones, con umbrales de severidad tomados de la escala numérica estándar. Se cita al médico como marco de referencia, no como prueba validada en español.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "dolor-pelvico",
+      "id": "disquecia_int",
+      "texto": "Al obrar (evacuar), sobre todo cuando estás en tu regla, ¿qué tan fuerte es el dolor?",
+      "tipo": "escala",
+      "condicional": false,
+      "fuente": "ENDOPAIN-4D (Puchar A, et al. J Clin Med. 2021;10(15):3216) para las cuatro dimensiones del dolor asociado a endometriosis; escala numérica de 11 puntos (0-10) recomendada por la American Society for Reproductive Medicine y por el consenso Art and Science of Endometriosis para medir el dolor por dimensión. No se localizó una versión validada al español al momento de construir el módulo; es una adaptación clínica al español de México del marco de cuatro dimensiones, con umbrales de severidad tomados de la escala numérica estándar. Se cita al médico como marco de referencia, no como prueba validada en español.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "dolor-pelvico",
+      "id": "disuria_int",
+      "texto": "Al orinar, sobre todo cuando estás en tu regla, ¿qué tan fuerte es el dolor?",
+      "tipo": "escala",
+      "condicional": false,
+      "fuente": "ENDOPAIN-4D (Puchar A, et al. J Clin Med. 2021;10(15):3216) para las cuatro dimensiones del dolor asociado a endometriosis; escala numérica de 11 puntos (0-10) recomendada por la American Society for Reproductive Medicine y por el consenso Art and Science of Endometriosis para medir el dolor por dimensión. No se localizó una versión validada al español al momento de construir el módulo; es una adaptación clínica al español de México del marco de cuatro dimensiones, con umbrales de severidad tomados de la escala numérica estándar. Se cita al médico como marco de referencia, no como prueba validada en español.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "dolor-pelvico",
+      "id": "impacto",
+      "texto": "En general, ¿cuánto afecta este dolor tu vida diaria (trabajo, ánimo, actividades, descanso)?",
+      "tipo": "escala",
+      "condicional": false,
+      "fuente": "ENDOPAIN-4D (Puchar A, et al. J Clin Med. 2021;10(15):3216) para las cuatro dimensiones del dolor asociado a endometriosis; escala numérica de 11 puntos (0-10) recomendada por la American Society for Reproductive Medicine y por el consenso Art and Science of Endometriosis para medir el dolor por dimensión. No se localizó una versión validada al español al momento de construir el módulo; es una adaptación clínica al español de México del marco de cuatro dimensiones, con umbrales de severidad tomados de la escala numérica estándar. Se cita al médico como marco de referencia, no como prueba validada en español.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "dolor-pelvico",
+      "id": "mas_molesto",
+      "texto": "De todos, ¿cuál dolor es el que más te molesta?",
+      "tipo": "opcion",
+      "condicional": true,
+      "fuente": "ENDOPAIN-4D (Puchar A, et al. J Clin Med. 2021;10(15):3216) para las cuatro dimensiones del dolor asociado a endometriosis; escala numérica de 11 puntos (0-10) recomendada por la American Society for Reproductive Medicine y por el consenso Art and Science of Endometriosis para medir el dolor por dimensión. No se localizó una versión validada al español al momento de construir el módulo; es una adaptación clínica al español de México del marco de cuatro dimensiones, con umbrales de severidad tomados de la escala numérica estándar. Se cita al médico como marco de referencia, no como prueba validada en español.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "dolor-pelvico",
+      "id": "banderas",
+      "texto": "¿Has notado alguna de estas situaciones? Marca todas las que apliquen.",
+      "tipo": "multiple",
+      "condicional": false,
+      "fuente": "ENDOPAIN-4D (Puchar A, et al. J Clin Med. 2021;10(15):3216) para las cuatro dimensiones del dolor asociado a endometriosis; escala numérica de 11 puntos (0-10) recomendada por la American Society for Reproductive Medicine y por el consenso Art and Science of Endometriosis para medir el dolor por dimensión. No se localizó una versión validada al español al momento de construir el módulo; es una adaptación clínica al español de México del marco de cuatro dimensiones, con umbrales de severidad tomados de la escala numérica estándar. Se cita al médico como marco de referencia, no como prueba validada en español.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "sop",
+      "id": "animo",
+      "texto": "En las últimas semanas, ¿qué tanto te han afectado los cambios de ánimo, la tristeza o la preocupación?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Dominios del PCOSQ (Polycystic Ovary Syndrome Questionnaire; Cronin y cols., 1998) con el dominio de acné del PCOSQ modificado (Barnard y cols., 2007). Se usan los seis dominios como preguntas de impacto en calidad de vida. NO es el PCOSQ de 26/30 reactivos puntuado ni un test diagnóstico: es una versión breve, orientativa, de autoinforme. Esta implementación no ha verificado una traducción autorizada ni equivalencia psicométrica; el texto es una adaptación propia.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "sop",
+      "id": "vello",
+      "texto": "¿Qué tanto te molesta el vello no deseado en la cara o el cuerpo?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Dominios del PCOSQ (Polycystic Ovary Syndrome Questionnaire; Cronin y cols., 1998) con el dominio de acné del PCOSQ modificado (Barnard y cols., 2007). Se usan los seis dominios como preguntas de impacto en calidad de vida. NO es el PCOSQ de 26/30 reactivos puntuado ni un test diagnóstico: es una versión breve, orientativa, de autoinforme. Esta implementación no ha verificado una traducción autorizada ni equivalencia psicométrica; el texto es una adaptación propia.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "sop",
+      "id": "peso",
+      "texto": "¿Qué tanto te afecta tu peso o la dificultad para controlarlo?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Dominios del PCOSQ (Polycystic Ovary Syndrome Questionnaire; Cronin y cols., 1998) con el dominio de acné del PCOSQ modificado (Barnard y cols., 2007). Se usan los seis dominios como preguntas de impacto en calidad de vida. NO es el PCOSQ de 26/30 reactivos puntuado ni un test diagnóstico: es una versión breve, orientativa, de autoinforme. Esta implementación no ha verificado una traducción autorizada ni equivalencia psicométrica; el texto es una adaptación propia.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "sop",
+      "id": "piel",
+      "texto": "¿Qué tanto te molestan los granitos o el acné?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Dominios del PCOSQ (Polycystic Ovary Syndrome Questionnaire; Cronin y cols., 1998) con el dominio de acné del PCOSQ modificado (Barnard y cols., 2007). Se usan los seis dominios como preguntas de impacto en calidad de vida. NO es el PCOSQ de 26/30 reactivos puntuado ni un test diagnóstico: es una versión breve, orientativa, de autoinforme. Esta implementación no ha verificado una traducción autorizada ni equivalencia psicométrica; el texto es una adaptación propia.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "sop",
+      "id": "reglas",
+      "texto": "¿Qué tanto te afectan tus reglas, ya sea porque son irregulares, muy espaciadas o difíciles de predecir?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Dominios del PCOSQ (Polycystic Ovary Syndrome Questionnaire; Cronin y cols., 1998) con el dominio de acné del PCOSQ modificado (Barnard y cols., 2007). Se usan los seis dominios como preguntas de impacto en calidad de vida. NO es el PCOSQ de 26/30 reactivos puntuado ni un test diagnóstico: es una versión breve, orientativa, de autoinforme. Esta implementación no ha verificado una traducción autorizada ni equivalencia psicométrica; el texto es una adaptación propia.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "sop",
+      "id": "fertilidad",
+      "texto": "Si estás buscando o piensas buscar un embarazo, ¿qué tanto te preocupa poder lograrlo?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Dominios del PCOSQ (Polycystic Ovary Syndrome Questionnaire; Cronin y cols., 1998) con el dominio de acné del PCOSQ modificado (Barnard y cols., 2007). Se usan los seis dominios como preguntas de impacto en calidad de vida. NO es el PCOSQ de 26/30 reactivos puntuado ni un test diagnóstico: es una versión breve, orientativa, de autoinforme. Esta implementación no ha verificado una traducción autorizada ni equivalencia psicométrica; el texto es una adaptación propia.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    },
+    {
+      "modulo": "sop",
+      "id": "prioridad",
+      "texto": "De todo lo anterior, ¿qué es lo que más te pesa y te gustaría mejorar primero?",
+      "tipo": "opcion",
+      "condicional": false,
+      "fuente": "Dominios del PCOSQ (Polycystic Ovary Syndrome Questionnaire; Cronin y cols., 1998) con el dominio de acné del PCOSQ modificado (Barnard y cols., 2007). Se usan los seis dominios como preguntas de impacto en calidad de vida. NO es el PCOSQ de 26/30 reactivos puntuado ni un test diagnóstico: es una versión breve, orientativa, de autoinforme. Esta implementación no ha verificado una traducción autorizada ni equivalencia psicométrica; el texto es una adaptación propia.",
+      "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+export const reporteClinico = {
+  id: 'qa-precarga-A', creado: '2026-09-10T15:00:00Z', version: 3,
+  paciente: { nombre: 'Paciente sintética de auditoría', edad: 46 },
+  autoReporte: {
+    hc: {
+      temasConsulta: ['sangrado', 'dolor', 'ciclos', 'urinario', 'mama', 'osea', 'metabolico', 'anticoncepcion'],
+      etapaReproductiva: 'menstrua_irregular', reglasRegulares: false,
+      motivo: 'Revisar mis síntomas y estudios. DATOS FICTICIOS.',
+      histerectomiaConfirmada: false, sangrado: true, sangradoTipos: ['muy_abundante', 'entre_periodos'],
+      sangradoDuracionDias: 9, sangradoIntervaloDias: 40, sangradoDesdeMenarca: true, sangradoOtrosSitios: ['dental'],
+      diasEntreReglas: 40, reglasUltimoAnio: 7, cicloMayor90: false,
+      dolorRelacionCiclo: 'solo_regla', dolorProfundoPenetracion: true, dolorEvacuarCiclico: true,
+      dolorOrinarCiclico: false, dolorMejoraVaciar: true, dolorMovimiento: false,
+      sintomasUrinarios: ['escapes'], urinarioProteccion: true, miccionesDia: 9, miccionesNoche: 0,
+      mamaFamiliarPrimerGradoMenor50: true, mamaDosFamiliares: false, mamaFamiliarOvario: false,
+      mamaFamiliarHombre: false, mamaVarianteConfirmada: 'no_se',
+      fracturaBajoImpacto: true, fracturaCaderaVertebra: false, fracturaCaderaProgenitor: true,
+      artritisReumatoideConfirmada: false, corticoidesTresMeses: true,
+      tabacoEstado: 'actual', cigarrillosDia: 16, tomaEstatina: false, tomaAntihipertensivo: true,
+      eventoCardiovascularConfirmado: false, enfDiabetes: true, migranaAura: true,
+      antecedentesSeleccionados: ['diabetes', 'migraña_aura'], objetivoReproductivo: 'evitar',
+    },
+    mrs: Object.fromEntries(['bochornos', 'cardiaco', 'sueno', 'musculo', 'animo', 'irritable', 'ansiedad', 'agotamiento', 'sexual', 'vejiga', 'sequedad'].map((k, i) => ['mrs_' + k, i % 5])),
+    dolor: { tiene: true, meses: 8, intensidad: 6, asociados: ['menstruacion'] },
+    profundos: { incontinencia: { frecuencia: 3, cantidad: 4, afectacion: 6 }, 'dolor-pelvico': { no_menstrual_int: 4 } },
+  },
+};

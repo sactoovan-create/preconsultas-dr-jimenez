@@ -1,10 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   CheckCircle2,
-  Clock3,
   Copy,
   FileText,
-  FileUp,
   Link2,
   LoaderCircle,
   LockKeyhole,
@@ -12,7 +10,7 @@ import {
 } from 'lucide-react';
 import { PacienteProvider } from '../core/PacienteContext.jsx';
 import PreConsulta from '../PreConsulta.jsx';
-import { guardarRespuesta } from '../core/respuestas.js';
+import { guardarRespuesta, modoAlmacenamiento } from '../core/respuestas.js';
 import { construirResumen } from '../core/resumenPaciente.js';
 import { bloqueoEnvioEstudios, eliminarEstudioPaciente } from '../core/estudios.js';
 import { instrumentosPara } from '../core/ruteoClinico.js';
@@ -104,6 +102,7 @@ export default function PortalPaciente() {
 
 function PortalInterno() {
   const [intentoEnvio] = useState(cargarIntentoEnvio);
+  const adjuntosRef = useRef(intentoEnvio.adjuntos || []);
   const tokenInicialRef = useRef(tokenContinuacionDesdeHash());
   const [tokenContinuacion, setTokenContinuacion] = useState(tokenInicialRef.current);
   const [restauracion, setRestauracion] = useState(() => ({
@@ -159,6 +158,7 @@ function PortalInterno() {
   }, [enviado]);
 
   const onEstudiosEstado = useCallback((estado) => {
+    adjuntosRef.current = estado.archivos;
     setEstudiosEstado(estado);
     guardarAdjuntosIntento(estado.archivos);
   }, []);
@@ -255,6 +255,7 @@ function PortalInterno() {
   };
 
   if (enviado) {
+    const local = modoAlmacenamiento() === 'local';
     const primerNombre = enviado.paciente?.nombre ? enviado.paciente.nombre.trim().split(/\s+/)[0] : '';
     const partesEstudios = [];
     const estudiosRecibidos = enviado.adjuntos?.length || 0;
@@ -275,10 +276,10 @@ function PortalInterno() {
           <img className="portal-logo" src="/marca/logo_maestro_web.svg" alt="dr. jiménez, ginecología" />
           <CheckCircle2 className="portal-fin-check" aria-hidden="true" />
           <h1>Gracias{primerNombre ? `, ${primerNombre}` : ''}.</h1>
-          <p>Tus respuestas llegaron al consultorio del Dr. Iván Jiménez Martínez.{estudiosTexto} Las revisará antes de tu consulta para dedicarle el tiempo a lo que más te importa.</p>
+          <p>{local ? 'Prueba guardada solo en este navegador. No se envió al consultorio ni a Supabase.' : <>Tus respuestas llegaron al consultorio del Dr. Iván Jiménez Martínez.{estudiosTexto} Las revisará antes de tu consulta para dedicarle el tiempo a lo que más te importa.</>}</p>
           <div className="portal-recibo" aria-label="Comprobante de envío">
             <div><span>Folio</span><b>{folio}</b></div>
-            <div><span>Enviado</span><b>{fechaEnvio}</b></div>
+            <div><span>{local ? 'Guardado local' : 'Enviado'}</span><b>{fechaEnvio}</b></div>
             <div><span>Archivos</span><b>{estudiosRecibidos}</b></div>
             {estudiosRecibidos > 0 && (
               <ul>
@@ -294,7 +295,7 @@ function PortalInterno() {
               <p>No esperes a que el consultorio revise el cuestionario. Busca atención médica de urgencia ahora.</p>
             </div>
           ) : (
-            <p className="portal-fin-nota">No necesitas volver a enviarlo. Ya puedes cerrar esta ventana.</p>
+            <p className="portal-fin-nota">{local ? 'Este comprobante es únicamente de prueba.' : 'No necesitas volver a enviarlo. Ya puedes cerrar esta ventana.'}</p>
           )}
           <button type="button" className="portal-imprimir-recibo" onClick={() => globalThis.print?.()}>
             <Printer aria-hidden="true" />Imprimir o guardar comprobante
@@ -325,17 +326,10 @@ function PortalInterno() {
         <div className="portal-hero-inner">
           <div className="portal-masthead">
             <img className="portal-hero-logo" src="/marca/logo_invertido_web.svg" alt="dr. jiménez, ginecología" />
-            <span>Preconsulta</span>
+            <a href="/privacidad" target="_blank" rel="noopener noreferrer"><LockKeyhole size={16} aria-hidden="true" />Aviso de privacidad</a>
           </div>
           <div className="portal-hero-copy">
-            <div className="portal-hero-eyebrow"><span className="portal-punto-dorado" />Tu espacio privado</div>
-            <h1 className="portal-hero-titulo">Antes de tu <em>consulta</em></h1>
-            <p className="portal-hero-sub">Responde con calma desde donde estés. Tus respuestas le ayudan al doctor a conocer cómo te sientes y a dedicar la consulta a lo que más te importa.</p>
-            <div className="portal-hero-datos" aria-label="Información del cuestionario">
-              <span><Clock3 aria-hidden="true" />8 a 12 minutos</span>
-              <span><LockKeyhole aria-hidden="true" />Información privada</span>
-              <span><FileUp aria-hidden="true" />Estudios al final</span>
-            </div>
+            <p className="portal-hero-titulo">Preconsulta ginecológica</p>
           </div>
         </div>
       </header>
@@ -370,11 +364,17 @@ function PortalInterno() {
                   folder={estudiosFolder}
                   habilitado={consentimientoAceptado}
                   bloqueado={enviando}
-                  archivosIniciales={intentoEnvio.adjuntos}
+                  archivosIniciales={adjuntosRef.current}
                   onEstadoCambio={onEstudiosEstado}
                 />
               )
-              : null
+              : <div className="pc-grupo">
+                  <p>El buzón de estudios no está disponible en esta vista. No se enviarán archivos.</p>
+                  <label className="pc-consentimiento">
+                    <input type="checkbox" checked={estudiosEstado.decision === 'no'} onChange={e => setEstudiosEstado(s => ({ ...s, decision: e.target.checked ? 'no' : null }))} />
+                    <span>No adjuntaré estudios en este envío.</span>
+                  </label>
+                </div>
           )}
           envioBloqueado={!!bloqueoEnvioEstudios(estudiosEstado)}
           envioBloqueadoMensaje={bloqueoEnvioEstudios(estudiosEstado)}

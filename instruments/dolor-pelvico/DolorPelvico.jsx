@@ -47,8 +47,8 @@ export default function DolorPelvico() {
 
   const [d, setD] = useInstrumento('dolor-pelvico', () => ({
     poblacion: (dem.edad && dem.edad < 18) ? 'adolescente' : 'adulta',
-    duracionMeses: (paciente.autoReporte && paciente.autoReporte.dolor && paciente.autoReporte.dolor.meses) ?? null,
-    intensidadEVA: (paciente.autoReporte && paciente.autoReporte.dolor && paciente.autoReporte.dolor.intensidad) ?? null, patron: 'ciclico',
+    duracionMeses: null,
+    intensidadEVA: null, patron: '',
     gin_ciclico: false, gin_dispareunia: false, gin_sangradoAnormal: false,
     uro_dolorVesical: false, uro_urgenciaDisuria: false, uro_polaquiuria: false,
     gi_cambiaDefecacion: false, gi_distension: false, gi_habitoAlterado: false,
@@ -104,7 +104,7 @@ export default function DolorPelvico() {
             <CampoNumero etiqueta="Duración" unidad="meses" valor={d.duracionMeses} onChange={(v) => set('duracionMeses', v)} min={0} max={240} />
             <CampoNumero etiqueta="Intensidad (escala visual analógica)" unidad="0 a 10" valor={d.intensidadEVA} onChange={(v) => set('intensidadEVA', v)} min={0} max={10} />
             <Selector etiqueta="Patrón temporal" valor={d.patron} onChange={(v) => set('patron', v)} full
-              opciones={[{ valor: 'ciclico', etiqueta: 'Cíclico' }, { valor: 'constante', etiqueta: 'Constante' }, { valor: 'intermitente', etiqueta: 'Intermitente' }]} />
+              opciones={[{ valor: '', etiqueta: 'Por confirmar' }, { valor: 'ciclico', etiqueta: 'Cíclico' }, { valor: 'constante', etiqueta: 'Constante' }, { valor: 'intermitente', etiqueta: 'Intermitente' }]} />
           </Seccion>
 
           <Seccion indice="III" titulo="Diagnóstico diferencial por sistemas" nota="Marca lo presente; el dolor suele tener más de una causa">

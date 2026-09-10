@@ -10,7 +10,7 @@ export const ID = 'genitourinario';
 export const TITULO = "Molestias vaginales y urinarias";
 export const FUENTE = "Escala de severidad de síntomas tipo MsFLASH (0 a 3) + lista del síntoma más molesto del consorcio COMMA + impacto en calidad de vida tipo DIVA (Day-to-Day Impact of Vaginal Aging); apoyado en el cuestionario de síntomas vulvovaginales (VSQ) y en el Cervantes-GSM (validado en español). No incluye el índice de salud vaginal (VHI), que lo mide el médico en la exploración.";
 
-function num(x) { const n = Number(x); return Number.isFinite(n) ? n : null; }
+function num(x) { if (x == null || x === '' || typeof x === 'boolean') return null; const n = Number(x); return Number.isFinite(n) ? n : null; }
 
 export function disparador(ar) {
   const mrs = (ar && ar.mrs) || {};
@@ -375,13 +375,11 @@ const NOMBRE = { sequedad: 'sequedad vaginal', comezon: 'comezón o irritación'
 
 export function evaluar(resp) {
   const r = resp || {};
-  const apl = SINTOMAS.filter((id) => { const x = num(r[id]); return x != null && x >= 0; });
-  if (!apl.length) return { instrumento: 'GSM', completo: false, resumen: null };
+  const apl = SINTOMAS.filter((id) => { const x = num(r[id]); return Number.isInteger(x) && x >= 0 && x <= 3; });
+  if (!apl.length) return { instrumento: 'Entrevista íntima local', version: 2, validado: false, completo: false, resumen: null };
 
-  const suma = apl.reduce((s, id) => s + num(r[id]), 0);
   const maxSev = Math.max(...apl.map((id) => num(r[id])));
   const nMod = apl.filter((id) => num(r[id]) >= 2).length;
-  const bandaSint = suma === 0 ? 'sin síntomas' : (maxSev === 1 ? 'leve' : ((maxSev === 3 || nMod >= 3) ? 'intensa' : 'moderada'));
 
   // Síntoma más molesto: la opción elegida guarda su valor; se mapea a su patrón.
   const mbsOpt = (PREGUNTAS.find((p) => p.id === 'mbs').opciones || []).find((o) => o.valor === num(r.mbs));
@@ -396,15 +394,14 @@ export function evaluar(resp) {
   }
 
   const IMP = ['impacto_dia', 'impacto_animo', 'impacto_intimidad'];
-  const impVals = IMP.map((id) => num(r[id])).filter((x) => x != null && x >= 0);
-  const media = impVals.length ? Math.round((impVals.reduce((a, b) => a + b, 0) / impVals.length) * 10) / 10 : null;
-  const bandaImp = media == null ? 'sin dato' : (media < 1 ? 'mínimo' : (media < 2 ? 'leve' : (media < 3 ? 'moderado' : 'alto')));
+  const impVals = IMP.map((id) => num(r[id])).filter((x) => Number.isInteger(x) && x >= 0 && x <= 4);
+  const impactoAlto = impVals.some(x => x >= 3);
 
   const evita = num(r.evita_intimidad);
   const evitaTxt = (evita != null && evita >= 1) ? ' Refiere evitar la intimidad por estas molestias.' : '';
-  const estado = (bandaSint === 'intensa' || bandaImp === 'alto') ? 'alerta'
-    : ((bandaSint === 'moderada' || bandaImp === 'moderado' || (mbsPat && mbsPat !== 'ninguna' && num(r[mbsPat]) >= 2)) ? 'aviso' : 'ok');
+  const estado = (maxSev >= 3 || impactoAlto) ? 'aviso' : 'neutro';
 
-  const resumen = `Salud íntima (síndrome genitourinario): lo que más le molesta, ${mbsTxt}. Síntomas ${bandaSint} (${nMod} de ${apl.length} moderados o intensos). Impacto en calidad de vida ${bandaImp}${media != null ? ` (${media} de 4)` : ''}.${evitaTxt} Medida basal; repetir a las 8-12 semanas.`;
-  return { instrumento: 'GSM', completo: true, resumen, estado };
+  const completo = SINTOMAS.every(id => apl.includes(id) || (id === 'dolor_sexo' && num(r[id]) === -1));
+  const resumen = `Salud íntima (entrevista local${completo ? '' : ', parcial'}): lo que más le molesta, ${mbsTxt}. ${nMod} de ${apl.length} síntomas contestados son moderados o intensos.${impactoAlto ? ' Refiere impacto importante en al menos un área de su vida.' : ''}${evitaTxt} No confirma síndrome genitourinario ni es una puntuación DIVA/VSQ.`;
+  return { instrumento: 'Entrevista íntima local', version: 2, validado: false, completo, resumen, estado };
 }

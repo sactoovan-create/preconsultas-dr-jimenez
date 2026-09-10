@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { pacienteDesdeRespuesta, ruteoDesdeRespuesta } from './precarga.js';
+import { precargaInstrumento, combinarPrecarga } from './precargaClinica.js';
 import {
   nubeActiva, cargarTrabajoNube, guardarTrabajoNube, borrarTrabajoNube, errorTrabajo,
   leerTrabajoLocal, escribirTrabajoLocal, borrarTrabajoLocal, claveTrabajoActiva,
@@ -462,10 +463,10 @@ export function useInstrumento(id, factory) {
   const ctx = usePaciente();
   const fabrica = useRef(factory);
   fabrica.current = factory;
-  const inicial = useMemo(() => fabrica.current(), [id, ctx.instanciaTrabajo, ctx.revisionRestauracion]);
-  const d = ctx.datosInstrumentos[id] ?? inicial;
+  const inicial = useMemo(() => combinarPrecarga(fabrica.current(), precargaInstrumento(id, ctx.paciente).valores), [id, ctx.instanciaTrabajo, ctx.revisionRestauracion, ctx.paciente.autoReporte]);
+  const d = useMemo(() => combinarPrecarga(inicial, {}, ctx.datosInstrumentos[id]), [inicial, ctx.datosInstrumentos[id]]);
   const setDatos = ctx.setDatosInstrumento;
   const setD = useCallback(upd => setDatos(id, anterior => typeof upd === 'function'
-    ? upd(anterior ?? inicial) : upd), [id, inicial, setDatos]);
+    ? upd(combinarPrecarga(inicial, {}, anterior)) : upd), [id, inicial, setDatos]);
   return [d, setD];
 }
