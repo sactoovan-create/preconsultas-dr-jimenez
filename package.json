@@ -5,7 +5,10 @@
   "type": "module",
   "description": "Suite de instrumentos clínicos de ginecología. Motores puros verificables.",
   "scripts": {
-    "test": "node tests/suite.mjs && node tests/ruteo.mjs && node tests/precarga.mjs && node tests/agenda.mjs && node tests/correcciones.mjs && node tests/profundos.mjs && node tests/preconsulta-flow.mjs && node tests/estudios.mjs && node tests/borradores.mjs && node tests/clinical-knowledge.mjs && node tests/atribucion.mjs",
+    "test": "node tests/suite.mjs && node tests/ruteo.mjs && node tests/precarga.mjs && node tests/agenda.mjs && node tests/correcciones.mjs && node tests/profundos.mjs && node tests/preconsulta-flow.mjs && node tests/estudios.mjs && node tests/borradores.mjs && node tests/clinical-knowledge.mjs && node tests/atribucion.mjs && node tests/lectura-respuesta.mjs && node tests/lectura-estudios.mjs && node tests/jornada.mjs && node tests/trabajo-contexto.mjs",
+    "test:panel": "node tests/panel-browser.mjs && node tests/panel-errors-browser.mjs && node tests/panel-auth-browser.mjs",
+    "test:contexto": "node tests/trabajo-contexto-browser.mjs",
+    "test:contexto:local": "TRABAJO_QA_LOCAL=1 node tests/trabajo-contexto-browser.mjs",
     "knowledge:build": "node scripts/build-clinical-knowledge.mjs",
     "knowledge:check": "node scripts/build-clinical-knowledge.mjs --check",
     "dev": "vite",

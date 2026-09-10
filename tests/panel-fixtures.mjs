@@ -1,0 +1,41 @@
+// Synthetic records only. No real patient, contact, attachment or storage path.
+export const respuestasPrueba = [
+  {
+    id: 'qa-panel-01', version: 3, creado: '2026-09-09T15:30:00Z',
+    paciente: { nombre: 'Paciente de prueba · Álvarez', edad: 47, telefono: '0000000001', correo: 'prueba@example.invalid' },
+    consentimiento: true,
+    autoReporte: {
+      hc: { formularioVersion: '2026.09.3', entrevistaVersion: '1.0.0',
+        motivo: 'Quiero revisar el sangrado que comenzó hace tres meses y saber por qué volvió después del tratamiento.',
+        temasConsulta: ['sangrado', 'dolor'], objetivoVisita: 'Entender mis resultados',
+        prioridadConsulta: 'Poder hacer mis actividades sin dolor.', etapaReproductiva: 'menstrua_irregular',
+        medicamentos: 'Medicamento de prueba, anotado por la paciente.', alergias: 'Penicilina (dato ficticio).',
+        enfDiabetes: false, enfHipertension: true, partos: 0, cesareas: 2,
+        senalesUrgencia: ['sangrado_abundante'], sintomasMama: ['dolor'],
+        campoAntiguoDesconocido: 'Conservar también el dato histórico.',
+      },
+      dolor: { tiene: true, intensidad: null, meses: 3, inicio: 'gradual', localizacion: 'Centro del abdomen bajo', asociados: ['menstruacion', 'evacuar'] },
+      mrs: { mrs_bochornos: 3 },
+      profundos: { incontinencia: { frecuencia: 2, cantidad: 2, afectacion: 4, cuando: ['sin_razon'] } },
+    },
+    alertaSeguridad: { urgente: true, senales: ['sangrado_abundante'] },
+    ruteoClinico: { version: 4, instrumentosSugeridos: [
+      { instrumento: 'hemorragia', nombre: 'Hemorragia uterina anormal', prioridad: 'alta', motivo: 'Sangrado reportado por la paciente.', accionSugerida: 'revisar_en_consulta' },
+      { instrumento: 'dolor-pelvico', nombre: 'Dolor pélvico', prioridad: 'media', motivo: 'Dolor referido desde hace tres meses.', accionSugerida: 'completar_datos' },
+    ], banderas: [] },
+    estudiosFolder: 'qa-folder',
+    adjuntos: [{ nombre: 'Laboratorio de prueba.pdf', ruta: 'qa-folder/lab.pdf', bytes: 120000, estado: 'recibido' }],
+    estudiosDeclaracion: 'adjunto_estudios',
+  },
+  { id: 'qa-panel-02', version: 1, creado: '2026-09-08T10:00:00Z',
+    paciente: { nombre: 'Paciente de prueba · Benítez', edad: 32, telefono: '0000000002' },
+    autoReporte: { hc: { motivo: 'Consulta de seguimiento', medicamentos: 'no_se', alergias: false, partos: 0 }, dolor: {}, mrs: {} },
+  },
+  ...Array.from({ length: 32 }, (_, i) => ({
+    id: 'qa-panel-' + (i + 3).toString().padStart(2, '0'),
+    creado: new Date(Date.UTC(2026, 8, 7, 15, 30 - i)).toISOString(),
+    paciente: { nombre: 'Paciente sintética ' + String(i + 3).padStart(2, '0'), edad: 30 + i },
+    autoReporte: { hc: { motivo: 'Revisión programada. Registro de prueba ' + (i + 3), temasConsulta: ['control'], entrevistaVersion: '1.0.0' } },
+    estudiosDeclaracion: 'no_los_tengo_ahora',
+  })),
+];

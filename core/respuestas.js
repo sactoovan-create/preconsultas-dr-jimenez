@@ -176,5 +176,6 @@ export async function iniciarSesion(correo, clave) {
 export async function cerrarSesion() {
   if (!hayBackend()) return;
   const sb = await cliente();
-  await sb.auth.signOut();
+  const { error } = await sb.auth.signOut();
+  if (error) throw error;
 }

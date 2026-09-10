@@ -1,98 +1,25 @@
-/* Contenedor y navegación del módulo. Hereda los tokens de designTokens.css. */
-
-.instrumentos-layout {
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  min-height: 100%;
-  background: radial-gradient(120% 80% at 50% 0%, var(--crema-papel), var(--crema) 64%);
+.consultorio-shell { min-height:100dvh; background:#fff; color:#263d32; }
+.consultorio-shell * { letter-spacing:0; }
+.consultorio-chrome { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:10px 32px; border-bottom:1px solid #dce3df; background:#fff; }
+.consultorio-logo { width:142px; height:58px; object-fit:contain; object-position:left center; }
+.consultorio-nav { display:flex; align-items:center; gap:26px; }
+.consultorio-nav button { display:flex; align-items:center; gap:8px; min-height:52px; border:0; border-bottom:3px solid transparent; background:transparent; color:#5a6b60; font:600 14px/1.4 var(--sans); padding:10px 0; cursor:pointer; }
+.consultorio-nav button[aria-current=page] { color:#23523c; border-bottom-color:#23523c; }
+.consultorio-nav button:focus-visible { outline:3px solid #917431; outline-offset:3px; }
+.instrumentos-contenido { min-width:0; }
+.consulta-instrumento { margin-top:18px; border-top:1px solid #dce3df; }
+.consulta-instrumento .inst-cab { background:#f5f7f5; color:#263d32; padding:20px 24px; min-height:0; border-bottom:1px solid #dce3df; }
+.consulta-instrumento .inst-cab h1 { font:600 24px/1.3 var(--sans); color:#263d32; }
+.consulta-instrumento .inst-cab small { color:#596c60; font:400 13px/1.5 var(--sans); }
+.consulta-instrumento .inst-mono { display:none; }
+.consulta-instrumento .inst-eyebrow { font:600 11px/1.5 var(--sans); color:#6e613f; }
+.consulta-instrumento .inst { min-height:0; }
+@media(max-width:650px) {
+ .consultorio-chrome { padding:8px 16px 0; gap:6px; flex-wrap:wrap; }
+ .consultorio-logo { width:122px; height:44px; }
+ .consultorio-nav { width:100%; gap:16px; justify-content:space-between; }
+ .consultorio-nav button { min-height:48px; font-size:13px; gap:6px; }
+ .consulta-instrumento .inst-cab { padding:16px; }
+ .consulta-instrumento .inst-cab h1 { font-size:21px; }
 }
-
-/* Navegación lateral — verde profundo con velo dorado y filo hairline. */
-.instrumentos-nav {
-  background:
-    radial-gradient(120% 60% at 50% -8%, rgba(168,139,92,.10), transparent 60%),
-    linear-gradient(180deg, #24432F 0%, #1F3A2E 46%, #16291F 100%);
-  color: var(--crema-papel);
-  padding: 26px 18px;
-  overflow-y: auto;
-  border-right: 1px solid rgba(168,139,92,.18);
-}
-.nav-marca { margin-bottom: 24px; padding: 4px 2px 18px; position: relative; }
-/* Filete dorado bajo la marca: sensación de membrete. */
-.nav-marca::after {
-  content: ''; position: absolute; left: 2px; right: 2px; bottom: 0; height: 1px;
-  background: linear-gradient(90deg, rgba(168,139,92,.5), transparent 78%);
-}
-.nav-logo { width: 100%; max-width: 212px; height: auto; display: block; margin-bottom: 12px; }
-.nav-eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 9px; font-weight: 800; letter-spacing: .24em; text-transform: uppercase; color: var(--dorado);
-}
-.nav-eyebrow::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--dorado); flex-shrink: 0; }
-
-.nav-lista { list-style: none; display: flex; flex-direction: column; gap: 4px; }
-
-.nav-resumen {
-  width: 100%; text-align: left; cursor: pointer; margin-bottom: 14px;
-  background: rgba(168,139,92,.16); border: 1px solid rgba(168,139,92,.5);
-  border-radius: 12px; padding: 12px 14px; color: var(--crema-papel);
-  font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: .02em;
-  transition: background .14s, box-shadow .14s, transform .14s;
-}
-.nav-resumen:hover { background: rgba(168,139,92,.26); transform: translateY(-1px); box-shadow: 0 6px 16px -8px rgba(0,0,0,.4); }
-.nav-resumen.activo { background: var(--dorado); color: var(--verde-tinta); }
-
-.nav-preconsulta {
-  width: 100%; text-align: left; cursor: pointer; margin-bottom: 14px; margin-top: -8px;
-  background: rgba(241,234,219,.08); border: 1px solid rgba(241,234,219,.28);
-  border-radius: 12px; padding: 11px 14px; color: var(--crema-papel);
-  font-family: var(--sans); font-size: 12.5px; font-weight: 600;
-  transition: background .14s;
-}
-.nav-preconsulta:hover { background: rgba(241,234,219,.16); }
-.nav-preconsulta.activo { background: var(--crema-papel); color: var(--verde-tinta); }
-.nav-item {
-  width: 100%; text-align: left; cursor: pointer;
-  background: transparent; border: none; border-radius: 10px;
-  padding: 12px 13px; color: rgba(246,241,230,.78);
-  display: flex; flex-direction: column; gap: 3px;
-  transition: background .14s, color .14s;
-  position: relative;
-}
-.nav-item:hover { background: rgba(246,241,230,.07); color: var(--crema-papel); }
-.nav-item.activo { background: rgba(246,241,230,.12); color: var(--crema-papel); }
-.nav-item.activo::before {
-  content: ''; position: absolute; left: 0; top: 12px; bottom: 12px; width: 3px;
-  background: var(--dorado); border-radius: 2px;
-}
-.nav-item-titulo { font-size: 13.5px; font-weight: 700; }
-.nav-item-desc { font-size: 11px; line-height: 1.35; color: rgba(246,241,230,.55); }
-.nav-item.activo .nav-item-desc { color: rgba(246,241,230,.72); }
-.nav-badge {
-  align-self: flex-start; margin-top: 5px;
-  font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
-  color: var(--dorado); border: 1px solid rgba(168,139,92,.5);
-  border-radius: 20px; padding: 1px 8px;
-}
-
-/* Área de contenido */
-.instrumentos-contenido { padding: 0; overflow-y: auto; }
-
-@media (max-width: 820px) {
-  .instrumentos-layout { grid-template-columns: 1fr; }
-  .instrumentos-nav { padding: 16px; }
-  .nav-lista { flex-direction: row; overflow-x: auto; }
-  .nav-item { min-width: 220px; }
-}
-
-/* Indicador de guardado en la navegación. El trabajo se guarda solo. */
-.nav-guardado { margin: 4px 0 14px; padding: 10px 12px; background: rgba(241,234,219,.06); border: 1px solid rgba(241,234,219,.14); border-radius: 10px; }
-.nav-guardado-estado { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: rgba(241,234,219,.72); line-height: 1.3; }
-.nav-guardado-punto { width: 7px; height: 7px; border-radius: 50%; background: #6FBF8B; flex-shrink: 0; box-shadow: 0 0 0 3px rgba(111,191,139,.18); }
-.nav-guardar { margin-top: 9px; width: 100%; font-family: var(--sans, 'Inter', sans-serif); font-size: 11.5px; font-weight: 600; cursor: pointer; background: transparent; color: var(--crema, #F1EADB); border: 1px solid rgba(241,234,219,.3); border-radius: 999px; padding: 7px 12px; }
-.nav-guardar:hover { background: rgba(241,234,219,.1); }
-
-/* Estado de guardado: color según destino (nube, guardando, este equipo). */
-.nav-guardado-estado.nube .nav-guardado-punto { background: #6FBF8B; box-shadow: 0 0 0 3px rgba(111,191,139,.18); }
-.nav-guardado-estado.guardando .nav-guardado-punto { background: var(--dorado, #A88B5C); box-shadow: 0 0 0 3px rgba(168,139,92,.2); }
-.nav-guardado-estado.local .nav-guardado-punto { background: var(--dorado, #A88B5C); }
+@media print { .consultorio-chrome { display:none!important; } }

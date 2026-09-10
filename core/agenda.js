@@ -27,8 +27,14 @@ export function hoyLocal(d = new Date()) {
  * Citas de hoy publicadas por el expediente. Cada una: { inicio, fin, nombre,
  * telefono, cita_id, estado }. Vacío si no hay base o no hay tabla.
  */
-export async function agendaDeHoy(fecha = hoyLocal()) {
-  if (!hayBackend()) return [];
+export async function agendaDeHoy(fecha = hoyLocal(), { estricto = false } = {}) {
+  if (!hayBackend()) {
+    if (import.meta.env?.DEV && typeof window !== 'undefined' && ['127.0.0.1', 'localhost'].includes(window.location.hostname)) {
+      try { return JSON.parse(localStorage.getItem('drj_qa_agenda') || '[]').filter(c => c.fecha === fecha); }
+      catch (_) { return []; }
+    }
+    return [];
+  }
   try {
     const sb = await clienteSupabase();
     const { data, error } = await sb
@@ -36,9 +42,10 @@ export async function agendaDeHoy(fecha = hoyLocal()) {
       .select('*')
       .eq('fecha', fecha)
       .order('inicio', { ascending: true });
-    if (error) return []; // tabla ausente o sin permiso: el panel sigue sin agenda
+    if (error) throw error;
     return data || [];
-  } catch (_) {
+  } catch (error) {
+    if (estricto) throw error;
     return [];
   }
 }
@@ -63,8 +70,8 @@ export function cruzarAgenda(agenda, respuestas) {
   resp.forEach((r, i) => {
     const tel = normalizarTelefono(r.paciente && r.paciente.telefono);
     const nom = normalizarNombre(r.paciente && r.paciente.nombre);
-    if (tel && !porTelefono.has(tel)) porTelefono.set(tel, i);
-    if (nom && !porNombre.has(nom)) porNombre.set(nom, i);
+    if (tel) porTelefono.set(tel, [...(porTelefono.get(tel) || []), i]);
+    if (nom) porNombre.set(nom, [...(porNombre.get(nom) || []), i]);
   });
 
   const tomar = (indice) => {
@@ -76,10 +83,30 @@ export function cruzarAgenda(agenda, respuestas) {
   const agendadas = citas.map((c) => {
     const tel = normalizarTelefono(c.telefono);
     const nom = normalizarNombre(c.nombre);
-    let idx = tel && porTelefono.has(tel) ? porTelefono.get(tel) : null;
-    if ((idx == null || usadas.has(idx)) && nom && porNombre.has(nom)) idx = porNombre.get(nom);
+    let idx = null, criterio = null, advertencia = null;
+    const telefonos = (porTelefono.get(tel) || []).filter(i => !usadas.has(i));
+    const nombresDistintos = new Set(telefonos.map(i => normalizarNombre(resp[i].paciente?.nombre)));
+    if (telefonos.length) {
+      idx = nombresDistintos.size > 1
+        ? telefonos.find(i => nom && normalizarNombre(resp[i].paciente?.nombre) === nom)
+        : telefonos[0];
+      if (idx == null) advertencia = 'Teléfono compartido; no se puede asociar automáticamente.';
+      else {
+        criterio = 'teléfono';
+        if (nom && normalizarNombre(resp[idx].paciente?.nombre) !== nom) advertencia = 'El nombre es distinto; confirma la identidad.';
+      }
+    }
+    if (idx == null && !advertencia && nom) {
+      const nombres = (porNombre.get(nom) || []).filter(i => !usadas.has(i));
+      const compatibles = nombres.filter(i => {
+        const otroTel = normalizarTelefono(resp[i].paciente?.telefono);
+        return !tel || !otroTel || tel === otroTel;
+      });
+      if (compatibles.length) { idx = compatibles[0]; criterio = 'nombre'; advertencia = 'Coincidencia por nombre; confirma la identidad.'; }
+      else if (nombres.length) advertencia = 'Mismo nombre con teléfono diferente; sin asociación automática.';
+    }
     const respuesta = tomar(idx);
-    return { cita: c, respuesta, contesto: !!respuesta };
+    return { cita: c, respuesta, contesto: !!respuesta, criterio, advertencia };
   });
 
   const sinAgendar = resp.filter((_, i) => !usadas.has(i));
