@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="es"><meta charset="utf-8"><title>Prueba local del panel</title>
+<body><h1>Datos ficticios para la auditoría del panel</h1><p>No conecta con Supabase ni modifica expedientes.</p><button id="cargar">Abrir panel con datos ficticios</button>
+<script type="module">
+import { datosJornada } from './jornada-fixtures.mjs';
+import { hoyLocal } from '../core/agenda.js';
+document.getElementById('cargar').onclick = () => {
+  if (!import.meta.env.DEV || import.meta.env.VITE_SUPABASE_URL || !['127.0.0.1', 'localhost'].includes(location.hostname)) throw new Error('Solo permitido en servidor local sin Supabase.');
+  const datos = datosJornada(hoyLocal());
+  const existentes = JSON.parse(localStorage.getItem('drj_respuestas_v1') || '[]');
+  localStorage.setItem('drj_respuestas_v1', JSON.stringify([...datos.respuestas, ...existentes.filter(r => !String(r.id).startsWith('qa-panel-'))]));
+  localStorage.setItem('drj_qa_agenda', JSON.stringify(datos.agenda));
+  for (const [id, t] of Object.entries(datos.trabajos)) {
+    if (!localStorage.getItem('drj_trabajo_' + id)) localStorage.setItem('drj_trabajo_' + id, JSON.stringify(t));
+  }
+  location.href = '/consultorio';
+};
+</script></body></html>
