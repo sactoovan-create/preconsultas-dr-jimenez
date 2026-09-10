@@ -47,9 +47,8 @@ t('el portal ya no ofrece embarazo o posparto como motivo',
 t('un tema obstétrico heredado no abre plan reproductivo',
   !pasosPara({ ...base, hc: { ...base.hc, temasConsulta: ['embarazo'] } })
     .some((p) => p.id === 'plan-reproductivo'));
-t('elegir temas no hace retroceder el progreso del paso motivo',
-  porcentajePaso('motivo', pasosPara({ ...base, hc: { ...base.hc, temasConsulta: ['control'] } }))
-  === porcentajePaso('motivo', pasosPara({ ...base, hc: { ...base.hc, temasConsulta: ['sangrado', 'dolor', 'climaterio', 'mama'] } })));
+t('progreso representa la ruta activa y no envío confirmado',
+  porcentajePaso('envio', pasosPara(base)) === 95 && porcentajePaso('inicio', pasosPara(base)) === 0);
 const rutaClimaterioSimple = pasosPara({
   ...base,
   hc: { ...base.hc, temasConsulta: ['climaterio'] },
@@ -60,9 +59,9 @@ const rutaClimaterioProfunda = pasosPara({
   hc: { ...base.hc, temasConsulta: ['climaterio'] },
   mrs: { mrs_sequedad: 4 },
 });
-t('abrir preguntas específicas no hace retroceder el progreso en climaterio',
+t('abrir preguntas específicas conserva el módulo de climaterio',
   rutaClimaterioProfunda.some((p) => p.id === 'profundizaciones')
-  && porcentajePaso('climaterio', rutaClimaterioSimple) === porcentajePaso('climaterio', rutaClimaterioProfunda));
+  && rutaClimaterioProfunda.some(p => p.id === 'climaterio'));
 const rutaSeparada = expandirPasosProfundos(rutaClimaterioProfunda, [
   { id: 'genitourinario', titulo: 'Salud genitourinaria' },
   { id: 'salud-sexual', titulo: 'Salud sexual' },
@@ -71,8 +70,8 @@ t('cada escala profunda ocupa una etapa independiente',
   rutaSeparada.some((p) => p.id === 'profundizacion:genitourinario')
   && rutaSeparada.some((p) => p.id === 'profundizacion:salud-sexual')
   && !rutaSeparada.some((p) => p.id === 'profundizaciones'));
-t('las escalas profundas comparten un avance fijo sin mover etapas previas',
-  porcentajePaso('profundizacion:salud-sexual') === 72);
+t('cada profundización avanza dentro de la ruta real',
+  porcentajePaso('profundizacion:salud-sexual', rutaSeparada) > porcentajePaso('profundizacion:genitourinario', rutaSeparada));
 t('salud general e historia viven en pasos separados y consecutivos',
   rutaClimaterioSimple.findIndex((p) => p.id === 'historia')
   === rutaClimaterioSimple.findIndex((p) => p.id === 'antecedentes') + 1);

@@ -1,16 +1,13 @@
 /**
- * Profundización de SALUD SEXUAL. Instrumento: Índice de Función Sexual Femenina,
- * versión breve de 6 reactivos (FSFI-6, Isidori 2010; redacción de la adaptación
- * española del FSFI). Total 2-30; corte <= 19 sugiere posible dificultad sexual
- * (sensibilidad 0.96, especificidad 0.91). Orientativo, no diagnóstico. Tema
- * sensible: encuadre cálido, privado; se contesta aunque no haya actividad reciente.
+ * Entrevista local de salud sexual. No equivale a FSFI ni FSFI-6 validado.
+ * Se conserva el contrato de respuestas, sin aplicar un corte a esta adaptación.
  */
 
 export const ID = 'salud-sexual';
 export const TITULO = "Tu vida sexual: una mirada breve y privada";
-export const FUENTE = "Índice de Función Sexual Femenina, versión breve de 6 reactivos (FSFI-6, Isidori 2010). Redacción tomada de la adaptación transcultural validada al español del FSFI (Rosen 2000, versión española). Se cita al médico como \"FSFI-6\"; la paciente nunca ve la sigla.";
+export const FUENTE = 'Entrevista local de función sexual, con dominios del FSFI como referencia. No es una versión española autorizada/verificada de FSFI-6 y no se aplica un punto de corte diagnóstico.';
 
-function num(x) { const n = Number(x); return Number.isFinite(n) ? n : null; }
+function num(x) { if (x == null || x === '' || typeof x === 'boolean') return null; const n = Number(x); return Number.isFinite(n) ? n : null; }
 
 export function disparador(ar) {
   const mrs = (ar && ar.mrs) || {};
@@ -295,22 +292,19 @@ const DOM = { ss_deseo: 'deseo', ss_excitacion: 'excitación', ss_lubricacion: '
 export function evaluar(resp) {
   const r = resp || {};
   const v = {}; ITEMS.forEach((id) => { v[id] = num(r[id]); });
-  const completo = ITEMS.every((id) => v[id] != null);
-  if (!completo) return { instrumento: 'FSFI-6', completo: false, resumen: null };
+  const completo = ITEMS.every(id => Number.isInteger(v[id]) && v[id] >= (DEPENDEN.includes(id) ? 0 : 1) && v[id] <= 5);
+  if (!completo) return { instrumento: 'Entrevista sexual local', version: 2, validado: false, completo: false, resumen: null };
 
-  const total = ITEMS.reduce((s, id) => s + v[id], 0);
   const sinActividad = DEPENDEN.filter((id) => v[id] === 0).length;
   // Área más afectada: se excluyen los reactivos con 0 por "sin actividad" (no son síntoma).
   const candidatos = ITEMS.filter((id) => !(DEPENDEN.includes(id) && v[id] === 0));
   const minVal = Math.min(...candidatos.map((id) => v[id]));
   const dominios = candidatos.filter((id) => v[id] === minVal).map((id) => DOM[id]);
 
-  const positivo = total <= 19;
-  const cautela = sinActividad >= 3 && positivo;
-  const banda = cautela
-    ? 'tamizaje positivo, probablemente influido por poca actividad sexual reciente (interpretar con cautela)'
-    : (positivo ? 'tamizaje positivo: posible dificultad sexual' : 'por arriba del punto de corte');
+  const positivo = null;
+  const cautela = sinActividad > 0;
+  const banda = 'Descripción por dominios; no se aplica corte de FSFI-6 ni se diagnostica disfunción.';
   const actividad = sinActividad === 0 ? '' : ` No reportó actividad en ${sinActividad} de 4 reactivos que dependen de ella.`;
-  const resumen = `Salud sexual (tamizaje breve de 6 reactivos): ${total} de 30. ${banda}. Área más afectada: ${dominios.join(', ')} (${minVal}/5).${actividad} Basal para repetir a las 8-12 semanas.`;
-  return { instrumento: 'FSFI-6', completo: true, total, positivo, cautela, dominios, resumen, estado: positivo ? 'aviso' : 'ok' };
+  const resumen = `Salud sexual (entrevista local). ${banda} Dominios con menor puntuación reportada: ${dominios.join(', ')} (${minVal}/5).${actividad}${cautela ? ' Sin actividad no significa disfunción; interpretar con cautela y explorar el malestar personal.' : ' Explorar malestar personal y contexto.'}`;
+  return { instrumento: 'Entrevista sexual local', version: 2, validado: false, completo: true, total: null, positivo, cautela, dominios, resumen, estado: 'neutro' };
 }

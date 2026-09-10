@@ -36,7 +36,7 @@ export const CONDICIONES = [
   { id: 'tabacoMenor35', grupo: 'Cardiovascular', nombre: 'Tabaquismo, menor de treinta y cinco años', cat: C(2, 1, 1, 1, 1, 1) },
   { id: 'tabaco35menos', grupo: 'Cardiovascular', nombre: 'Tabaquismo, treinta y cinco años o más, menos de quince cigarrillos al día', cat: C(3, 1, 1, 1, 1, 1) },
   { id: 'tabaco35mas', grupo: 'Cardiovascular', nombre: 'Tabaquismo, treinta y cinco años o más, quince cigarrillos o más al día', cat: C(4, 1, 1, 1, 1, 1) },
-  { id: 'tabacoEdadDesconocida', grupo: 'Cardiovascular', nombre: 'Tabaquismo con edad no capturada: registra la edad para clasificar el riesgo', cat: C(3, 1, 1, 1, 1, 1) },
+  { id: 'tabacoEdadDesconocida', grupo: 'Cardiovascular', nombre: 'Tabaquismo con edad o cantidad pendiente: completar antes de elegir anticoncepción combinada', cat: C(3, 1, 1, 1, 1, 1) },
   { id: 'htaControlada', grupo: 'Cardiovascular', nombre: 'Hipertensión controlada con tratamiento', cat: C(3, 1, 2, 1, 1, 1) },
   { id: 'htaModerada', grupo: 'Cardiovascular', nombre: 'Presión de ciento cuarenta a ciento cincuenta y nueve sobre noventa a noventa y nueve', cat: C(3, 1, 2, 1, 1, 1) },
   { id: 'htaSevera', grupo: 'Cardiovascular', nombre: 'Presión de ciento sesenta sobre cien o más', cat: C(4, 2, 3, 2, 2, 1) },
@@ -92,7 +92,7 @@ export function condicionesAutomaticas(paciente, seleccion) {
     // Sin edad no se puede clasificar por el umbral de treinta y cinco años. No se
     // asume "menor de treinta y cinco": se marca con cautela y se pide la edad,
     // para no despejar en falso a una posible fumadora de mayor riesgo.
-    if (!v(edad)) auto.tabacoEdadDesconocida = true;
+    if (!v(edad) || (edad >= 35 && typeof seleccion.fumaIntenso !== 'boolean')) auto.tabacoEdadDesconocida = true;
     else if (edad >= 35) auto[seleccion.fumaIntenso ? 'tabaco35mas' : 'tabaco35menos'] = true;
     else auto.tabacoMenor35 = true;
   }

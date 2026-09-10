@@ -14,7 +14,7 @@
 
 import { MRS_IDS } from './preconsultaFlow.js';
 
-export const RUTEO_VERSION = 3;
+export const RUTEO_VERSION = 5;
 
 // Catálogo de instrumentos (ids = carpetas en instruments/).
 const NOMBRE = {
@@ -67,7 +67,7 @@ export function instrumentosPara(pre) {
   const total = resultadoMrs.total;
   const temas = Array.isArray(hc.temasConsulta) ? hc.temasConsulta : [];
   const etapa = hc.etapaReproductiva || '';
-  const posmenopausia = etapa === 'menopausia';
+  const posmenopausia = etapa === 'menopausia' || hc.causaAusenciaRegla === 'menopausia_confirmada';
   const enfermedadCardiovascular = hc.enfCorazon === true;
 
   const sug = [];
@@ -107,6 +107,10 @@ export function instrumentosPara(pre) {
 
   // ---------------- Capa 2: por respuestas ----------------
 
+  if (temas.includes('metabolico')) {
+    add('cardiometabolico', 'media', 'Solicita revisión metabólica: verificar antecedentes, mediciones y estudios en consulta.', ['motivo'], {}, 'completar_datos');
+  }
+
   // Menopausia (síntomas vasomotores / MRS). Sintomática pesa más que la edad sola.
   const sintomatica = (total != null && total >= 5) || num(mrs.mrs_bochornos) >= 2;
   const contextoClimaterio = temas.includes('climaterio')
@@ -141,7 +145,7 @@ export function instrumentosPara(pre) {
 
   // Cardiometabólico por antecedentes o fármaco metabólico. El seguimiento
   // longitudinal de composición corporal vive solo en el ERP/expediente.
-  const meds = txt(hc.medicamentos);
+  const meds = txt([hc.medicamentos, hc.metabolicoTratamiento].filter(Boolean).join(' '));
   const enMetabolico = RE_METABOLICO.test(meds);
   if (enfermedadCardiovascular) {
     add(
@@ -175,6 +179,8 @@ export function instrumentosPara(pre) {
   }
 
   // Ósea por factor de riesgo
+  if (temas.includes('osea')) add('osea', 'media', 'La paciente solicita revisar su salud ósea.', ['motivo_consulta'], {}, 'completar_datos');
+  if (hc.fracturaBajoImpacto === true) add('osea', 'alta', 'Fractura de bajo impacto reportada: confirmar mecanismo, sitio y fecha.', ['antecedentes'], {}, 'completar_datos');
   if (hc.famOsteoporosis || (posmenopausia && hc.fuma)) {
     add('osea', 'media', 'Posmenopausia con factor de riesgo óseo reportado.', ['etapa_reproductiva', 'antecedentes'], {}, 'completar_datos');
   }

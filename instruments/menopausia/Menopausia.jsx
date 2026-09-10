@@ -33,7 +33,6 @@ export default function Menopausia() {
     tipo: '',
     tabaquismo: false, hipertension: false, sindromeMetabolico: false, riesgoTev: false,
     gsmSintomas: false, prefiereNoHormonal: false,
-    ...((paciente.autoReporte && paciente.autoReporte.mrs) || {}),
   }));
   const set = (k, val) => setD((p) => ({ ...p, [k]: val }));
   // Las contraindicaciones se guardan en el paciente compartido, no en el estado local.
@@ -43,14 +42,14 @@ export default function Menopausia() {
   const r = useMemo(() => evaluarMenopausia(paciente, d), [paciente, d]);
 
   useEffect(() => {
-    const evaluado = r.mrs.total > 0 || !!d.tipo || r.candidatura.tipo === 'contraindicada';
+    const evaluado = r.mrs.completo || !!d.tipo || r.candidatura.tipo === 'contraindicada';
     const mapa = { mínima: 'ok', leve: 'ok', moderada: 'aviso', severa: 'alerta' };
     publicarResumen('menopausia', {
       evaluado,
       estado: mapa[r.mrs.sevTotal] || 'neutro',
       titular: `Síntomas: intensidad ${r.mrs.sevTotal}`,
       detalle: r.candidatura.recomienda ? 'Candidata a terapia hormonal' : r.candidatura.titulo,
-      metrica: r.mrs.total > 0 ? { clave: 'mrs', nombre: 'Síntomas de menopausia', valor: r.mrs.total, unidad: 'de 44', min: 0, max: 44, mejorAbajo: true } : null,
+      metrica: r.mrs.completo ? { clave: 'mrs', nombre: 'Síntomas de menopausia', valor: r.mrs.total, unidad: 'de 44', min: 0, max: 44, mejorAbajo: true } : null,
     });
   }, [r, d.tipo, publicarResumen]);
   const setDem = (c, val) => actualizar('demografia', c, val);
@@ -134,7 +133,7 @@ export default function Menopausia() {
           <div className="inst-bloque">
             <h3>Escala de síntomas</h3>
             <div className="men-total">
-              <div className="men-total-n">{r.mrs.total}<span>/44</span></div>
+              <div className="men-total-n">{r.mrs.total ?? 'Pendiente'}<span>{r.mrs.completo ? '/44' : ` ${r.mrs.respondidos}/11 respuestas`}</span></div>
               <div className={'inst-pill ' + (SEV_PILL[r.mrs.sevTotal] || '')}>Intensidad {r.mrs.sevTotal}</div>
             </div>
             <div className="men-dominios-res">
@@ -149,7 +148,7 @@ export default function Menopausia() {
 
           <div className="inst-bloque">
             <h3>Tipo</h3>
-            <div className="inst-pill aviso">{r.tipo.etiqueta}</div>
+            <div className="inst-pill aviso">{r.tipo.determinado ? r.tipo.etiqueta : 'Etapa por confirmar'}</div>
             {r.tipo.nota && <p className="men-detalle">{r.tipo.nota}</p>}
           </div>
 

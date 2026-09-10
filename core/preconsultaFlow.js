@@ -6,7 +6,8 @@
  * portal debe mostrar una orientación de seguridad inmediata.
  */
 
-export const FORMULARIO_VERSION = '2026.09.2';
+import { validarEntrevista } from './entrevista.js';
+export const FORMULARIO_VERSION = '2026.09.4';
 
 export const TEMAS_CONSULTA = [
   { id: 'control', etiqueta: 'Revisión o chequeo ginecológico' },
@@ -20,6 +21,10 @@ export const TEMAS_CONSULTA = [
   { id: 'intimidad', etiqueta: 'Sequedad, dolor o salud sexual' },
   { id: 'mama', etiqueta: 'Molestia o revisión de mama' },
   { id: 'metabolico', etiqueta: 'Peso, metabolismo o riesgo cardiovascular' },
+  { id: 'osea', etiqueta: 'Huesos, osteoporosis o fracturas' },
+  { id: 'cervical', etiqueta: 'VPH, Papanicolaou o resultado alterado' },
+  { id: 'vulvar', etiqueta: 'Flujo, comezón o cambios en la vulva' },
+  { id: 'piso-pelvico', etiqueta: 'Bulto vaginal, presión o dificultad para vaciar' },
   { id: 'otro', etiqueta: 'Otro motivo' },
 ];
 
@@ -40,11 +45,16 @@ const PASO_TEMA = {
   urinario: { id: 'urinario', titulo: 'Salud urinaria' },
   intimidad: { id: 'intimidad', titulo: 'Salud íntima' },
   mama: { id: 'mama', titulo: 'Salud mamaria' },
+  cervical: { id: 'cervical', titulo: 'Tus resultados cervicales' },
+  vulvar: { id: 'vulvar', titulo: 'Molestias vaginales y vulvares' },
+  metabolico: { id: 'metabolico', titulo: 'Tu salud metabólica' },
+  osea: { id: 'osea', titulo: 'Tu salud ósea' },
+  'piso-pelvico': { id: 'piso-pelvico', titulo: 'Tu piso pélvico' },
 };
 
 const ETAPAS_NO_OBSTETRICAS = new Set([
   'menstrua_regular', 'menstrua_irregular', 'sin_regla_menos_12m',
-  'menopausia', 'histerectomia', 'no_se',
+  'menopausia', 'sin_regla_12m', 'histerectomia', 'no_se',
 ]);
 function lista(valor) {
   return Array.isArray(valor) ? valor : [];
@@ -66,6 +76,9 @@ export function filtrarHistoriaActiva(hc = {}) {
   const limpia = { ...hc };
   const temas = lista(limpia.temasConsulta).filter((tema) => tema !== 'embarazo');
   limpia.temasConsulta = temas;
+  // El antiguo formulario usaba este ID solo por llevar 12 meses sin regla.
+  // Al retomar un borrador se pide la causa; no se modifica la respuesta guardada.
+  if (limpia.etapaReproductiva === 'menopausia') limpia.etapaReproductiva = 'sin_regla_12m';
 
   // La práctica no ofrece atención obstétrica. Se limpian datos de borradores
   // creados antes de retirar esa ruta, sin perder antecedentes obstétricos previos.
@@ -147,6 +160,7 @@ export function alternarOpcion(actual, id, exclusiva = OPCION_NINGUNA) {
 export function mrsRespondidos(mrs) {
   const datos = mrs || {};
   return MRS_IDS.filter((id) => {
+    if (typeof datos[id] !== 'number') return false;
     const n = Number(datos[id]);
     return Number.isInteger(n) && n >= 0 && n <= 4;
   }).length;
@@ -225,30 +239,18 @@ export function expandirPasosProfundos(pasos = [], sugeridas = []) {
   });
 }
 
-/** Avance fijo por etapa. Una respuesta puede abrir módulos posteriores, pero
- * nunca hace retroceder la barra del paso donde ya está la paciente. */
-export function porcentajePaso(id) {
-  if (String(id || '').startsWith('profundizacion:')) return 72;
-  const porcentaje = {
-    inicio: 8,
-    motivo: 18,
-    seguridad: 30,
-    contexto: 40,
-    sangrado: 47,
-    dolor: 50,
-    ciclos: 53,
-    climaterio: 56,
-    urinario: 59,
-    intimidad: 62,
-    mama: 65,
-    'plan-reproductivo': 68,
-    profundizaciones: 72,
-    antecedentes: 76,
-    historia: 82,
-    prevencion: 90,
-    envio: 100,
-  };
-  return porcentaje[id] ?? 40;
+export const GRUPOS_PASOS = ['Tu consulta', 'Seguridad y contexto', 'Tus molestias', 'Tu historia', 'Revisión y estudios'];
+export function grupoPaso(id) {
+  if (['inicio', 'motivo'].includes(id)) return 0;
+  if (['seguridad', 'contexto'].includes(id)) return 1;
+  if (['antecedentes', 'historia', 'prevencion'].includes(id)) return 3;
+  return id === 'envio' ? 4 : 2;
+}
+/** Avance del recorrido, no porcentaje de respuestas ni confirmación de envío. */
+export function porcentajePaso(id, pasos = []) {
+  const indice = pasos.findIndex(p => p.id === id);
+  if (indice < 0) return 0;
+  return Math.round(95 * indice / Math.max(1, pasos.length - 1));
 }
 
 function error(mensaje, campo) {
@@ -259,6 +261,8 @@ export function validarPaso(id, { demografia, hc, mrs, dolor } = {}) {
   const dem = demografia || {};
   const historia = hc || {};
   const temas = lista(historia.temasConsulta);
+  const entrevista = validarEntrevista(id, historia);
+  if (!entrevista.ok) return entrevista;
 
   if (id === 'inicio') {
     if (!String(dem.nombre || '').trim()) return error('Escribe tu nombre para poder identificar tu cuestionario.', 'nombre');
@@ -283,6 +287,7 @@ export function validarPaso(id, { demografia, hc, mrs, dolor } = {}) {
     if (!ETAPAS_NO_OBSTETRICAS.has(historia.etapaReproductiva)) {
       return error('Elige la opción que mejor describe tu etapa actual.', 'etapaReproductiva');
     }
+    if (historia.edadMenopausiaReportada != null && dem.edad != null && historia.edadMenopausiaReportada > Number(dem.edad)) return error('La edad de menopausia no puede ser mayor que tu edad actual.', 'edadMenopausiaReportada');
   }
 
   if (id === 'sangrado' && !lista(historia.sangradoTipos).length) {
@@ -291,7 +296,7 @@ export function validarPaso(id, { demografia, hc, mrs, dolor } = {}) {
 
   if (id === 'dolor') {
     const intensidad = Number((dolor || {}).intensidad);
-    if (!Number.isFinite(intensidad) || intensidad < 0 || intensidad > 10) {
+    if (typeof dolor?.intensidad !== 'number' || !Number.isInteger(intensidad) || intensidad < 0 || intensidad > 10) {
       return error('Marca la intensidad de tu dolor de 0 a 10.', 'dolorIntensidad');
     }
     if (!(dolor || {}).inicio) return error('Indica cómo comenzó el dolor.', 'dolorInicio');

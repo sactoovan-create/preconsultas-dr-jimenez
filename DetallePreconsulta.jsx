@@ -10,6 +10,7 @@ import { resumenLectura, gruposHistoria, formatoRespuesta } from './core/lectura
 import { descripcionEstudios } from './core/lecturaEstudios.js';
 import EstudiosRespuesta from './EstudiosRespuesta.jsx';
 import ResumenPaciente from './ResumenPaciente.jsx';
+import MarcoInstrumento from './core/MarcoInstrumento.jsx';
 import { CANALES_RESERVA, FUENTES_DECLARADAS, etiquetaAtribucion } from './core/atribucion.js';
 
 function fecha(iso) {
@@ -98,7 +99,7 @@ export default function DetallePreconsulta({ r, onEliminar, eliminando, tab, set
     <div id="resp-view-instrumentos" role="tabpanel" aria-labelledby="resp-tab-instrumentos" hidden={tab !== 'instrumentos'} tabIndex={0}>
       {tab === 'instrumentos' && (Instrumento ? <>
         <button className="resp-button" onClick={onCerrarInstrumento}><ArrowLeft size={17} />Volver a la selección y resultados</button>
-        <div className="consulta-instrumento"><Instrumento /></div>
+        <div className="consulta-instrumento"><MarcoInstrumento id={instrumentoId}><Instrumento /></MarcoInstrumento></div>
       </> : <ResumenPaciente />)}
     </div>
     <div id="resp-view-historial" role="tabpanel" aria-labelledby="resp-tab-historial" hidden={tab !== 'historial'} tabIndex={0}>

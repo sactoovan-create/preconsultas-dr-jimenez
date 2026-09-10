@@ -13,10 +13,10 @@ export default function Hemorragia() {
   const dem = paciente.demografia;
 
   const [d, setD] = useInstrumento('hemorragia', () => ({
-    contexto: (dem.edad && dem.edad >= 52) ? 'posmenopausica' : (dem.edad && dem.edad < 18 ? 'adolescente' : 'reproductiva'),
+    contexto: '',
     agudo: false,
     taquicardia: false, ortostatismo: false, hipotension: false, saturacionAlta: false,
-    frecuenciaDias: null, duracionDias: null, regular: null, volumen: 'normal', intermenstrual: false,
+    frecuenciaDias: null, duracionDias: null, regular: null, volumen: '', intermenstrual: false,
     polipo: false, adenomiosis: false, leiomioma: false, leiomiomaSubmucoso: false, malignidadHiperplasia: false,
     coag_menarcaAbundante: false, coag_posparto: false, coag_quirurgico: false, coag_dental: false, coag_epistaxis: false, coag_equimosis: false, coag_familiar: false,
     ovulatoria: false, endometrial: false, iatrogenica: false,
@@ -61,7 +61,7 @@ export default function Hemorragia() {
             <CampoTexto etiqueta="Nombre de la paciente" full valor={dem.nombre} onChange={(v) => setDem('nombre', v)} placeholder="Para identificar la hoja impresa" />
             <CampoNumero etiqueta="Edad" unidad="años" valor={dem.edad} onChange={(v) => setDem('edad', v)} min={9} max={90} />
             <Selector etiqueta="Contexto" valor={d.contexto} onChange={(v) => set('contexto', v)}
-              opciones={[{ valor: 'reproductiva', etiqueta: 'Edad reproductiva' }, { valor: 'adolescente', etiqueta: 'Adolescente' }, { valor: 'posmenopausica', etiqueta: 'Posmenopáusica' }]} />
+              opciones={[{ valor: '', etiqueta: 'Por confirmar' }, { valor: 'reproductiva', etiqueta: 'Edad reproductiva' }, { valor: 'adolescente', etiqueta: 'Adolescente' }, { valor: 'posmenopausica', etiqueta: 'Posmenopáusica' }]} />
             <CampoNumero etiqueta="Hemoglobina" unidad="gramos por decilitro" valor={d.hb} onChange={(v) => set('hb', v)} step={0.1} nota={r.anemia.estado !== 'pendiente' && r.anemia.estado !== 'normal' ? r.anemia.texto : ''} />
           </Seccion>
 
@@ -82,7 +82,7 @@ export default function Hemorragia() {
               <CampoNumero etiqueta="Frecuencia (longitud del ciclo)" unidad="días" valor={d.frecuenciaDias} onChange={(v) => set('frecuenciaDias', v)} min={10} max={120} />
               <CampoNumero etiqueta="Duración del sangrado" unidad="días" valor={d.duracionDias} onChange={(v) => set('duracionDias', v)} min={1} max={40} />
               <Selector etiqueta="Volumen" valor={d.volumen} onChange={(v) => set('volumen', v)}
-                opciones={[{ valor: 'ligero', etiqueta: 'Ligero' }, { valor: 'normal', etiqueta: 'Normal' }, { valor: 'abundante', etiqueta: 'Abundante' }]} />
+                opciones={[{ valor: '', etiqueta: 'Por confirmar' }, { valor: 'ligero', etiqueta: 'Ligero' }, { valor: 'normal', etiqueta: 'Normal' }, { valor: 'abundante', etiqueta: 'Abundante' }]} />
               <Selector etiqueta="Regularidad" valor={d.regular === null ? '' : (d.regular ? 'si' : 'no')} onChange={(v) => set('regular', v === 'si')}
                 opciones={[{ valor: '', etiqueta: 'Sin definir' }, { valor: 'si', etiqueta: 'Regular' }, { valor: 'no', etiqueta: 'Irregular' }]} />
               <div className="hua-checks">

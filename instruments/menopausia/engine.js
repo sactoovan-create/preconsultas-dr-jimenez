@@ -47,19 +47,23 @@ function severidad(valor, cortes) {
 
 /** Menopause Rating Scale: puntaje total y por dominio con su severidad. */
 export function evaluarMrs(d) {
-  const suma = (dom) => MRS_ITEMS.filter((i) => i.dominio === dom).reduce((a, i) => a + (v(d[i.id]) ? d[i.id] : 0), 0);
+  const valido = x => typeof x === 'number' && Number.isInteger(x) && x >= 0 && x <= 4;
+  const suma = (dom) => {
+    const items = MRS_ITEMS.filter(i => i.dominio === dom);
+    return items.every(i => valido(d[i.id])) ? items.reduce((a, i) => a + d[i.id], 0) : null;
+  };
   const somatico = suma('somatico');
   const psicologico = suma('psicologico');
   const urogenital = suma('urogenital');
-  const total = somatico + psicologico + urogenital;
+  const total = [somatico, psicologico, urogenital].every(x => x != null) ? somatico + psicologico + urogenital : null;
   // Cuántos reactivos se contestaron: distingue "todo en cero" de "nada capturado".
-  const respondidos = MRS_ITEMS.filter((i) => v(d[i.id])).length;
+  const respondidos = MRS_ITEMS.filter((i) => valido(d[i.id])).length;
   return {
-    total, somatico, psicologico, urogenital, respondidos,
-    sevTotal: severidad(total, [4, 8, 16]),
-    sevSomatico: severidad(somatico, [2, 4, 8]),
-    sevPsicologico: severidad(psicologico, [1, 3, 6]),
-    sevUrogenital: severidad(urogenital, [0, 1, 3]),
+    total, somatico, psicologico, urogenital, respondidos, completo: respondidos === 11,
+    sevTotal: total == null ? 'pendiente' : severidad(total, [4, 8, 16]),
+    sevSomatico: somatico == null ? 'pendiente' : severidad(somatico, [2, 4, 8]),
+    sevPsicologico: psicologico == null ? 'pendiente' : severidad(psicologico, [1, 3, 6]),
+    sevUrogenital: urogenital == null ? 'pendiente' : severidad(urogenital, [0, 1, 3]),
   };
 }
 
@@ -97,6 +101,11 @@ export function evaluarCandidatura(paciente, d, tipo) {
 
   if (contra.length) {
     return { recomienda: false, tipo: 'contraindicada', titulo: 'Terapia hormonal sistémica contraindicada', detalle: 'Contraindicación presente: ' + contra.join(', ') + '. Considerar alternativas no hormonales y tratamiento local del síndrome genitourinario.' };
+  }
+
+  const faltantes = ['cancerMama', 'ecvEstablecida', 'tromboembolismo', 'hepatica', 'sangradoNoDx'].filter(k => a[k] == null);
+  if (faltantes.length || (a.corazonPorPrecisar && a.ecvEstablecida == null) || (a.hepaticaPorPrecisar && a.hepatica == null)) {
+    return { recomienda: false, tipo: 'incompleta', titulo: 'Pendiente de valoración médica', detalle: 'Falta confirmar antecedentes y contraindicaciones. Los datos no contestados no equivalen a antecedentes negativos.' };
   }
 
   // Insuficiencia ovárica primaria y menopausia precoz: indicar hasta la edad natural.
@@ -159,6 +168,7 @@ export function evaluarGenitourinario(d, mrs) {
 
 /** Alternativas no hormonales para síntomas vasomotores. */
 export function alternativasNoHormonales(candidatura, d) {
+  if (candidatura.tipo === 'incompleta') return null;
   // Relevantes si hay contraindicación, está fuera de ventana, o se prefiere no hormonal.
   const aplica = !candidatura.recomienda || d.prefiereNoHormonal;
   if (!aplica) return null;

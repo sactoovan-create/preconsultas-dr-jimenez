@@ -29,6 +29,8 @@ export const FREC_OPCIONES = ['Nunca', 'Rara vez', 'A veces', 'A menudo', 'Casi 
 
 /** Clasifica el tipo según los puntajes de esfuerzo y urgencia. */
 export function clasificarTipo(d) {
+  const completo = [...ITEMS_ESFUERZO, ...ITEMS_URGENCIA].every(i => typeof d[i.id] === 'number' && Number.isInteger(d[i.id]) && d[i.id] >= 0 && d[i.id] <= 5);
+  if (!completo) return { tipo: 'pendiente', etiqueta: 'Patrón de escapes pendiente de precisar', esfuerzo: null, urgencia: null, predominio: null };
   const esfuerzo = ITEMS_ESFUERZO.reduce((a, i) => a + n0(d[i.id]), 0);
   const urgencia = ITEMS_URGENCIA.reduce((a, i) => a + n0(d[i.id]), 0);
   const esfPos = esfuerzo >= 4;
@@ -45,11 +47,13 @@ export function clasificarTipo(d) {
 
 /** Severidad e impacto, con la lógica del cuestionario internacional. */
 export function evaluarSeveridad(d) {
-  if (!v(d.frecuenciaPerdida) && !v(d.cantidadPerdida) && !v(d.impactoVida)) return null;
+  if (![d.frecuenciaPerdida, d.cantidadPerdida, d.impactoVida].every(x => typeof x === 'number' && Number.isInteger(x))) return null;
+  if (d.frecuenciaPerdida < 0 || d.frecuenciaPerdida > 5 || d.cantidadPerdida < 0 || d.cantidadPerdida > 3 || d.impactoVida < 0 || d.impactoVida > 10) return null;
   const pesoCantidad = [0, 2, 4, 6][n0(d.cantidadPerdida)] || 0;
   const puntaje = n0(d.frecuenciaPerdida) + pesoCantidad + n0(d.impactoVida);
   let nivel, estado;
-  if (puntaje <= 5) { nivel = 'leve'; estado = 'ok'; }
+  if (puntaje === 0) { nivel = 'sin escapes reportados'; estado = 'ok'; }
+  else if (puntaje <= 5) { nivel = 'leve'; estado = 'ok'; }
   else if (puntaje <= 12) { nivel = 'moderada'; estado = 'aviso'; }
   else if (puntaje <= 18) { nivel = 'severa'; estado = 'alerta'; }
   else { nivel = 'muy severa'; estado = 'alerta'; }

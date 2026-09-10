@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { ArrowRight, Plus, X, RotateCcw, Printer, AlertTriangle } from 'lucide-react';
 import { usePaciente } from './core/PacienteContext.jsx';
 import { INSTRUMENTOS } from './registry.js';
+import AreaClinica from './core/AreaClinica.jsx';
+import { estiloArea } from './core/areasClinicas.js';
 import { imprimirInforme } from './core/printReport.js';
 import { evidenciaDe } from './core/evidencia.js';
 import './ResumenPaciente.css';
@@ -35,8 +37,8 @@ export default function ResumenPaciente() {
     <section className="resp-sec">
       <div className="resp-section-heading"><h3>Selección médica · {seleccion.length}</h3><span className="resp-muted">{seleccion.filter(i => resumenes[i.id]?.evaluado).length} evaluados de los seleccionados</span></div>
       {!seleccion.length && <p className="resp-muted">Sin instrumentos seleccionados para esta consulta.</p>}
-      <ul className="valoracion-lista">{seleccion.map(i => <li key={i.id}>
-        <div><strong>{i.titulo}</strong><span>{resumenes[i.id]?.evaluado ? 'Resultado guardado' : 'Pendiente de evaluar'}</span></div>
+      <ul className="valoracion-lista">{seleccion.map(i => <li key={i.id} style={estiloArea(i.id)}>
+        <div><AreaClinica id={i.id} /><strong>{i.titulo}</strong><span>{resumenes[i.id]?.evaluado ? 'Resultado guardado' : 'Pendiente de evaluar'}</span></div>
         <button className="resp-button" onClick={() => irA(i.id)} disabled={ocupado || ctx.cargandoTrabajo}><ArrowRight size={16} />{resumenes[i.id]?.evaluado ? 'Revisar' : 'Evaluar'}</button>
         <button className="resp-icon" title={'Retirar ' + i.titulo} aria-label={'Retirar ' + i.titulo} disabled={ocupado || ctx.cargandoTrabajo} onClick={() => cambiar(i.id, false)}><X size={17} /></button>
       </li>)}</ul>
@@ -44,7 +46,7 @@ export default function ResumenPaciente() {
     </section>
     {sugerencias.length > 0 && <section className="resp-sec">
       <h3>Sugerencias del autorreporte</h3><p className="resp-muted">Orientación del motor · no diagnóstico</p>
-      <ul className="valoracion-lista">{sugerencias.map(s => <li key={s.instrumento}>
+      <ul className="valoracion-lista">{sugerencias.map(s => <li key={s.instrumento} style={estiloArea(s.instrumento)}>
         <label className="valoracion-sugerida"><input type="checkbox" checked={ids.includes(s.instrumento)} disabled={ocupado || ctx.cargandoTrabajo || descartados.includes(s.instrumento)} onChange={e => cambiar(s.instrumento, e.target.checked)} /><span><strong>{s.nombre}</strong><span>{s.motivo}</span>{descartados.includes(s.instrumento) && <small>Sugerencia retirada por el médico</small>}</span></label>
         <button className="resp-icon" disabled={ocupado || ctx.cargandoTrabajo} title={descartados.includes(s.instrumento) ? 'Restaurar sugerencia' : 'Retirar sugerencia'} aria-label={(descartados.includes(s.instrumento) ? 'Restaurar sugerencia de ' : 'Retirar sugerencia de ') + s.nombre} onClick={() => descartados.includes(s.instrumento) ? ctx.restaurarSugerencia(s.instrumento) : ctx.descartarSugerencia(s.instrumento)}>{descartados.includes(s.instrumento) ? <RotateCcw size={16} /> : <X size={16} />}</button>
       </li>)}</ul>

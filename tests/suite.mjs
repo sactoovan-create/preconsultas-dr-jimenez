@@ -12,7 +12,7 @@
  */
 
 import { calcularPrevent } from '../core/prevent.js';
-import { evaluarMrs, evaluarMenopausia } from '../instruments/menopausia/engine.js';
+import { evaluarMrs, evaluarMenopausia, MRS_ITEMS } from '../instruments/menopausia/engine.js';
 import { evaluarTerapiaHormonal } from '../instruments/cardiometabolico/engine.js';
 import { construirHojaPaciente } from '../core/printSheet.js';
 import { construirInforme } from '../core/printReport.js';
@@ -73,7 +73,8 @@ console.log('PREVENT · caso canónico');
 
 console.log('Menopause Rating Scale · tramos del total (corte [4, 8, 16])');
 {
-  const sev = (items) => evaluarMrs(items).sevTotal;
+  const sev = (items) => evaluarMrs({ ...Object.fromEntries(MRS_ITEMS.map(i => [i.id, 0])), ...items }).sevTotal;
+  check('MRS parcial no se clasifica como intensidad mínima', evaluarMrs({mrs_bochornos:0}).total === null);
   check('total 4 es mínima', sev({ mrs_bochornos: 4 }) === 'mínima');
   check('total 8 es leve', sev({ mrs_bochornos: 4, mrs_cardiaco: 4 }) === 'leve');
   check('total 9 es moderada', sev({ mrs_bochornos: 4, mrs_cardiaco: 4, mrs_animo: 1 }) === 'moderada');
@@ -103,7 +104,9 @@ console.log('Terapia hormonal · contraindicaciones leídas del paciente compart
   }), {});
   check('menopausia marca contraindicada con tromboembolismo', menoContra.candidatura.tipo === 'contraindicada');
   const menoOk = evaluarMenopausia(pacienteBase(), {});
-  check('menopausia recomienda en ventana sin contraindicación', menoOk.candidatura.recomienda === true);
+  check('menopausia no interpreta antecedentes desconocidos como negativos', menoOk.candidatura.tipo === 'incompleta' && !menoOk.candidatura.recomienda);
+  const confirmados = evaluarMenopausia(pacienteBase({ antecedentes: { cancerMama: false, ecvEstablecida: false, tromboembolismo: false, hepatica: false, sangradoNoDx: false } }), {});
+  check('menopausia conserva ventana con antecedentes explícitamente negativos', confirmados.candidatura.recomienda === true);
 }
 
 console.log('Impresión · escape de marcado en valores dinámicos');
@@ -141,7 +144,7 @@ console.log('Resumen de la paciente · contrato portal hacia panel');
     },
   });
   check('congela el resumen de una profundización contestada',
-    r4.profundizaciones.length === 1 && /ICIQ-SF 8/.test(r4.profundizaciones[0].resumen));
+    r4.profundizaciones.length === 1 && /Índice urinario local 8/.test(r4.profundizaciones[0].resumen));
 }
 
 console.log('Almacenamiento de respuestas · modo local');

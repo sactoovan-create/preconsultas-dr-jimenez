@@ -10,9 +10,7 @@
  */
 
 import { instrumentosPara } from './ruteoClinico.js';
-
-// Ojo: Number(null) y Number('') dan 0; un dato ausente debe quedar en null.
-function num(x) { if (x == null || x === '') return null; const n = Number(x); return Number.isFinite(n) ? n : null; }
+import { PRECARGA_VERSION, numeroClinico } from './precargaClinica.js';
 
 /**
  * Forma parcial del paciente compartido a partir del registro enviado.
@@ -34,10 +32,46 @@ export function pacienteDesdeRespuesta(registro) {
   // Sangrado anormal reportado: cuenta como sangrado no diagnosticado hasta que
   // el médico lo estudie (pesa en las contraindicaciones de terapia hormonal).
   if (hc.sangrado === true) antecedentes.sangradoNoDx = true;
+  if (hc.cancerMamaPersonal === true) antecedentes.cancerMama = true;
+  if (hc.enfTrombosis === true) antecedentes.tromboembolismo = true;
+  // Los antecedentes amplios requieren precisar el diagnóstico, no inferirlo.
+  if (hc.enfCorazon === true) antecedentes.corazonPorPrecisar = true;
+  if (hc.enfHepatica === true) antecedentes.hepaticaPorPrecisar = true;
+
+  const demografia = { nombre: pac.nombre || '', edad: numeroClinico(pac.edad, 1, 110) };
+  const campos = [];
+  const registrar = (grupo, destino, valor, fuente, etiqueta) => {
+    if (valor == null || valor === '') return;
+    grupo[destino] = valor;
+    campos.push({ destino: (grupo === demografia ? 'demografia.' : 'antecedentes.') + destino, valor, fuente, etiqueta });
+  };
+  registrar(demografia, 'nombre', pac.nombre, 'paciente.nombre', 'Nombre');
+  registrar(demografia, 'edad', numeroClinico(pac.edad, 1, 110), 'paciente.edad', 'Edad');
+  if (typeof hc.histerectomiaConfirmada === 'boolean') registrar(demografia, 'histerectomia', hc.histerectomiaConfirmada, 'autoReporte.hc.histerectomiaConfirmada', 'Histerectomía reportada');
+  else if (hc.etapaReproductiva === 'histerectomia') registrar(demografia, 'histerectomia', true, 'autoReporte.hc.etapaReproductiva', 'Histerectomía reportada');
+  if (hc.causaAusenciaRegla === 'menopausia_confirmada') {
+    registrar(demografia, 'etapaReproductiva', 'post', 'autoReporte.hc.causaAusenciaRegla', 'Menopausia confirmada según autorreporte');
+    registrar(demografia, 'edadMenopausia', numeroClinico(hc.edadMenopausiaReportada, 10, demografia.edad || 70), 'autoReporte.hc.edadMenopausiaReportada', 'Edad de menopausia reportada');
+  }
+  const seleccionExplicita = Array.isArray(hc.antecedentesSeleccionados) && hc.antecedentesSeleccionados.length > 0;
+  for (const [dest, src, label] of [
+    ['diabetes', 'enfDiabetes', 'Diabetes reportada'], ['cancerMama', 'cancerMamaPersonal', 'Antecedente de cáncer de mama'],
+    ['tromboembolismo', 'enfTrombosis', 'Antecedente de trombosis'],
+  ]) {
+    if (hc[src] === true || (seleccionExplicita && hc[src] === false)) registrar(antecedentes, dest, hc[src], 'autoReporte.hc.' + src, label);
+  }
+  if (['actual', 'antes', 'nunca'].includes(hc.tabacoEstado)) registrar(antecedentes, 'tabaquismo', hc.tabacoEstado === 'actual', 'autoReporte.hc.tabacoEstado', 'Tabaco actual');
+  else if (hc.fuma === true) registrar(antecedentes, 'tabaquismo', true, 'autoReporte.hc.fuma', 'Tabaco actual');
+  for (const [dest, src, label] of [
+    ['antihipertensivo', 'tomaAntihipertensivo', 'Tratamiento para presión'], ['estatina', 'tomaEstatina', 'Estatina'],
+    ['ecvEstablecida', 'eventoCardiovascularConfirmado', 'Enfermedad cardiovascular reportada'],
+  ]) if (typeof hc[src] === 'boolean') registrar(antecedentes, dest, hc[src], 'autoReporte.hc.' + src, label);
+  if (hc.sangrado === true) registrar(antecedentes, 'sangradoNoDx', true, 'autoReporte.hc.sangrado', 'Sangrado por estudiar');
 
   return {
-    demografia: { nombre: pac.nombre || '', edad: num(pac.edad) },
+    demografia,
     antecedentes,
+    procedencia: { version: PRECARGA_VERSION, tipo: 'autorreporte', respuestaId: r.id || null, fecha: r.creado || null, campos },
     autoReporte: {
       mrs: ar.mrs || {},
       dolor: ar.dolor || {},

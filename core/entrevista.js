@@ -1,6 +1,6 @@
 /** Anamnesis complementaria, no escala validada. Fuentes y alcance en
  * docs/ENTREVISTA-2026-09.md. IDs compartidos por captura, resumen y lector. */
-export const ENTREVISTA_VERSION = '1.0.0';
+export const ENTREVISTA_VERSION = '2.0.0';
 const opciones = (pares) => pares.map(([valor, etiqueta]) => ({ valor, etiqueta }));
 const periodo = opciones([['dias', 'Hace días'], ['semanas', 'Hace semanas'], ['meses', 'Hace meses'], ['anios', 'Hace años'], ['no_se', 'No recuerdo']]);
 const impacto = opciones([['ninguno', 'No cambia mis actividades'], ['molesta', 'Me molesta, pero puedo continuar'], ['limita', 'He reducido o evitado actividades'], ['impide', 'Me impide trabajar, dormir o hacer actividades'], ['prefiero_no', 'Prefiero comentarlo en consulta']]);
@@ -13,7 +13,7 @@ export const ENTREVISTA = {
     titulo: 'Prioridad de la consulta', fuente: 'MP-006 / Checklist 71',
     preguntas: [
       eleccion('consultaTipo', '¿Qué necesitas de esta visita?', opciones([['primera', 'Valorar una molestia por primera vez'], ['seguimiento', 'Revisar cómo voy con un tratamiento'], ['resultados', 'Entender mis estudios o resultados'], ['segunda_opinion', 'Una segunda opinión'], ['prevencion', 'Revisión preventiva']])),
-      texto('consultaPrioridad', '¿Qué es lo más importante que quieres resolver?', 'Una preocupación, una pregunta o algo que no quieres dejar pendiente'),
+      texto('consultaPrioridad', '¿Hay algo que te preocupe especialmente o que no quieras dejar pendiente?', 'Una preocupación concreta o una actividad que te gustaría recuperar'),
     ],
   },
   contexto: {
@@ -116,6 +116,96 @@ export const ENTREVISTA = {
 };
 
 ENTREVISTA.cervical.preguntas.find(q => q.id === 'cervicalTratamientoDetalle').mostrarSi = h => h.cervicalTratamientoPrevio === 'si';
+
+const siNo = opciones([[true, 'Sí'], [false, 'No'], ['no_se', 'No lo sé'], ['prefiero_no', 'Prefiero comentarlo en consulta']]);
+const binaria = (id, etiqueta, extra = {}) => eleccion(id, etiqueta, siNo, extra);
+const numero = (id, etiqueta, min, max, extra = {}) => ({ id, etiqueta, tipo: 'numero', min, max, ...extra });
+const tema = (h, id) => h.temasConsulta?.includes(id);
+const menstrua = h => ['menstrua_regular', 'menstrua_irregular'].includes(h.etapaReproductiva);
+
+ENTREVISTA.contexto.preguntas.push(
+  binaria('histerectomiaConfirmada', '¿Te han retirado el útero en una cirugía?'),
+  numero('edadMenopausiaReportada', '¿A qué edad te confirmaron la menopausia? (si lo recuerdas)', 10, 70,
+    { mostrarSi: h => h.causaAusenciaRegla === 'menopausia_confirmada' }),
+);
+ENTREVISTA.sangrado.preguntas.push(
+  numero('sangradoIntervaloDias', 'Días desde el inicio de una regla hasta el inicio de la siguiente (aproximados)', 10, 180, { mostrarSi: menstrua }),
+  binaria('sangradoDesdeMenarca', '¿Tus reglas han sido muy abundantes desde que comenzaste a menstruar?'),
+  multiple('sangradoOtrosSitios', 'Además de la regla, ¿has tenido sangrado difícil de detener?', [
+    ['dental', 'Después de una extracción dental'], ['cirugia', 'Después de una cirugía'],
+    ['nariz', 'De nariz, repetidamente'], ['moretones', 'Moretones frecuentes sin golpe claro'], ['ninguna', 'Ninguno de estos'],
+  ]),
+);
+ENTREVISTA.dolor.preguntas.push(
+  eleccion('dolorRelacionCiclo', 'En los últimos 3 meses, ¿cómo se relacionó el dolor con tu regla?', opciones([
+    ['solo_regla', 'Aparece solo con la regla'], ['empeora_regla', 'Existe otros días y empeora con la regla'],
+    ['sin_relacion', 'No noto relación con la regla'], ['no_menstruo', 'No menstruo'], ['no_se', 'No estoy segura'],
+  ])),
+  binaria('dolorProfundoPenetracion', 'Cuando hay penetración, ¿sientes dolor profundo dentro de la pelvis?',
+    { opciones: [...siNo, { valor: 'no_aplica', etiqueta: 'No he tenido penetración recientemente' }] }),
+  binaria('dolorEvacuarCiclico', '¿El dolor al evacuar aparece o empeora alrededor de la menstruación?'),
+  binaria('dolorOrinarCiclico', '¿El dolor al orinar aparece o empeora alrededor de la menstruación?'),
+  binaria('dolorMejoraVaciar', '¿El dolor aumenta al llenarse la vejiga y mejora al orinar?'),
+  binaria('dolorMovimiento', '¿El dolor cambia al caminar, sentarte, hacer ejercicio o cambiar de postura?'),
+);
+ENTREVISTA.ciclos.preguntas.push(
+  numero('reglasUltimoAnio', '¿Cuántas menstruaciones tuviste en los últimos 12 meses? (aproximadas)', 0, 30),
+  binaria('cicloMayor90', 'En ese año, ¿pasaste más de 90 días seguidos sin menstruar?'),
+  binaria('cambiosRapidosVozVello', '¿El vello aumentó rápidamente o tu voz cambió en pocos meses?'),
+);
+ENTREVISTA.urinario.preguntas.push(
+  binaria('urinarioProteccion', '¿Usas toalla o protector por los escapes de orina?', { mostrarSi: h => h.sintomasUrinarios?.includes('escapes') }),
+  numero('miccionesDia', 'En un día habitual, ¿cuántas veces orinas mientras estás despierta?', 0, 40),
+  numero('miccionesNoche', '¿Cuántas veces te despiertas del sueño para orinar?', 0, 15),
+);
+ENTREVISTA.mama.preguntas.push(
+  binaria('mamaFamiliarPrimerGradoMenor50', '¿Tu madre, hermana o hija tuvo cáncer de mama antes de los 50 años?'),
+  binaria('mamaDosFamiliares', '¿Dos o más familiares de tu familia biológica tuvieron cáncer de mama?'),
+  binaria('mamaFamiliarOvario', '¿Algún familiar de tu familia biológica tuvo cáncer de ovario?'),
+  binaria('mamaFamiliarHombre', '¿Algún hombre de tu familia biológica tuvo cáncer de mama?'),
+  binaria('mamaVarianteConfirmada', '¿Un estudio genético tuyo confirmó una variante de riesgo para cáncer de mama, como BRCA1 o BRCA2?'),
+  texto('mamaFamiliaDetalle', 'Si respondiste sí, ¿qué familiar y a qué edad? (si lo sabes)', 'Parentesco, tipo de cáncer, edad y de qué lado de la familia'),
+);
+ENTREVISTA.metabolico.preguntas.push(
+  binaria('tomaAntihipertensivo', '¿Tomas actualmente algún medicamento indicado para bajar la presión?'),
+  binaria('tomaEstatina', '¿Tomas una estatina para el colesterol (por ejemplo, atorvastatina o rosuvastatina)?'),
+  binaria('eventoCardiovascularConfirmado', '¿Un médico te ha confirmado infarto del corazón, enfermedad de sus arterias o un evento vascular cerebral?'),
+);
+ENTREVISTA.historia = { titulo: 'Antecedentes para la valoración', fuente: 'Checklist 71 / U.S. MEC 2024', preguntas: [
+  numero('cigarrillosDia', '¿Cuántos cigarrillos fumas en un día habitual?', 1, 100, { mostrarSi: h => h.tabacoEstado === 'actual' }),
+] };
+ENTREVISTA.osea = { titulo: 'Huesos, fracturas y caídas', fuente: 'FRAX / Menopausia AMOLCA 24', preguntas: [
+  binaria('fracturaBajoImpacto', 'Después de los 40 años, ¿te fracturaste al caer desde tu propia altura o con un golpe leve?'),
+  binaria('fracturaCaderaVertebra', '¿Esa fractura fue de cadera o de una vértebra?', { mostrarSi: h => h.fracturaBajoImpacto === true }),
+  binaria('fracturaCaderaProgenitor', '¿Tu madre o padre tuvo una fractura de cadera?'),
+  binaria('corticoidesTresMeses', '¿Has tomado cortisona por boca, como prednisona, durante 3 meses o más?'),
+  binaria('artritisReumatoideConfirmada', '¿Un médico te ha diagnosticado artritis reumatoide?'),
+  numero('caidasUltimoAnio', '¿Cuántas caídas tuviste en los últimos 12 meses?', 0, 100),
+  texto('oseaEstudios', '¿Tienes densitometría o tratamiento para los huesos?', 'Fecha del estudio, medicamento y tiempo de uso, si lo recuerdas'),
+] };
+ENTREVISTA['plan-reproductivo'] = { titulo: 'Preferencias y experiencia anticonceptiva', fuente: 'U.S. MEC 2024 / Checklist 71', preguntas: [
+  multiple('anticoncepcionPrioridades', '¿Qué es importante para ti al elegir un método?', [
+    ['eficacia', 'Evitar un embarazo con alta eficacia'], ['sin_hormonas', 'No usar hormonas'],
+    ['sangrado', 'Mejorar el sangrado o los cólicos'], ['olvidos', 'No tener que recordarlo todos los días'],
+    ['reversible', 'Poder suspenderlo cuando lo decida'], ['no_se', 'Quiero conocer las opciones'],
+  ]),
+  texto('anticoncepcionExperiencia', '¿Qué métodos probaste y por qué los suspendiste?', 'Qué te funcionó, efectos molestos o dificultad para usarlos'),
+] };
+ENTREVISTA['plan-reproductivo'].preguntas.forEach(q => { q.mostrarSi = h => tema(h, 'anticoncepcion'); });
+
+/** Solo valida respuestas presentes. Omitir una pregunta opcional no es un "no". */
+export function validarEntrevista(paso, hc = {}) {
+  for (const q of preguntasEntrevista(paso, hc)) {
+    const v = hc[q.id];
+    if (!tieneRespuesta(v)) continue;
+    const invalida = q.tipo === 'numero'
+      ? typeof v !== 'number' || !Number.isInteger(v) || v < q.min || v > q.max
+      : q.tipo === 'opcion' ? !q.opciones.some(o => o.valor === v)
+        : q.tipo === 'multiple' ? !Array.isArray(v) || v.some(x => !q.opciones.some(o => o.id === x)) || (v.length > 1 && v.some(x => ['ninguna', 'no_se', 'prefiero_no'].includes(x))) : typeof v !== 'string' || v.length > 3000;
+    if (invalida) return { ok: false, campo: q.id, mensaje: q.tipo === 'numero' ? `Revisa el valor: debe estar entre ${q.min} y ${q.max}, o déjalo vacío si no lo sabes.` : 'Revisa esta respuesta o déjala vacía para comentarla en consulta.' };
+  }
+  return { ok: true };
+}
 
 export const CAMPOS_ENTREVISTA = Object.values(ENTREVISTA).flatMap(m => m.preguntas);
 export function preguntasEntrevista(paso, hc = {}) {

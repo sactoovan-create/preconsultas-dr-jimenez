@@ -1,11 +1,18 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, LoaderCircle, Send } from 'lucide-react';
+import { ArrowLeft, ArrowRight, LoaderCircle, Send, ClipboardList, ShieldCheck, HeartPulse, History, Paperclip, Save } from 'lucide-react';
+import { ENTREVISTA_VERSION, limpiarEntrevista } from './core/entrevista.js';
+import EntrevistaDirigida from './paciente/EntrevistaDirigida.jsx';
+import AreaClinica from './core/AreaClinica.jsx';
+import { estiloArea } from './core/areasClinicas.js';
+import RevisionPreconsulta from './paciente/RevisionPreconsulta.jsx';
 import { usePaciente } from './core/PacienteContext.jsx';
 import {
   alertaUrgente,
   expandirPasosProfundos,
   filtrarHistoriaActiva,
   FORMULARIO_VERSION,
+  GRUPOS_PASOS,
+  grupoPaso,
   normalizarTelefonoMexicano,
   pasosPara,
   porcentajePaso,
@@ -22,6 +29,7 @@ import Profundizaciones from './paciente/Profundizaciones.jsx';
 import {
   CampoNumero,
   CampoTexto,
+  CampoSelect,
   EscalaNumerica,
   GrupoMultiple,
   GrupoOpciones,
@@ -48,7 +56,7 @@ const ETAPAS = [
   { valor: 'menstrua_regular', etiqueta: 'Tengo menstruaciones regulares' },
   { valor: 'menstrua_irregular', etiqueta: 'Mis menstruaciones son irregulares' },
   { valor: 'sin_regla_menos_12m', etiqueta: 'No menstruo desde hace menos de 12 meses' },
-  { valor: 'menopausia', etiqueta: 'No menstruo desde hace 12 meses o más' },
+  { valor: 'sin_regla_12m', etiqueta: 'No menstruo desde hace 12 meses o más' },
   { valor: 'histerectomia', etiqueta: 'Me retiraron la matriz (histerectomía)' },
   { valor: 'no_se', etiqueta: 'No estoy segura' },
 ];
@@ -158,46 +166,6 @@ function EscalaMrs({ mrs, onChange }) {
   );
 }
 
-function ResumenEnvio({ dem, hc, pasos, irPaso, estudiosEstado }) {
-  const etiquetas = new Map(TEMAS_CONSULTA.map((t) => [t.id, t.etiqueta]));
-  const temas = (hc.temasConsulta || []).map((id) => etiquetas.get(id) || id);
-  const resumenEstudios = estudiosEstado?.listos
-    ? `${estudiosEstado.listos} archivo(s) recibido(s)`
-    : estudiosEstado?.decision === 'no'
-      ? 'Los llevarás después'
-      : estudiosEstado?.decision === 'si'
-        ? 'Falta agregar por lo menos un archivo'
-        : 'Falta indicar si compartirás estudios';
-  return (
-    <div className="pc-revision">
-      <div>
-        <span>Paciente</span>
-        <b>{dem.nombre || '—'}{dem.edad != null ? ` · ${dem.edad} años` : ''}</b>
-        <button type="button" onClick={() => irPaso('inicio')}>Editar</button>
-      </div>
-      <div>
-        <span>Lo que quieres revisar</span>
-        <b>{temas.join(', ') || '—'}</b>
-        <small>{hc.motivo || ''}</small>
-        <button type="button" onClick={() => irPaso('motivo')}>Editar</button>
-      </div>
-      <div>
-        <span>Etapa actual</span>
-        <b>{ETAPAS.find((e) => e.valor === hc.etapaReproductiva)?.etiqueta || '—'}</b>
-        <button type="button" onClick={() => irPaso('contexto')}>Editar</button>
-      </div>
-      <div>
-        <span>Secciones contestadas</span>
-        <b>{Math.max(0, pasos.length - 1)} apartados revisados</b>
-      </div>
-      <div>
-        <span>Estudios</span>
-        <b>{resumenEstudios}</b>
-      </div>
-    </div>
-  );
-}
-
 export default function PreConsulta({
   onEnviar,
   extraAntesDeEnviar = null,
@@ -233,6 +201,7 @@ export default function PreConsulta({
   const [guardado, setGuardado] = useState(false);
   const [bloqueo, setBloqueo] = useState('');
   const [campoError, setCampoError] = useState('');
+  const [volverRevision, setVolverRevision] = useState(false);
   const trampaRef = useRef(null);
   const inicioRef = useRef(Date.now());
   const pasoRef = useRef(null);
@@ -334,18 +303,22 @@ export default function PreConsulta({
   };
 
   const irPaso = (id) => {
+    if (enviando || estudiosEstado?.subiendo) { setBloqueo('Espera a que terminen de verificarse tus archivos antes de cambiar de sección.'); return; }
     if (!pasos.some((p) => p.id === id)) return;
+    if (paso.id === 'envio') setVolverRevision(true);
     setPasoId(id); limpiarError(); moverVista();
   };
 
   const siguiente = () => {
     const resultado = validarPaso(paso.id, { demografia: dem, hc, mrs, dolor });
     if (!resultado.ok) { mostrarError(resultado); return; }
+    if (volverRevision) { setVolverRevision(false); irPaso('envio'); return; }
     const siguientePaso = pasos[indice + 1];
     if (siguientePaso) { setPasoId(siguientePaso.id); limpiarError(); moverVista(); }
   };
 
   const anterior = () => {
+    if (enviando || estudiosEstado?.subiendo) { setBloqueo('Espera a que terminen de verificarse tus archivos antes de cambiar de sección.'); return; }
     const anteriorPaso = pasos[indice - 1];
     if (anteriorPaso) { setPasoId(anteriorPaso.id); limpiarError(); moverVista(); }
   };
@@ -381,10 +354,11 @@ export default function PreConsulta({
   };
 
   const reporteParaEnviar = () => {
-    const historia = filtrarHistoriaActiva({
+    const historia = limpiarEntrevista(filtrarHistoriaActiva({
       ...hc,
       telefono: normalizarTelefonoMexicano(hc.telefono),
-    });
+      entrevistaVersion: ENTREVISTA_VERSION,
+    }), pasos.map(p => p.id));
     const temas = Array.isArray(historia.temasConsulta) ? historia.temasConsulta : [];
     const reportaDolor = temas.includes('dolor') || senalFuerzaDolor(historia);
     const reportaSangrado = temas.includes('sangrado') || senalFuerzaSangrado(historia);
@@ -463,7 +437,7 @@ export default function PreConsulta({
         consentimientoFecha: new Date().toISOString(),
         formularioVersion: FORMULARIO_VERSION,
         atribucion: normalizarAtribucion(atribucion),
-        alertaSeguridad: alerta,
+        alertaSeguridad: alertaUrgente(reporte),
       });
       borrarBorrador();
     } catch (e) {
@@ -475,10 +449,11 @@ export default function PreConsulta({
   };
 
   const contenidoPaso = () => {
+    if (['cervical', 'vulvar', 'metabolico', 'piso-pelvico'].includes(paso.id)) return null;
     if (paso.id === 'inicio') return (
       <>
         <p className="pc-paso-intro">Estos datos permiten identificar tu cuestionario y asociarlo de forma segura con tu cita.</p>
-        <div className="pc-datos">
+        <div className="pc-datos pc-datos-identidad">
           <CampoTexto id="nombre" etiqueta="Nombre y apellidos" requerido valor={dem.nombre} onChange={(v) => setDem('nombre', v)} placeholder="Como aparece en tu cita" />
           <CampoNumero id="edad" etiqueta="Edad" requerido min={1} max={110} valor={dem.edad} onChange={(v) => setDem('edad', v)} placeholder="años" />
           <CampoTexto id="telefono" etiqueta="Teléfono o WhatsApp de México" requerido tipo="tel" valor={hc.telefono} onChange={(v) => setH('telefono', v)} placeholder="10 dígitos; puedes incluir +52" />
@@ -713,7 +688,7 @@ export default function PreConsulta({
 
     if (paso.id.startsWith('profundizacion:')) return (
       <>
-        <p className="pc-paso-intro">Esta escala breve apareció por lo que contaste. Es opcional y puedes continuar sin abrirla.</p>
+        <p className="pc-paso-intro">Puedes responder lo que quieras compartir y dejar lo demás para la consulta.</p>
         <Profundizaciones
           tamizaje={{ mrs, dolor, hc }}
           valor={profundos}
@@ -740,7 +715,7 @@ export default function PreConsulta({
       <>
         <p className="pc-paso-intro">Completa solo lo que recuerdes. Los campos de esta sección son opcionales y el doctor los verificará contigo.</p>
         <div className="pc-datos pc-datos-obstetricos">
-          <CampoNumero etiqueta="Embarazos" valor={hc.embarazos} onChange={(v) => setH('embarazos', v)} max={30} />
+          <CampoNumero etiqueta="Embarazos previos" valor={hc.embarazos} onChange={(v) => setH('embarazos', v)} max={30} />
           <CampoNumero etiqueta="Partos" valor={hc.partos} onChange={(v) => setH('partos', v)} max={30} />
           <CampoNumero etiqueta="Cesáreas" valor={hc.cesareas} onChange={(v) => setH('cesareas', v)} max={30} />
           <CampoNumero etiqueta="Pérdidas o abortos" valor={hc.abortos} onChange={(v) => setH('abortos', v)} max={30} />
@@ -769,7 +744,7 @@ export default function PreConsulta({
           ]} valor={hc.tieneCuelloUterino} onChange={(v) => setH('tieneCuelloUterino', v)} />
           {['si', 'no_se'].includes(hc.tieneCuelloUterino) && (
             <>
-              <CampoTexto etiqueta="Fecha aproximada de tu última prueba cervical" tipo="date" valor={hc.ultimoPapFecha} onChange={(v) => setH('ultimoPapFecha', v)} />
+              <CampoTexto etiqueta="Fecha aproximada de tu última prueba cervical" placeholder="Mes y año, si los recuerdas" valor={hc.ultimoPapFecha} onChange={(v) => setH('ultimoPapFecha', v)} />
               <GrupoOpciones etiqueta="¿Qué resultado tuvo?" opciones={[
                 { valor: 'normal', etiqueta: 'Normal' },
                 { valor: 'alterado', etiqueta: 'Alterado o requirió seguimiento' },
@@ -780,7 +755,7 @@ export default function PreConsulta({
           )}
           {muestraMama && (
             <>
-              <CampoTexto etiqueta="Fecha aproximada de tu última mastografía" tipo="date" valor={hc.ultimaMastografiaFecha} onChange={(v) => setH('ultimaMastografiaFecha', v)} />
+              <CampoTexto etiqueta="Fecha aproximada de tu última mastografía" placeholder="Mes y año, si los recuerdas" valor={hc.ultimaMastografiaFecha} onChange={(v) => setH('ultimaMastografiaFecha', v)} />
               <GrupoOpciones etiqueta="¿Qué resultado tuvo?" opciones={[
                 { valor: 'normal', etiqueta: 'Normal' },
                 { valor: 'seguimiento', etiqueta: 'Pidieron seguimiento u otro estudio' },
@@ -808,22 +783,11 @@ export default function PreConsulta({
       );
     }
 
+    if (paso.id !== 'envio') return null;
     return (
       <>
         {avisoUrgenteTexto(alerta)}
-        <ResumenEnvio dem={dem} hc={hc} pasos={pasos} irPaso={irPaso} estudiosEstado={estudiosEstado} />
-        {onEnviar && (
-          <section className="pc-campo pc-full" aria-labelledby="tituloAtribucion">
-            <h3 id="tituloAtribucion">Tu cita y cómo nos conociste</h3>
-            <p className="pc-grupo-ayuda">Selecciona una respuesta en cada pregunta. Si no recuerdas o prefieres no compartir este dato, puedes indicarlo.</p>
-            <GrupoOpciones id="canalReserva" requerido etiqueta="¿Por dónde reservaste tu cita?" opciones={CANALES_RESERVA}
-              valor={atribucion.booking_channel}
-              onChange={(valor) => { setAtribucion((p) => ({ ...p, booking_channel: valor })); limpiarError(); }} />
-            <GrupoOpciones id="fuenteDeclarada" requerido etiqueta="¿Dónde conociste al Dr. Jiménez?" opciones={FUENTES_DECLARADAS}
-              valor={atribucion.patient_reported_source}
-              onChange={(valor) => { setAtribucion((p) => ({ ...p, patient_reported_source: valor })); limpiarError(); }} />
-          </section>
-        )}
+        <h2 className="pc-subtitulo"><Paperclip aria-hidden="true" />Tus estudios</h2>
         {onEnviar && (
           <>
             <label className="pc-consent" id="consentimiento">
@@ -842,11 +806,21 @@ export default function PreConsulta({
             ? extraAntesDeEnviar({ consentimientoAceptado: acepto, enviando })
             : extraAntesDeEnviar}
         </div>
+        <h2 className="pc-subtitulo"><ClipboardList aria-hidden="true" />Revisa tus respuestas</h2>
+        <RevisionPreconsulta dem={dem} hc={hc} mrs={mrs} dolor={dolor} profundos={profundosSeguros} pasos={pasos} irPaso={irPaso} />
+        {onEnviar && <div className="pc-atribucion">
+          <h2 className="pc-subtitulo">Tu cita</h2>
+          <div className="pc-datos">
+            <CampoSelect id="canalReserva" requerido etiqueta="¿Por dónde reservaste?" opciones={CANALES_RESERVA} valor={atribucion.booking_channel}
+              onChange={v => { setAtribucion(p => ({ ...p, booking_channel: v })); limpiarError(); }} />
+            <CampoSelect id="fuenteDeclarada" requerido etiqueta="¿Dónde conociste al doctor?" opciones={FUENTES_DECLARADAS} valor={atribucion.patient_reported_source}
+              onChange={v => { setAtribucion(p => ({ ...p, patient_reported_source: v })); limpiarError(); }} />
+          </div>
+        </div>}
         <button type="button" className="pc-guardar pc-enviar" onClick={enviar} disabled={enviando} aria-busy={enviando}>
           {enviando ? <LoaderCircle className="pc-boton-cargando" aria-hidden="true" /> : <Send aria-hidden="true" />}
           <span>{onEnviar ? (enviando ? 'Enviando…' : 'Enviar cuestionario y estudios') : 'Guardar respuestas'}</span>
         </button>
-        <div className="pc-acciones-nota">Al enviar, recibirás una confirmación clara en esta misma pantalla.</div>
         {guardado && !onEnviar && <div className="pc-ok">Tus respuestas quedaron guardadas.</div>}
       </>
     );
@@ -855,12 +829,26 @@ export default function PreConsulta({
   return (
     <div className="pc">
       <div className="pc-cuerpo">
+        <aside className="pc-ruta" aria-label="Secciones de la preconsulta">
+          <h2>Tu preconsulta</h2>
+          <ol>{GRUPOS_PASOS.map((nombre, g) => {
+            const Icono = [ClipboardList, ShieldCheck, HeartPulse, History, Paperclip][g];
+            const destino = pasos.find(p => grupoPaso(p.id) === g);
+            return <li key={nombre} className={grupoPaso(paso.id) === g ? 'actual' : ''}>
+              <button type="button" title={nombre} aria-current={grupoPaso(paso.id) === g ? 'step' : undefined} disabled={!destino || g > grupoPaso(paso.id)} onClick={() => irPaso(destino.id)}>
+                <Icono aria-hidden="true" /><span>{nombre}</span>
+              </button>
+            </li>;
+          })}</ol>
+          <a href="/privacidad" target="_blank" rel="noopener noreferrer">Aviso de privacidad</a>
+        </aside>
+        <div className="pc-principal">
         <input ref={trampaRef} type="text" name="pc_no_rellenar" tabIndex={-1} autoComplete="off" aria-hidden="true" className="pc-trampa" />
 
         <div
           className="pc-progreso"
           role="progressbar"
-          aria-label="Avance del cuestionario"
+          aria-label="Avance del recorrido, pendiente de envío"
           aria-valuemin="0"
           aria-valuemax="100"
           aria-valuenow={progreso}
@@ -868,7 +856,7 @@ export default function PreConsulta({
           <div className="pc-progreso-meta">
             <div className="pc-progreso-identidad">
               <img src="/marca/isotipo_verde.svg" alt="" aria-hidden="true" />
-              <span>Cuestionario privado</span>
+              <span>Paso {indice + 1} de {pasos.length}</span>
             </div>
             <b>{paso.titulo}</b>
           </div>
@@ -884,34 +872,37 @@ export default function PreConsulta({
               onClick={() => onGuardarParaDespues(borradorActual())}
               disabled={guardandoParaDespues}
             >
-              {guardandoParaDespues ? 'Guardando...' : 'Guardar y continuar después'}
+              <Save size={16} aria-hidden="true" />{guardandoParaDespues ? 'Guardando...' : 'Continuar después'}
             </button>
             {enlaceContinuacion && <span>Enlace privado actualizado</span>}
           </div>
         )}
 
-        <section className="pc-paso" ref={pasoRef} tabIndex={-1} aria-labelledby="pc-paso-titulo">
+        <section className="pc-paso" style={estiloArea(paso.id)} ref={pasoRef} tabIndex={-1} aria-labelledby="pc-paso-titulo">
           <header className="pc-paso-cab">
-            <span>Etapa</span>
+            <AreaClinica id={paso.id} />
+            <span>{GRUPOS_PASOS[grupoPaso(paso.id)]}</span>
             <h1 id="pc-paso-titulo">{paso.titulo}</h1>
           </header>
 
           {bloqueo && <div id="pc-error" ref={alertaRef} tabIndex={-1} className="pc-bloqueo" role="alert">{bloqueo}</div>}
           {contenidoPaso()}
+          <EntrevistaDirigida paso={paso.id} hc={hc} onChange={setH} />
 
-          {paso.id !== 'envio' && (
+          {(
             <nav className="pc-navegacion" aria-label="Navegación del cuestionario">
-              <button type="button" className="pc-anterior" onClick={anterior} disabled={indice === 0}>
+              <button type="button" className="pc-anterior" onClick={anterior} disabled={indice === 0 || enviando}>
                 <ArrowLeft aria-hidden="true" /><span>Anterior</span>
               </button>
-              <button type="button" className="pc-siguiente" onClick={siguiente}>
-                <span>Continuar</span><ArrowRight aria-hidden="true" />
-              </button>
+              {paso.id !== 'envio' && <button type="button" className="pc-siguiente" onClick={siguiente}>
+                <span>{volverRevision ? 'Volver a la revisión' : 'Continuar'}</span><ArrowRight aria-hidden="true" />
+              </button>}
             </nav>
           )}
         </section>
 
         <p className="pc-privacidad-breve">Tus respuestas son privadas. El cuestionario orienta la consulta, pero no sustituye una valoración médica ni emite diagnósticos.</p>
+        </div>
       </div>
     </div>
   );

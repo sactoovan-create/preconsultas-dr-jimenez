@@ -1,20 +1,9 @@
-/**
- * Profundización de INCONTINENCIA URINARIA para la paciente.
- * Instrumento: ICIQ-SF (International Consultation on Incontinence Questionnaire —
- * Short Form), versión validada al español. Autoaplicable, breve, con puntaje y
- * bandas de severidad reproducibles, y una pregunta de tipo (esfuerzo / urgencia /
- * mixta) que es justo lo que pide diferenciar la nota clínica de incontinencia.
- *
- * Orientativo, no diagnóstico: entrega al médico una línea basal ordenada. Sirve
- * también como medida basal para repetir tras iniciar tratamiento.
- *
- * Puntaje = frecuencia (0-5) + cantidad (0/2/4/6) + afectación (0-10). Rango 0-21.
- * Bandas (Klovning y cols.): 1-5 leve, 6-12 moderada, 13-18 grave, 19-21 muy grave.
- */
+/** Entrevista urinaria local; revisar traducción oficial y permiso ICIQ antes
+ * de atribuir validación. Conserva las respuestas y su índice descriptivo 0-21. */
 
 export const ID = 'incontinencia';
 export const TITULO = 'Escapes de orina';
-export const FUENTE = 'ICIQ-SF (versión validada al español)';
+export const FUENTE = 'Entrevista urinaria local basada en dominios ICIQ-UI SF. Versión oficial española y permiso de uso pendientes de cotejo; no equivale a una implementación validada.';
 
 // Se ofrece cuando la paciente reporta molestias de vejiga en el tamizaje, o marcó
 // que tiene escapes de orina. Umbral moderado (2) para no molestar por una molestia leve.
@@ -72,20 +61,20 @@ export const PREGUNTAS = [
       { id: 'tos_estornudo', etiqueta: 'Al toser o estornudar', patron: 'esfuerzo' },
       { id: 'ejercicio', etiqueta: 'Al hacer esfuerzo físico o ejercicio', patron: 'esfuerzo' },
       { id: 'dormida', etiqueta: 'Mientras duermo', patron: 'otro' },
-      { id: 'sin_razon', etiqueta: 'Sin una razón clara', patron: 'urgencia' },
+      { id: 'sin_razon', etiqueta: 'Sin una razón clara', patron: 'otro' },
       { id: 'termina', etiqueta: 'Al terminar de orinar y ya vestida', patron: 'otro' },
       { id: 'siempre', etiqueta: 'Todo el tiempo', patron: 'otro' },
     ],
   },
 ];
 
-function num(x) { const n = Number(x); return Number.isFinite(n) ? n : null; }
+function num(x) { if (x == null || x === '' || typeof x === 'boolean') return null; const n = Number(x); return Number.isFinite(n) ? n : null; }
 
 /** Evalúa las respuestas. Devuelve puntaje, severidad, tipo y un resumen orientativo. */
 export function evaluar(resp) {
   const r = resp || {};
   const f = num(r.frecuencia), c = num(r.cantidad), a = num(r.afectacion);
-  const completo = f != null && c != null && a != null;
+  const completo = Number.isInteger(f) && f >= 0 && f <= 5 && [0, 2, 4, 6].includes(c) && Number.isInteger(a) && a >= 0 && a <= 10;
   const puntaje = completo ? f + c + a : null;
 
   let severidad = null;
@@ -117,9 +106,9 @@ export function evaluar(resp) {
   };
 
   const partes = [];
-  if (puntaje != null) partes.push(`ICIQ-SF ${puntaje} de 21 (${severidad}).`);
+  if (puntaje != null) partes.push(`Índice urinario local ${puntaje} de 21 (${severidad}); no acredita aplicación oficial de ICIQ-UI SF.`);
   if (tipo) partes.push(`Patrón sugerido: incontinencia ${NOMBRE_TIPO[tipo]}.`);
   const resumen = partes.join(' ') || null;
 
-  return { instrumento: 'ICIQ-SF', completo, puntaje, severidad, tipo, resumen };
+  return { instrumento: 'Entrevista urinaria local', version: 2, validado: false, completo, puntaje, severidad, tipo, resumen };
 }

@@ -16,10 +16,10 @@ const ocultas = filtrarProfundizacionesActivas(
   {'salud-sexual':{ss_deseo:2},incontinencia:{iciq_frecuencia:3}},
 );
 check('módulos que ya no aplican no conservan respuestas ocultas', Object.keys(ocultas).length===0);
-check('FSFI-6 corte <=19 positivo', /posible dificultad/.test(evaluarProfundizacion('salud-sexual',{ss_deseo:2,ss_excitacion:2,ss_lubricacion:1,ss_orgasmo:3,ss_satisfaccion:2,ss_dolor:4}).resumen));
+check('Entrevista sexual local no aplica un corte FSFI', evaluarProfundizacion('salud-sexual',{ss_deseo:2,ss_excitacion:2,ss_lubricacion:1,ss_orgasmo:3,ss_satisfaccion:2,ss_dolor:4}).positivo === null);
 check('FSFI-6 sin actividad marca cautela', /cautela/.test(evaluarProfundizacion('salud-sexual',{ss_deseo:2,ss_excitacion:0,ss_lubricacion:0,ss_orgasmo:0,ss_satisfaccion:3,ss_dolor:0}).resumen));
 check('GSM identifica síntoma más molesto', /lo que más le molesta/.test(evaluarProfundizacion('genitourinario',{sequedad:3,comezon:1,ardor:2,dolor_sexo:2,urinario:1,evita_intimidad:1,mbs:3,impacto_dia:2,impacto_animo:3,impacto_intimidad:2}).resumen));
-check('dolor: patrón dominante dolor menstrual', /patrón dominante dolor menstrual/.test(evaluarProfundizacion('dolor-pelvico',{dismenorrea_aplica:1,dismenorrea_int:9,no_menstrual_int:4,dispareunia_aplica:1,dispareunia_int:7,disquecia_int:6,disuria_int:2,impacto:8,mas_molesto:3,banderas:['b_refractario']}).resumen));
+check('dolor: patrón dominante dolor menstrual', /patrón dominante entre las respuestas disponibles, dolor menstrual/.test(evaluarProfundizacion('dolor-pelvico',{dismenorrea_aplica:1,dismenorrea_int:9,no_menstrual_int:4,dispareunia_aplica:1,dispareunia_int:7,disquecia_int:6,disuria_int:2,impacto:8,mas_molesto:3,banderas:['b_refractario']}).resumen));
 check('SOP: dominante vello + bandera ánimo', /vello corporal/.test(evaluarProfundizacion('sop',{animo:3,vello:4,peso:3,piel:1,reglas:2,fertilidad:-1,prioridad:1}).resumen));
 console.log(`\nResultado profundos: ${ok} pasan, ${fail} fallan.`);
 if(fail>0) process.exit(1);
