@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { EstadoCarga, ProteccionCarga } from './core/EstadoCarga.jsx';
 
 /**
  * Aplicación autónoma del consultorio del Dr. Iván Jiménez Martínez.
@@ -15,18 +16,10 @@ const PortalPaciente = lazy(() => import('./paciente/PortalPaciente.jsx'));
 const InstrumentosModule = lazy(() => import('./InstrumentosModule.jsx'));
 const AvisoPrivacidad = lazy(() => import('./paciente/AvisoPrivacidad.jsx'));
 
-function Cargando() {
-  return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1F3A2E', fontFamily: 'Inter, system-ui, sans-serif', background: '#F1EADB' }}>
-      Cargando…
-    </div>
-  );
-}
-
 export default function App() {
   return (
-    <BrowserRouter>
-      <Suspense fallback={<Cargando />}>
+    <ProteccionCarga><BrowserRouter>
+      <Suspense fallback={<EstadoCarga />}>
         <Routes>
           <Route path="/" element={<PortalPaciente />} />
           <Route path="/privacidad" element={<AvisoPrivacidad />} />
@@ -34,6 +27,6 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
-    </BrowserRouter>
+    </BrowserRouter></ProteccionCarga>
   );
 }

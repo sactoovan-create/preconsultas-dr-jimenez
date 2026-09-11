@@ -15,10 +15,29 @@
     <style>
       html, body, #root { height: 100%; margin: 0; }
       body { background: #E3DAC6; font-family: 'Inter', system-ui, sans-serif; }
+      .app-load { box-sizing: border-box; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 32px 20px; background: #fff; color: #1f3a2e; text-align: center; font-family: system-ui, sans-serif; }
+      .app-load > div { max-width: 440px; }
+      .app-load h1 { font: 600 21px/1.4 system-ui, sans-serif; margin: 0; }
+      .app-load p { font: 400 16px/1.5 system-ui, sans-serif; margin: 14px 0; color: #52645b; }
+      .app-load img { object-fit: contain; }
+      .app-load button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; max-width: 100%; padding: 10px 18px; border: 1px solid #1f3a2e; border-radius: 6px; background: #1f3a2e; color: #fff; font: 600 16px/1.4 system-ui, sans-serif; cursor: pointer; }
+      .app-load button:focus-visible { outline: 3px solid #14798d; outline-offset: 4px; }
+      .app-boot-recovery { visibility: hidden; animation: app-recovery 0s 8s forwards; }
+      @keyframes app-recovery { to { visibility: visible; } }
     </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <main class="app-load">
+        <img src="/marca/logo_maestro_web.svg" alt="dr. jiménez, ginecología" width="148" height="64" />
+        <h1 role="status">Cargando…</h1>
+        <div class="app-boot-recovery">
+          <p>La página está tardando en abrir. Comprueba tu conexión y vuelve a intentarlo.</p>
+          <button type="button" onclick="window.location.reload()">Volver a cargar</button>
+        </div>
+        <noscript>Activa JavaScript en tu navegador para abrir el cuestionario o el consultorio.</noscript>
+      </main>
+    </div>
     <script type="module" src="/main.jsx"></script>
   </body>
 </html>
