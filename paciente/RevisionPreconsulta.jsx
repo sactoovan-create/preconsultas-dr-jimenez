@@ -2,6 +2,7 @@ import React from 'react';
 import { Pencil } from 'lucide-react';
 import { preguntasEntrevista, tieneRespuesta, valorEntrevista } from '../core/entrevista.js';
 import { TEMAS_CONSULTA, validarPaso } from '../core/preconsultaFlow.js';
+import { formatearDomicilio } from '../core/domicilio.js';
 import { MODULOS } from '../core/profundos/index.js';
 import { MRS_ITEMS } from '../instruments/menopausia/engine.js';
 
@@ -29,7 +30,7 @@ export default function RevisionPreconsulta({ dem, hc, mrs, dolor, profundos, pa
   return <div className="pc-revision" aria-label="Revisión de respuestas">
     {pasos.filter(p => p.id !== 'envio').map(p => {
       let filas = (campos[p.id] || []).filter(([k]) => tieneRespuesta(hc[k])).map(([k, label]) => [label, formato(hc[k])]);
-      if (p.id === 'inicio') filas = [['Nombre', dem.nombre], ['Edad', dem.edad], ['Teléfono', hc.telefono], ['Correo', hc.correo]].filter(([,v]) => tieneRespuesta(v));
+      if (p.id === 'inicio') filas = [['Nombre', dem.nombre], ['Edad', dem.edad], ['Teléfono', hc.telefono], ['Correo', hc.correo], ['Domicilio (INE)', formatearDomicilio(hc)]].filter(([,v]) => tieneRespuesta(v));
       if (p.id === 'motivo') filas = [['Motivo', hc.motivo], ['Temas', (hc.temasConsulta || []).map(id => TEMAS_CONSULTA.find(t => t.id === id)?.etiqueta || id).join(', ')]];
       if (p.id === 'dolor') filas = Object.entries(dolor).filter(([,v]) => tieneRespuesta(v)).map(([k,v]) => [formato(k), formato(v)]);
       if (p.id === 'climaterio') filas = MRS_ITEMS.filter(q => mrs[q.id] != null).map(q => [q.texto, `${mrs[q.id]} de 4`]);

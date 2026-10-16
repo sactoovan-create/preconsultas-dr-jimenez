@@ -5,10 +5,18 @@ import { estiloArea } from '../core/areasClinicas.js';
 
 export function CampoTexto({
   etiqueta, valor, onChange, placeholder, area = false, tipo = 'text',
-  requerido = false, ayuda, id,
+  requerido = false, ayuda, id, inputMode, maxLength, autoComplete,
 }) {
   const generado = useId();
   const inputId = id || generado;
+  const autoCompleteValor = autoComplete ?? {
+    nombre: 'name',
+    telefono: 'tel',
+    correo: 'email',
+    dom_calle_numero: 'street-address',
+    dom_cp: 'postal-code',
+    dom_municipio: 'address-level2',
+  }[id];
   return (
     <label className="pc-campo pc-full" htmlFor={inputId}>
       <span>{etiqueta}{requerido && <b className="pc-requerido"> *</b>}</span>
@@ -18,6 +26,7 @@ export function CampoTexto({
           id={inputId}
           rows={3}
           aria-required={requerido}
+          maxLength={maxLength}
           value={valor || ''}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
@@ -26,8 +35,10 @@ export function CampoTexto({
         <input
           id={inputId}
           type={tipo}
+          inputMode={inputMode}
+          maxLength={maxLength}
           aria-required={requerido}
-          autoComplete={{ nombre: 'name', telefono: 'tel', correo: 'email' }[id]}
+          autoComplete={autoCompleteValor}
           value={valor ?? ''}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
@@ -60,12 +71,18 @@ export function CampoNumero({
   );
 }
 
-export function CampoSelect({ id, etiqueta, opciones, valor, onChange, requerido = false }) {
+export function CampoSelect({ id, etiqueta, opciones, valor, onChange, requerido = false, autoComplete }) {
   const generado = useId();
   const controlId = id || generado;
   return <label className="pc-campo" htmlFor={controlId}>
     <span>{etiqueta}{requerido && <b className="pc-requerido"> *</b>}</span>
-    <select id={controlId} aria-required={requerido} value={valor || ''} onChange={e => onChange(e.target.value)}>
+    <select
+      id={controlId}
+      aria-required={requerido}
+      autoComplete={autoComplete ?? (id === 'dom_estado' ? 'address-level1' : undefined)}
+      value={valor || ''}
+      onChange={e => onChange(e.target.value)}
+    >
       <option value="" disabled>Selecciona una opción</option>
       {opciones.map(o => <option key={o.valor} value={o.valor}>{o.etiqueta}</option>)}
     </select>

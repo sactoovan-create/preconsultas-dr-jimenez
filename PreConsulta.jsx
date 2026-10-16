@@ -36,6 +36,7 @@ import {
 } from './paciente/CamposPreconsulta.jsx';
 import './PreConsulta.css';
 import { atribucionDesdeEnlace, normalizarAtribucion, validarAtribucion, CANALES_RESERVA, FUENTES_DECLARADAS } from './core/atribucion.js';
+import { OPCIONES_ENTIDADES_FEDERATIVAS, limpiarEntradaCp, normalizarDomicilio, tieneDatosDomicilio } from './core/domicilio.js';
 
 const MRS = [
   ['mrs_bochornos', 'Bochornos o sudoraciones repentinas'],
@@ -242,7 +243,7 @@ export default function PreConsulta({
 
   useEffect(() => {
     if (!onEnviar) return;
-    const hayDatos = dem.nombre || hc.telefono || hc.motivo || (hc.temasConsulta || []).length;
+    const hayDatos = dem.nombre || hc.telefono || hc.motivo || (hc.temasConsulta || []).length || tieneDatosDomicilio(hc);
     if (!hayDatos) return;
     const contenido = {
       demografia: { nombre: dem.nombre || '', edad: dem.edad ?? null },
@@ -354,8 +355,10 @@ export default function PreConsulta({
   };
 
   const reporteParaEnviar = () => {
+    const domicilio = normalizarDomicilio(hc);
     const historia = limpiarEntrevista(filtrarHistoriaActiva({
       ...hc,
+      ...domicilio,
       telefono: normalizarTelefonoMexicano(hc.telefono),
       entrevistaVersion: ENTREVISTA_VERSION,
     }), pasos.map(p => p.id));
@@ -368,6 +371,7 @@ export default function PreConsulta({
       : { tiene: false, intensidad: null, meses: null };
     const hcActiva = {
       ...historia,
+      ...domicilio,
       sangrado: reportaSangrado,
       formularioVersion: FORMULARIO_VERSION,
     };
@@ -402,7 +406,7 @@ export default function PreConsulta({
     for (const p of pasos) {
       if (p.id.startsWith('profundizacion:') || ['prevencion', 'envio'].includes(p.id)) continue;
       const resultado = validarPaso(p.id, { demografia: dem, hc, mrs, dolor });
-      if (!resultado.ok) { setPasoId(p.id); mostrarError(resultado); return; }
+      if (!resultado.ok) { setVolverRevision(true); setPasoId(p.id); mostrarError(resultado); return; }
     }
     if (onEnviar) {
       const resultado = validarAtribucion(atribucion);
@@ -432,6 +436,7 @@ export default function PreConsulta({
           telefono: reporte.hc.telefono || null,
           correo: reporte.hc.correo || null,
         },
+        domicilio: normalizarDomicilio(reporte.hc),
         demografia: { nombre: dem.nombre, edad: dem.edad },
         consentimiento: true,
         consentimientoFecha: new Date().toISOString(),
@@ -458,6 +463,17 @@ export default function PreConsulta({
           <CampoNumero id="edad" etiqueta="Edad" requerido min={1} max={110} valor={dem.edad} onChange={(v) => setDem('edad', v)} placeholder="años" />
           <CampoTexto id="telefono" etiqueta="Teléfono o WhatsApp de México" requerido tipo="tel" valor={hc.telefono} onChange={(v) => setH('telefono', v)} placeholder="10 dígitos; puedes incluir +52" />
           <CampoTexto id="correo" etiqueta="Correo (opcional)" tipo="email" valor={hc.correo} onChange={(v) => setH('correo', v)} placeholder="tu@correo.com" />
+        </div>
+        <div className="pc-domicilio">
+          <h2 className="pc-subtitulo">Tu domicilio, como aparece en tu INE</h2>
+          <p className="pc-paso-intro pc-domicilio-intro">Lo necesitamos por norma sanitaria en caso de que tu receta lo requiera.</p>
+          <div className="pc-datos pc-datos-domicilio">
+            <CampoTexto id="dom_calle_numero" etiqueta="Calle y número (opcional)" valor={hc.dom_calle_numero} onChange={(v) => setH('dom_calle_numero', v)} placeholder="Ej. Av. Insurgentes Sur 123, Int. 4" maxLength={200} />
+            <CampoTexto id="dom_colonia" etiqueta="Colonia" requerido valor={hc.dom_colonia} onChange={(v) => setH('dom_colonia', v)} placeholder="Como aparece en tu INE" maxLength={120} />
+            <CampoTexto id="dom_cp" etiqueta="C.P." requerido valor={hc.dom_cp} onChange={(v) => setH('dom_cp', limpiarEntradaCp(v))} placeholder="5 dígitos (ej. 06700)" inputMode="numeric" maxLength={5} />
+            <CampoTexto id="dom_municipio" etiqueta="Municipio o alcaldía" requerido valor={hc.dom_municipio} onChange={(v) => setH('dom_municipio', v)} placeholder="Ej. Benito Juárez, Zapopan..." maxLength={120} />
+            <CampoSelect id="dom_estado" etiqueta="Estado" requerido opciones={OPCIONES_ENTIDADES_FEDERATIVAS} valor={hc.dom_estado} onChange={(v) => setH('dom_estado', v)} />
+          </div>
         </div>
       </>
     );

@@ -2,7 +2,7 @@
   "formulario": "2026.09.4",
   "alcance": "Captura base, 11 dominios de síntomas, entrevista dirigida y módulos complementarios; excluye consentimiento, honeypot y controles de navegación. No es conteo de preguntas obligatorias ni certificación clínica.",
   "conteo": {
-    "controlesBase": 49,
+    "controlesBase": 54,
     "mrs": 11,
     "entrevistaDirigida": 75,
     "complementarias": 38
@@ -13,7 +13,7 @@
       "control": "CampoTexto",
       "id": "nombre",
       "archivo": "PreConsulta.jsx",
-      "linea": 457,
+      "linea": 462,
       "valor": "{dem.nombre}"
     },
     {
@@ -21,7 +21,7 @@
       "control": "CampoNumero",
       "id": "edad",
       "archivo": "PreConsulta.jsx",
-      "linea": 458,
+      "linea": 463,
       "valor": "{dem.edad}"
     },
     {
@@ -29,7 +29,7 @@
       "control": "CampoTexto",
       "id": "telefono",
       "archivo": "PreConsulta.jsx",
-      "linea": 459,
+      "linea": 464,
       "valor": "{hc.telefono}"
     },
     {
@@ -37,15 +37,55 @@
       "control": "CampoTexto",
       "id": "correo",
       "archivo": "PreConsulta.jsx",
-      "linea": 460,
+      "linea": 465,
       "valor": "{hc.correo}"
+    },
+    {
+      "etiqueta": "Calle y número (opcional)",
+      "control": "CampoTexto",
+      "id": "dom_calle_numero",
+      "archivo": "PreConsulta.jsx",
+      "linea": 471,
+      "valor": "{hc.dom_calle_numero}"
+    },
+    {
+      "etiqueta": "Colonia",
+      "control": "CampoTexto",
+      "id": "dom_colonia",
+      "archivo": "PreConsulta.jsx",
+      "linea": 472,
+      "valor": "{hc.dom_colonia}"
+    },
+    {
+      "etiqueta": "C.P.",
+      "control": "CampoTexto",
+      "id": "dom_cp",
+      "archivo": "PreConsulta.jsx",
+      "linea": 473,
+      "valor": "{hc.dom_cp}"
+    },
+    {
+      "etiqueta": "Municipio o alcaldía",
+      "control": "CampoTexto",
+      "id": "dom_municipio",
+      "archivo": "PreConsulta.jsx",
+      "linea": 474,
+      "valor": "{hc.dom_municipio}"
+    },
+    {
+      "etiqueta": "Estado",
+      "control": "CampoSelect",
+      "id": "dom_estado",
+      "archivo": "PreConsulta.jsx",
+      "linea": 475,
+      "valor": "{hc.dom_estado}"
     },
     {
       "etiqueta": "¿Qué te gustaría resolver en esta consulta?",
       "control": "CampoTexto",
       "id": "motivo",
       "archivo": "PreConsulta.jsx",
-      "linea": 468,
+      "linea": 484,
       "valor": "{hc.motivo}"
     },
     {
@@ -53,7 +93,7 @@
       "control": "GrupoMultiple",
       "id": "temasConsulta",
       "archivo": "PreConsulta.jsx",
-      "linea": 469,
+      "linea": 485,
       "valor": "{hc.temasConsulta}"
     },
     {
@@ -61,7 +101,7 @@
       "control": "GrupoMultiple",
       "id": "senalesUrgencia",
       "archivo": "PreConsulta.jsx",
-      "linea": 529,
+      "linea": 545,
       "valor": "{hc.senalesUrgencia}"
     },
     {
@@ -69,7 +109,7 @@
       "control": "GrupoOpciones",
       "id": "etapaReproductiva",
       "archivo": "PreConsulta.jsx",
-      "linea": 538,
+      "linea": 554,
       "valor": "{hc.etapaReproductiva}"
     },
     {
@@ -77,7 +117,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 539,
+      "linea": 555,
       "valor": "{hc.ultimaMenstruacion}"
     },
     {
@@ -85,7 +125,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 540,
+      "linea": 556,
       "valor": "{hc.anticonceptivo}"
     },
     {
@@ -93,7 +133,7 @@
       "control": "GrupoMultiple",
       "id": "sangradoTipos",
       "archivo": "PreConsulta.jsx",
-      "linea": 547,
+      "linea": 563,
       "valor": "{hc.sangradoTipos}"
     },
     {
@@ -101,7 +141,7 @@
       "control": "GrupoOpciones",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 563,
+      "linea": 579,
       "valor": "{hc.sangradoAhora}"
     },
     {
@@ -109,7 +149,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 565,
+      "linea": 581,
       "valor": "{hc.sangradoDuracionDias}"
     },
     {
@@ -117,7 +157,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 566,
+      "linea": 582,
       "valor": "{hc.sangradoDesde}"
     },
     {
@@ -125,7 +165,7 @@
       "control": "EscalaNumerica",
       "id": "dolorIntensidad",
       "archivo": "PreConsulta.jsx",
-      "linea": 574,
+      "linea": 590,
       "valor": "{dolor.intensidad}"
     },
     {
@@ -133,7 +173,7 @@
       "control": "GrupoOpciones",
       "id": "dolorInicio",
       "archivo": "PreConsulta.jsx",
-      "linea": 575,
+      "linea": 591,
       "valor": "{dolor.inicio}"
     },
     {
@@ -141,7 +181,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 582,
+      "linea": 598,
       "valor": "{dolor.meses}"
     },
     {
@@ -149,7 +189,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 583,
+      "linea": 599,
       "valor": "{dolor.localizacion}"
     },
     {
@@ -157,7 +197,7 @@
       "control": "GrupoMultiple",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 585,
+      "linea": 601,
       "valor": "{dolor.asociados}"
     },
     {
@@ -165,7 +205,7 @@
       "control": "GrupoOpciones",
       "id": "reglasRegulares",
       "archivo": "PreConsulta.jsx",
-      "linea": 606,
+      "linea": 622,
       "valor": "{hc.reglasRegulares}"
     },
     {
@@ -173,7 +213,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 613,
+      "linea": 629,
       "valor": "{hc.edadMenarca}"
     },
     {
@@ -181,7 +221,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 614,
+      "linea": 630,
       "valor": "{hc.diasEntreReglas}"
     },
     {
@@ -189,7 +229,7 @@
       "control": "GrupoMultiple",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 616,
+      "linea": 632,
       "valor": "{hc.cambiosAndrogenicos}"
     },
     {
@@ -197,7 +237,7 @@
       "control": "GrupoMultiple",
       "id": "sintomasUrinarios",
       "archivo": "PreConsulta.jsx",
-      "linea": 635,
+      "linea": 651,
       "valor": "{hc.sintomasUrinarios}"
     },
     {
@@ -205,7 +245,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 643,
+      "linea": 659,
       "valor": "{hc.urinarioDetalle}"
     },
     {
@@ -213,7 +253,7 @@
       "control": "GrupoMultiple",
       "id": "molestiasIntimas",
       "archivo": "PreConsulta.jsx",
-      "linea": 650,
+      "linea": 666,
       "valor": "{hc.molestiasIntimas}"
     },
     {
@@ -221,7 +261,7 @@
       "control": "GrupoMultiple",
       "id": "sintomasMama",
       "archivo": "PreConsulta.jsx",
-      "linea": 662,
+      "linea": 678,
       "valor": "{hc.sintomasMama}"
     },
     {
@@ -229,7 +269,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 669,
+      "linea": 685,
       "valor": "{hc.mamaDetalle}"
     },
     {
@@ -237,7 +277,7 @@
       "control": "GrupoOpciones",
       "id": "objetivoReproductivo",
       "archivo": "PreConsulta.jsx",
-      "linea": 675,
+      "linea": 691,
       "valor": "{hc.objetivoReproductivo}"
     },
     {
@@ -245,7 +285,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 683,
+      "linea": 699,
       "valor": "{hc.mesesBuscandoEmbarazo}"
     },
     {
@@ -253,7 +293,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 685,
+      "linea": 701,
       "valor": "{hc.anticonceptivo}"
     },
     {
@@ -261,7 +301,7 @@
       "control": "GrupoMultiple",
       "id": "antecedentes",
       "archivo": "PreConsulta.jsx",
-      "linea": 703,
+      "linea": 719,
       "valor": "{hc.antecedentesSeleccionados}"
     },
     {
@@ -269,7 +309,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 718,
+      "linea": 734,
       "valor": "{hc.embarazos}"
     },
     {
@@ -277,7 +317,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 719,
+      "linea": 735,
       "valor": "{hc.partos}"
     },
     {
@@ -285,7 +325,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 720,
+      "linea": 736,
       "valor": "{hc.cesareas}"
     },
     {
@@ -293,7 +333,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 721,
+      "linea": 737,
       "valor": "{hc.abortos}"
     },
     {
@@ -301,7 +341,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 723,
+      "linea": 739,
       "valor": "{hc.cirugias}"
     },
     {
@@ -309,7 +349,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 724,
+      "linea": 740,
       "valor": "{hc.medicamentos}"
     },
     {
@@ -317,7 +357,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 725,
+      "linea": 741,
       "valor": "{hc.alergias}"
     },
     {
@@ -325,7 +365,7 @@
       "control": "GrupoOpciones",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 726,
+      "linea": 742,
       "valor": "{hc.tabacoEstado}"
     },
     {
@@ -333,7 +373,7 @@
       "control": "GrupoOpciones",
       "id": "tieneCuelloUterino",
       "archivo": "PreConsulta.jsx",
-      "linea": 740,
+      "linea": 756,
       "valor": "{hc.tieneCuelloUterino}"
     },
     {
@@ -341,7 +381,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 747,
+      "linea": 763,
       "valor": "{hc.ultimoPapFecha}"
     },
     {
@@ -349,7 +389,7 @@
       "control": "GrupoOpciones",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 748,
+      "linea": 764,
       "valor": "{hc.ultimoPapResultado}"
     },
     {
@@ -357,7 +397,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 758,
+      "linea": 774,
       "valor": "{hc.ultimaMastografiaFecha}"
     },
     {
@@ -365,7 +405,7 @@
       "control": "GrupoOpciones",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 759,
+      "linea": 775,
       "valor": "{hc.ultimaMastografiaResultado}"
     },
     {
@@ -373,7 +413,7 @@
       "control": "GrupoMultiple",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 767,
+      "linea": 783,
       "valor": "{hc.cancerFamiliarTipos}"
     },
     {
@@ -381,7 +421,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 780,
+      "linea": 796,
       "valor": "{hc.cancerFamiliarDetalle}"
     },
     {
@@ -389,7 +429,7 @@
       "control": "CampoSelect",
       "id": "canalReserva",
       "archivo": "PreConsulta.jsx",
-      "linea": 814,
+      "linea": 830,
       "valor": "{atribucion.booking_channel}"
     },
     {
@@ -397,7 +437,7 @@
       "control": "CampoSelect",
       "id": "fuenteDeclarada",
       "archivo": "PreConsulta.jsx",
-      "linea": 816,
+      "linea": 832,
       "valor": "{atribucion.patient_reported_source}"
     }
   ],

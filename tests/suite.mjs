@@ -152,11 +152,37 @@ console.log('Almacenamiento de respuestas · modo local');
   globalThis.localStorage.clear();
   const idEstable = nuevaRespuestaId();
   check('el identificador de envío tiene formato UUID', /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idEstable));
-  const guardado = await guardarRespuesta({ id: idEstable, paciente: { nombre: 'Prueba Uno' }, resumen: { menopausia: { total: 3, intensidad: 'mínima' } } });
+  const guardado = await guardarRespuesta({
+    id: idEstable,
+    paciente: {
+      nombre: 'Prueba Uno',
+      domicilio: {
+        dom_calle_numero: 'Calle Prueba 123',
+        dom_colonia: 'Colonia Centro',
+        dom_cp: '06000',
+        dom_municipio: 'Cuauhtémoc',
+        dom_estado: 'Ciudad de México',
+      },
+    },
+    autoReporte: {
+      hc: {
+        dom_calle_numero: 'Calle Prueba 123',
+        dom_colonia: 'Colonia Centro',
+        dom_cp: '06000',
+        dom_municipio: 'Cuauhtémoc',
+        dom_estado: 'Ciudad de México',
+      },
+    },
+    resumen: { menopausia: { total: 3, intensidad: 'mínima' } },
+  });
   check('guardar devuelve id y fecha', !!guardado.id && !!guardado.creado);
   check('un reintento conserva el mismo identificador', guardado.id === idEstable);
   const lista1 = await listarRespuestas();
   check('listar incluye la respuesta guardada', lista1.length === 1 && lista1[0].paciente.nombre === 'Prueba Uno');
+  check('el envío conserva el domicilio como en la INE dentro de la misma respuesta',
+    lista1[0].paciente.domicilio?.dom_cp === '06000'
+    && lista1[0].paciente.domicilio?.dom_colonia === 'Colonia Centro'
+    && lista1[0].autoReporte?.hc?.dom_estado === 'Ciudad de México');
   await guardarRespuesta({ paciente: { nombre: 'Prueba Dos' } });
   const lista2 = await listarRespuestas();
   check('la respuesta más reciente va primero', lista2.length === 2 && lista2[0].paciente.nombre === 'Prueba Dos');

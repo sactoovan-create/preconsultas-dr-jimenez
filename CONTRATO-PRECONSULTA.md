@@ -54,7 +54,14 @@ Cada envío de una paciente es **un objeto JSON** con esta forma:
     "nombre":   "María González Ramírez",  // texto libre, puede ser null
     "edad":     52,                          // entero o null
     "telefono": "3312345678",                  // teléfono mexicano, 10 dígitos
-    "correo":   "maria@correo.com"           // texto libre o null (opcional)
+    "correo":   "maria@correo.com",          // texto libre o null (opcional)
+    "domicilio": {
+      "dom_calle_numero": "Av. Vallarta 1234",
+      "dom_colonia":      "Americana",
+      "dom_cp":           "44160",
+      "dom_municipio":    "Guadalajara",
+      "dom_estado":       "Jalisco"
+    }
   },
 
   "autoReporte": {

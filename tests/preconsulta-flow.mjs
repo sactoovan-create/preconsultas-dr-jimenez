@@ -11,6 +11,14 @@ import {
   telefonoValido,
   validarPaso,
 } from '../core/preconsultaFlow.js';
+import {
+  cpValido,
+  ENTIDADES_FEDERATIVAS,
+  formatearDomicilio,
+  limpiarEntradaCp,
+  normalizarDomicilio,
+  validarDomicilio,
+} from '../core/domicilio.js';
 
 let ok = 0;
 let fail = 0;
@@ -26,6 +34,11 @@ const base = {
   hc: {
     telefono: '+52 55 1234 5678',
     correo: 'ana@example.com',
+    dom_calle_numero: 'Av. Insurgentes Sur 123',
+    dom_colonia: 'Roma Norte',
+    dom_cp: '06700',
+    dom_municipio: 'Cuauhtémoc',
+    dom_estado: 'Ciudad de México',
     motivo: 'Quiero revisar sangrado irregular',
     temasConsulta: ['sangrado'],
   },
@@ -167,6 +180,53 @@ t('el contexto no depende de una respuesta de embarazo',
     ...base,
     hc: { ...base.hc, etapaReproductiva: 'menstrua_regular' },
   }).ok);
+
+t('catálogo de entidades federativas incluye las 32 entidades de México',
+  ENTIDADES_FEDERATIVAS.length === 32 && new Set(ENTIDADES_FEDERATIVAS).size === 32);
+t('C.P. de 5 dígitos es válido (con o sin espacios)',
+  cpValido('06700') && cpValido(' 44160 ') && cpValido('01-000'));
+t('C.P. corto, largo o con letras se rechaza',
+  !cpValido('6700') && !cpValido('067001') && !cpValido('0670A') && !cpValido(''));
+t('limpiarEntradaCp recorta espacios y limita a 5 caracteres',
+  limpiarEntradaCp(' 067-009 ') === '06700');
+t('inicio pasa sin calle y número porque es opcional',
+  validarPaso('inicio', {
+    ...base,
+    hc: { ...base.hc, dom_calle_numero: '' },
+  }).ok);
+t('inicio exige colonia, C.P. de 5 dígitos, municipio y estado válido',
+  validarPaso('inicio', { ...base, hc: { ...base.hc, dom_colonia: '' } }).campo === 'dom_colonia'
+  && validarPaso('inicio', { ...base, hc: { ...base.hc, dom_cp: '1234' } }).campo === 'dom_cp'
+  && validarPaso('inicio', { ...base, hc: { ...base.hc, dom_municipio: '' } }).campo === 'dom_municipio'
+  && validarPaso('inicio', { ...base, hc: { ...base.hc, dom_estado: 'Estado Inventado' } }).campo === 'dom_estado');
+t('normalizarDomicilio limpia espacios y formatea igual que el ERP',
+  (() => {
+    const dom = normalizarDomicilio({
+      dom_calle_numero: '  Av.   Vallarta  1234 ',
+      dom_colonia: ' Americana ',
+      dom_cp: ' 44160 ',
+      dom_municipio: ' Guadalajara ',
+      dom_estado: 'Jalisco',
+    });
+    return dom.dom_calle_numero === 'Av. Vallarta 1234'
+      && dom.dom_colonia === 'Americana'
+      && dom.dom_cp === '44160'
+      && dom.dom_municipio === 'Guadalajara'
+      && dom.dom_estado === 'Jalisco'
+      && formatearDomicilio(dom) === 'Av. Vallarta 1234, Col. Americana, C.P. 44160, Guadalajara, Jalisco';
+  })());
+t('validarDomicilio no muta ni pierde los datos capturados cuando hay error en C.P.',
+  (() => {
+    const captura = {
+      dom_calle_numero: 'Calle Ficticia 10',
+      dom_colonia: 'Del Valle',
+      dom_cp: '0310',
+      dom_municipio: 'Benito Juárez',
+      dom_estado: 'Ciudad de México',
+    };
+    const res = validarDomicilio(captura);
+    return !res.ok && res.campo === 'dom_cp' && captura.dom_colonia === 'Del Valle' && captura.dom_cp === '0310';
+  })());
 
 console.log(`\nResultado flujo v2: ${ok} pasan, ${fail} fallan.`);
 if (fail) process.exit(1);

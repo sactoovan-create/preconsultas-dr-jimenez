@@ -3,6 +3,11 @@ export const reporteClinico = {
   paciente: { nombre: 'Paciente sintética de auditoría', edad: 46 },
   autoReporte: {
     hc: {
+      dom_calle_numero: 'Av. Prueba Sintética 100',
+      dom_colonia: 'Colonia Sintética',
+      dom_cp: '06700',
+      dom_municipio: 'Cuauhtémoc',
+      dom_estado: 'Ciudad de México',
       temasConsulta: ['sangrado', 'dolor', 'ciclos', 'urinario', 'mama', 'osea', 'metabolico', 'anticoncepcion'],
       etapaReproductiva: 'menstrua_irregular', reglasRegulares: false,
       motivo: 'Revisar mis síntomas y estudios. DATOS FICTICIOS.',

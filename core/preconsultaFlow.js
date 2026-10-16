@@ -7,6 +7,7 @@
  */
 
 import { validarEntrevista } from './entrevista.js';
+import { validarDomicilio } from './domicilio.js';
 export const FORMULARIO_VERSION = '2026.09.4';
 
 export const TEMAS_CONSULTA = [
@@ -270,6 +271,8 @@ export function validarPaso(id, { demografia, hc, mrs, dolor } = {}) {
     if (!Number.isInteger(edad) || edad < 1 || edad > 110) return error('Escribe una edad válida.', 'edad');
     if (!telefonoValido(historia.telefono)) return error('Escribe un teléfono mexicano válido de 10 dígitos; puedes incluir +52.', 'telefono');
     if (!correoValido(historia.correo)) return error('Revisa el formato de tu correo electrónico.', 'correo');
+    const domicilio = validarDomicilio(historia);
+    if (!domicilio.ok) return domicilio;
   }
 
   if (id === 'motivo') {

@@ -18,6 +18,7 @@ import { CREDITO } from '../core/marca.js';
 import SubirEstudios from './SubirEstudios.jsx';
 import { FORMULARIO_VERSION } from '../core/preconsultaFlow.js';
 import { normalizarAtribucion } from '../core/atribucion.js';
+import { normalizarDomicilio } from '../core/domicilio.js';
 import {
   borrarIntentoEnvio,
   cargarIntentoEnvio,
@@ -49,6 +50,8 @@ function Grano() {
 
 export function construirRegistro(datos, estudiosFolder, archivos = [], respuestaId = null, estudiosDecision = null) {
   const submittedAtClient = datos.consentimientoFecha || new Date().toISOString();
+  const domicilio = normalizarDomicilio(datos.domicilio || datos.hc || datos.paciente || {});
+  const hcNormalizada = datos.hc ? { ...datos.hc, ...domicilio } : { ...domicilio };
   const registro = {
     // v2 conserva los campos canónicos de v1 para una migración gradual, pero
     // distingue respuesta parcial, consentimiento, reloj del cliente y adjuntos.
@@ -62,8 +65,9 @@ export function construirRegistro(datos, estudiosFolder, archivos = [], respuest
       edad: datos.demografia?.edad ?? null,
       telefono: datos.contacto?.telefono || null,
       correo: datos.contacto?.correo || null,
+      domicilio,
     },
-    autoReporte: { mrs: datos.mrs, dolor: datos.dolor, hc: datos.hc, profundos: datos.profundos || {} },
+    autoReporte: { mrs: datos.mrs, dolor: datos.dolor, hc: hcNormalizada, profundos: datos.profundos || {} },
     resumen: construirResumen(datos),
     consentimiento: {
       aceptado: true,

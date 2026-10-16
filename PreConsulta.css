@@ -119,9 +119,13 @@
 
 .pc-datos { display: grid; grid-template-columns: minmax(0, 2fr) minmax(120px, 1fr); gap: 16px; margin-bottom: 18px; }
 .pc-datos-obstetricos { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.pc-domicilio { margin-top: 8px; padding-top: 18px; border-top: 1px solid rgba(31, 58, 46, .12); }
+.pc-domicilio .pc-subtitulo { margin: 0 0 6px; }
+.pc-domicilio-intro { margin: 0 0 18px; }
 .pc-campo { display: flex; min-width: 0; flex-direction: column; gap: 7px; margin: 0 0 19px; }
 .pc-campo.pc-full { grid-column: 1 / -1; }
-.pc-datos-identidad > .pc-campo:first-child { grid-column: auto; }
+.pc-datos-identidad > .pc-campo:first-child,
+.pc-datos-domicilio > .pc-campo:not(:first-child) { grid-column: auto; }
 .pc-campo > span { color: #27352e; font-size: 15px; font-weight: 650; line-height: 1.5; }
 .pc-campo > small { margin-top: -2px; color: rgba(31, 58, 46, .58); font-size: 12px; line-height: 1.45; }
 .pc-campo input,

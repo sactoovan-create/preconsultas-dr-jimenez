@@ -12,6 +12,7 @@ import EstudiosRespuesta from './EstudiosRespuesta.jsx';
 import ResumenPaciente from './ResumenPaciente.jsx';
 import MarcoInstrumento from './core/MarcoInstrumento.jsx';
 import { CANALES_RESERVA, FUENTES_DECLARADAS, etiquetaAtribucion } from './core/atribucion.js';
+import { formatearDomicilio } from './core/domicilio.js';
 
 function fecha(iso) {
   const d = new Date(iso);
@@ -85,6 +86,7 @@ export default function DetallePreconsulta({ r, onEliminar, eliminando, tab, set
         <div><dt>Formulario</dt><dd>{hc.formularioVersion || 'Versión no registrada'}</dd></div>
         <div><dt>Contrato de datos</dt><dd>{r.version ?? 'No registrado'}</dd></div>
         <div><dt>Consentimiento registrado</dt><dd>{consentimiento === true ? 'Sí' : consentimiento === false ? 'No' : 'No consta'}</dd></div>
+        <div><dt>Domicilio (INE)</dt><dd>{formatearDomicilio(r.paciente?.domicilio || hc) || 'No registrado'}</dd></div>
         <div><dt>Ruteo</dt><dd>{r.ruteoClinico ? 'Guardado con el envío' : 'Sin ruteo guardado; vista previa con motor actual'}</dd></div>
       </dl>{r.atribucion && <dl className="resp-facts">
         <div><dt>Canal de reserva</dt><dd>{etiquetaAtribucion(r.atribucion.booking_channel, CANALES_RESERVA)}</dd></div>

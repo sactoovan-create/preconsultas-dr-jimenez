@@ -174,6 +174,7 @@ const OMITIDOS = new Set([
   'motivo', 'temasConsulta', 'telefono', 'correo', 'nombre', 'edad',
   'formularioVersion', 'entrevistaVersion', 'antecedentesRevisados',
   'version', 'id', 'creado', 'submittedAtClient', 'consentimiento', 'atribucion',
+  'dom_calle_numero', 'dom_colonia', 'dom_cp', 'dom_municipio', 'dom_estado', 'domicilio',
 ]);
 
 const lista = v => Array.isArray(v) ? v : [];
