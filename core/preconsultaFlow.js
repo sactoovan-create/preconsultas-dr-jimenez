@@ -8,7 +8,8 @@
 
 import { validarEntrevista } from './entrevista.js';
 import { validarDomicilio } from './domicilio.js';
-export const FORMULARIO_VERSION = '2026.09.4';
+// 2026.10.1: cuestionarios validados PHQ-9 (siempre) y CSI-Sp (con dolor pélvico).
+export const FORMULARIO_VERSION = '2026.10.1';
 
 export const TEMAS_CONSULTA = [
   { id: 'control', etiqueta: 'Revisión o chequeo ginecológico' },

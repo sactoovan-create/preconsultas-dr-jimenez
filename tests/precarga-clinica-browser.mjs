@@ -92,7 +92,7 @@ try {
   await page.getByText('Prueba guardada solo en este navegador.',{exact:false}).waitFor();
   check('Portal real confirma guardado local sin fingir envío remoto',true);
   const enviada = await page.evaluate(()=>JSON.parse(localStorage.getItem('drj_respuestas_v1'))[0]);
-  check('Sobre guarda campos nuevos y ruteo versionado',enviada.formularioVersion==='2026.09.4' && enviada.autoReporte.hc.entrevistaVersion==='2.0.0' && enviada.ruteoClinico.version===5 && enviada.autoReporte.hc.fracturaBajoImpacto===true);
+  check('Sobre guarda campos nuevos y ruteo versionado',enviada.formularioVersion==='2026.10.1' && enviada.autoReporte.hc.entrevistaVersion==='2.0.0' && enviada.ruteoClinico.version===6 && enviada.autoReporte.hc.fracturaBajoImpacto===true);
   check('No inventa archivos ni conserva respuestas de ramas retiradas',enviada.adjuntos.length===0 && enviada.estudiosFolder===null && enviada.autoReporte.hc.mamaFamiliarPrimerGradoMenor50===undefined);
   await page.screenshot({path:path.join(out,'envio-local-confirmado.png'),fullPage:true});
   check('Cero errores React/JS',errors.length===0);

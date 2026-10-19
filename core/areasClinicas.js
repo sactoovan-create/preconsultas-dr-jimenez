@@ -19,8 +19,9 @@ const mapa = {
   cardiometabolico: 'cardio', metabolico: 'cardio', mama: 'mama', osea: 'osea',
   anticoncepcion: 'prevencion', 'plan-reproductivo': 'prevencion', cervical: 'prevencion', prevencion: 'prevencion',
   intimidad: 'sexual', 'salud-sexual': 'sexual', genitourinario: 'sexual', vulvar: 'sexual',
+  csi: 'dolor', phq9: 'general',
 };
-export function areaClinica(id) { return AREAS_CLINICAS[mapa[String(id).replace('profundizacion:', '')] || 'general']; }
+export function areaClinica(id) { return AREAS_CLINICAS[mapa[String(id).replace(/^(profundizacion|cuestionario):/, '')] || 'general']; }
 export function estiloArea(id) {
   const area = areaClinica(id);
   return { '--area-color': area.color, '--area-fondo': area.fondo };

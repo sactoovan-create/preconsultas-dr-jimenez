@@ -4,10 +4,12 @@
  * (intensidad de síntomas de menopausia y dolor). Verificable con pruebas.
  *
  * Contrato consumido por Respuestas.jsx: resumen.menopausia.{total,intensidad}
- * y resumen.dolor (objeto {intensidad,meses} o null).
+ * y resumen.dolor (objeto {intensidad,meses} o null). Desde 2026.10.1 agrega
+ * resumen.phq9 y resumen.csi solo cuando ese cuestionario se ofreció.
  */
 import { evaluarMrs } from '../instruments/menopausia/engine.js';
 import { evaluarProfundizacion } from './profundos/index.js';
+import { resumenCuestionarios } from './cuestionarios/index.js';
 
 export function construirResumen(datos) {
   const mrs = evaluarMrs((datos && datos.mrs) || {});
@@ -36,5 +38,7 @@ export function construirResumen(datos) {
     },
     dolor: dolor.tiene ? { intensidad: dolor.intensidad ?? null, meses: dolor.meses ?? null } : null,
     profundizaciones,
+    // Cuestionarios validados: lectura congelada con las reglas publicadas.
+    ...resumenCuestionarios(datos),
   };
 }

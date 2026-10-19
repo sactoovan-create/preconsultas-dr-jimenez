@@ -13,6 +13,8 @@ import ResumenPaciente from './ResumenPaciente.jsx';
 import MarcoInstrumento from './core/MarcoInstrumento.jsx';
 import { CANALES_RESERVA, FUENTES_DECLARADAS, etiquetaAtribucion } from './core/atribucion.js';
 import { formatearDomicilio } from './core/domicilio.js';
+import * as phq9 from './core/cuestionarios/phq9.js';
+import * as csi from './core/cuestionarios/csi.js';
 
 function fecha(iso) {
   const d = new Date(iso);
@@ -29,6 +31,39 @@ const EVENTOS = { preconsulta_revisada: 'Preconsulta marcada como revisada', rev
 function fuenteLegible(fuente) {
   return [...new Set(String(fuente || '').split(' | ').map(f => f.startsWith('alertaSeguridad') ? 'Orientación registrada al enviar'
     : f.startsWith('ruteoClinico') ? 'Ruteo guardado' : f.includes('profundos') ? 'Cuestionario complementario' : 'Formulario de la paciente'))].join(' · ');
+}
+/** Lectura congelada al enviar (resumen.phq9 / resumen.csi); no se recalcula aquí. */
+function ResumenCuestionarios({ r }) {
+  const filas = ['phq9', 'csi'].map(clave => r.resumen?.[clave]).filter(c => c && typeof c.resumen === 'string');
+  if (!filas.length) return null;
+  return <section className="resp-sec"><h3>Cuestionarios validados</h3>
+    <dl className="resp-facts">{filas.map(c => <div key={c.instrumento}><dt>{c.instrumento}</dt><dd>{c.resumen}</dd></div>)}</dl>
+    <p className="resp-muted">Lectura guardada con el envío con reglas publicadas. Tamizaje, no diagnóstico.</p>
+  </section>;
+}
+function RespuestasCuestionarios({ r }) {
+  const bloques = [];
+  const p = r.autoReporte?.phq9?.respuestas;
+  if (p && typeof p === 'object') {
+    const filas = [...phq9.ITEMS, phq9.DIFICULTAD].filter(q => p[q.id] != null).map(q => ({
+      id: q.id,
+      pregunta: q.numero ? `${q.numero}. ${q.texto}` : q.texto,
+      respuesta: `${(q.opciones || phq9.OPCIONES).find(o => o.valor === p[q.id])?.etiqueta || formatoRespuesta(p[q.id])} (${p[q.id]})`,
+    }));
+    bloques.push({ id: 'phq9', titulo: phq9.NOMBRE, filas, credito: phq9.CREDITO });
+  }
+  const c = r.autoReporte?.csi?.respuestas;
+  if (c && typeof c === 'object') {
+    const filas = [
+      ...csi.ITEMS_A.filter(q => c[q.id] != null).map(q => ({ id: q.id, pregunta: `${q.numero}. ${q.texto}`, respuesta: `${csi.OPCIONES.find(o => o.valor === c[q.id])?.etiqueta || formatoRespuesta(c[q.id])} (${c[q.id]})` })),
+      ...csi.ITEMS_B.filter(q => c[q.id] != null).map(q => ({ id: q.id, pregunta: `Parte B ${q.numero}. ${q.texto}`, respuesta: (c[q.id] === 'si' ? 'Sí' : 'No') + (c[q.anioId] ? ` (${c[q.anioId]})` : '') })),
+    ];
+    bloques.push({ id: 'csi', titulo: csi.NOMBRE, filas, credito: `${csi.ATRIBUCION} ${csi.CAMBIOS}` });
+  }
+  return bloques.map(b => <section className="resp-sec" key={b.id}><h3>{b.titulo}</h3>
+    {b.filas.length ? <dl className="resp-facts">{b.filas.map(f => <div key={f.id}><dt>{f.pregunta}</dt><dd>{f.respuesta}</dd></div>)}</dl> : <p className="resp-muted">Se ofreció y no tiene respuestas.</p>}
+    <p className="resp-muted">{b.credito}</p>
+  </section>);
 }
 
 export default function DetallePreconsulta({ r, onEliminar, eliminando, tab, setTab, instrumentoId, onCerrarInstrumento, historial = [], onAbrirHistoria, onEstadoArchivos }) {
@@ -68,6 +103,7 @@ export default function DetallePreconsulta({ r, onEliminar, eliminando, tab, set
         <section className="resp-sec"><h3>Dolor pélvico</h3><p>{lectura.dolor.texto}</p></section>
         <section className="resp-sec"><h3>Síntomas MRS</h3><p>{lectura.mrs.texto}</p></section>
       </div>
+      <ResumenCuestionarios r={r} />
       </div>
       <aside className="consulta-pendientes" aria-label="Preparación de la consulta">
       {lectura.pendientes.length > 0 && <section className="resp-sec"><h3>Datos por precisar</h3><ul className="resp-pending">{lectura.pendientes.map((x, i) => <li key={i}>{x}</li>)}</ul></section>}
@@ -82,6 +118,7 @@ export default function DetallePreconsulta({ r, onEliminar, eliminando, tab, set
       {!grupos.length && <p className="resp-muted">No hay respuestas coincidentes en entrevista y antecedentes.</p>}
       <SintomasMRS r={r} lectura={lectura} />
       <Profundos r={r} />
+      <RespuestasCuestionarios r={r} />
       <details className="resp-source"><summary>Datos del envío y procedencia</summary><dl className="resp-facts">
         <div><dt>Formulario</dt><dd>{hc.formularioVersion || 'Versión no registrada'}</dd></div>
         <div><dt>Contrato de datos</dt><dd>{r.version ?? 'No registrado'}</dd></div>

@@ -7,7 +7,7 @@ import { evaluarMenopausia } from '../instruments/menopausia/engine.js';
 
 const ids = CAMPOS_ENTREVISTA.map(q => q.id);
 assert.equal(new Set(ids).size, ids.length, 'IDs de preguntas únicos');
-assert.equal(FORMULARIO_VERSION, '2026.09.4');
+assert.equal(FORMULARIO_VERSION, '2026.10.1');
 for (const tema of ['cervical', 'vulvar', 'metabolico', 'piso-pelvico']) {
   assert.ok(pasosPara({hc:{temasConsulta:[tema]}}).some(p=>p.id===tema));
   assert.ok(!pasosPara({hc:{temasConsulta:['control']}}).some(p=>p.id===tema));
@@ -22,7 +22,7 @@ assert.ok(!Object.hasOwn(limpiarEntrevista({cervicalTratamientoPrevio:'no',cervi
 assert.equal(valorEntrevista(ENTREVISTA.metabolico.preguntas[0],['glucosa']), 'Glucosa, diabetes o resistencia a la insulina');
 assert.ok(instrumentosPara({paciente:{edad:30},autoReporte:{hc:{temasConsulta:['metabolico']}}}).instrumentosSugeridos.some(s=>s.instrumento==='cardiometabolico'));
 assert.equal(instrumentosPara({paciente:{edad:30},autoReporte:{hc:{metabolicoTratamiento:'Tirzepatida'}}}).instrumentosSugeridos.find(s=>s.instrumento==='cardiometabolico')?.prioridad,'alta');
-assert.equal(instrumentosPara({}).version,5);
+assert.equal(instrumentosPara({}).version,6);
 const legado = {etapaReproductiva:'menopausia'};
 assert.equal(filtrarHistoriaActiva(legado).etapaReproductiva,'sin_regla_12m');
 assert.equal(legado.etapaReproductiva,'menopausia', 'No muta el registro historico');

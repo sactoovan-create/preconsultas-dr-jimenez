@@ -1,11 +1,13 @@
 {
-  "formulario": "2026.09.4",
-  "alcance": "Captura base, 11 dominios de síntomas, entrevista dirigida y módulos complementarios; excluye consentimiento, honeypot y controles de navegación. No es conteo de preguntas obligatorias ni certificación clínica.",
+  "formulario": "2026.10.1",
+  "alcance": "Captura base, 11 dominios de síntomas, entrevista dirigida, módulos complementarios y cuestionarios validados; excluye consentimiento, honeypot y controles de navegación. No es conteo de preguntas obligatorias ni certificación clínica.",
   "conteo": {
     "controlesBase": 54,
     "mrs": 11,
     "entrevistaDirigida": 75,
-    "complementarias": 38
+    "complementarias": 38,
+    "validados": 45,
+    "pendientesLicencia": 4
   },
   "base": [
     {
@@ -13,7 +15,7 @@
       "control": "CampoTexto",
       "id": "nombre",
       "archivo": "PreConsulta.jsx",
-      "linea": 462,
+      "linea": 519,
       "valor": "{dem.nombre}"
     },
     {
@@ -21,7 +23,7 @@
       "control": "CampoNumero",
       "id": "edad",
       "archivo": "PreConsulta.jsx",
-      "linea": 463,
+      "linea": 520,
       "valor": "{dem.edad}"
     },
     {
@@ -29,7 +31,7 @@
       "control": "CampoTexto",
       "id": "telefono",
       "archivo": "PreConsulta.jsx",
-      "linea": 464,
+      "linea": 521,
       "valor": "{hc.telefono}"
     },
     {
@@ -37,7 +39,7 @@
       "control": "CampoTexto",
       "id": "correo",
       "archivo": "PreConsulta.jsx",
-      "linea": 465,
+      "linea": 522,
       "valor": "{hc.correo}"
     },
     {
@@ -45,7 +47,7 @@
       "control": "CampoTexto",
       "id": "dom_calle_numero",
       "archivo": "PreConsulta.jsx",
-      "linea": 471,
+      "linea": 528,
       "valor": "{hc.dom_calle_numero}"
     },
     {
@@ -53,7 +55,7 @@
       "control": "CampoTexto",
       "id": "dom_colonia",
       "archivo": "PreConsulta.jsx",
-      "linea": 472,
+      "linea": 529,
       "valor": "{hc.dom_colonia}"
     },
     {
@@ -61,7 +63,7 @@
       "control": "CampoTexto",
       "id": "dom_cp",
       "archivo": "PreConsulta.jsx",
-      "linea": 473,
+      "linea": 530,
       "valor": "{hc.dom_cp}"
     },
     {
@@ -69,7 +71,7 @@
       "control": "CampoTexto",
       "id": "dom_municipio",
       "archivo": "PreConsulta.jsx",
-      "linea": 474,
+      "linea": 531,
       "valor": "{hc.dom_municipio}"
     },
     {
@@ -77,7 +79,7 @@
       "control": "CampoSelect",
       "id": "dom_estado",
       "archivo": "PreConsulta.jsx",
-      "linea": 475,
+      "linea": 532,
       "valor": "{hc.dom_estado}"
     },
     {
@@ -85,7 +87,7 @@
       "control": "CampoTexto",
       "id": "motivo",
       "archivo": "PreConsulta.jsx",
-      "linea": 484,
+      "linea": 541,
       "valor": "{hc.motivo}"
     },
     {
@@ -93,7 +95,7 @@
       "control": "GrupoMultiple",
       "id": "temasConsulta",
       "archivo": "PreConsulta.jsx",
-      "linea": 485,
+      "linea": 542,
       "valor": "{hc.temasConsulta}"
     },
     {
@@ -101,7 +103,7 @@
       "control": "GrupoMultiple",
       "id": "senalesUrgencia",
       "archivo": "PreConsulta.jsx",
-      "linea": 545,
+      "linea": 602,
       "valor": "{hc.senalesUrgencia}"
     },
     {
@@ -109,7 +111,7 @@
       "control": "GrupoOpciones",
       "id": "etapaReproductiva",
       "archivo": "PreConsulta.jsx",
-      "linea": 554,
+      "linea": 611,
       "valor": "{hc.etapaReproductiva}"
     },
     {
@@ -117,7 +119,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 555,
+      "linea": 612,
       "valor": "{hc.ultimaMenstruacion}"
     },
     {
@@ -125,7 +127,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 556,
+      "linea": 613,
       "valor": "{hc.anticonceptivo}"
     },
     {
@@ -133,7 +135,7 @@
       "control": "GrupoMultiple",
       "id": "sangradoTipos",
       "archivo": "PreConsulta.jsx",
-      "linea": 563,
+      "linea": 620,
       "valor": "{hc.sangradoTipos}"
     },
     {
@@ -141,7 +143,7 @@
       "control": "GrupoOpciones",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 579,
+      "linea": 636,
       "valor": "{hc.sangradoAhora}"
     },
     {
@@ -149,7 +151,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 581,
+      "linea": 638,
       "valor": "{hc.sangradoDuracionDias}"
     },
     {
@@ -157,7 +159,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 582,
+      "linea": 639,
       "valor": "{hc.sangradoDesde}"
     },
     {
@@ -165,7 +167,7 @@
       "control": "EscalaNumerica",
       "id": "dolorIntensidad",
       "archivo": "PreConsulta.jsx",
-      "linea": 590,
+      "linea": 647,
       "valor": "{dolor.intensidad}"
     },
     {
@@ -173,7 +175,7 @@
       "control": "GrupoOpciones",
       "id": "dolorInicio",
       "archivo": "PreConsulta.jsx",
-      "linea": 591,
+      "linea": 648,
       "valor": "{dolor.inicio}"
     },
     {
@@ -181,7 +183,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 598,
+      "linea": 655,
       "valor": "{dolor.meses}"
     },
     {
@@ -189,7 +191,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 599,
+      "linea": 656,
       "valor": "{dolor.localizacion}"
     },
     {
@@ -197,7 +199,7 @@
       "control": "GrupoMultiple",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 601,
+      "linea": 658,
       "valor": "{dolor.asociados}"
     },
     {
@@ -205,7 +207,7 @@
       "control": "GrupoOpciones",
       "id": "reglasRegulares",
       "archivo": "PreConsulta.jsx",
-      "linea": 622,
+      "linea": 679,
       "valor": "{hc.reglasRegulares}"
     },
     {
@@ -213,7 +215,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 629,
+      "linea": 686,
       "valor": "{hc.edadMenarca}"
     },
     {
@@ -221,7 +223,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 630,
+      "linea": 687,
       "valor": "{hc.diasEntreReglas}"
     },
     {
@@ -229,7 +231,7 @@
       "control": "GrupoMultiple",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 632,
+      "linea": 689,
       "valor": "{hc.cambiosAndrogenicos}"
     },
     {
@@ -237,7 +239,7 @@
       "control": "GrupoMultiple",
       "id": "sintomasUrinarios",
       "archivo": "PreConsulta.jsx",
-      "linea": 651,
+      "linea": 708,
       "valor": "{hc.sintomasUrinarios}"
     },
     {
@@ -245,7 +247,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 659,
+      "linea": 716,
       "valor": "{hc.urinarioDetalle}"
     },
     {
@@ -253,7 +255,7 @@
       "control": "GrupoMultiple",
       "id": "molestiasIntimas",
       "archivo": "PreConsulta.jsx",
-      "linea": 666,
+      "linea": 723,
       "valor": "{hc.molestiasIntimas}"
     },
     {
@@ -261,7 +263,7 @@
       "control": "GrupoMultiple",
       "id": "sintomasMama",
       "archivo": "PreConsulta.jsx",
-      "linea": 678,
+      "linea": 735,
       "valor": "{hc.sintomasMama}"
     },
     {
@@ -269,7 +271,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 685,
+      "linea": 742,
       "valor": "{hc.mamaDetalle}"
     },
     {
@@ -277,7 +279,7 @@
       "control": "GrupoOpciones",
       "id": "objetivoReproductivo",
       "archivo": "PreConsulta.jsx",
-      "linea": 691,
+      "linea": 748,
       "valor": "{hc.objetivoReproductivo}"
     },
     {
@@ -285,7 +287,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 699,
+      "linea": 756,
       "valor": "{hc.mesesBuscandoEmbarazo}"
     },
     {
@@ -293,7 +295,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 701,
+      "linea": 758,
       "valor": "{hc.anticonceptivo}"
     },
     {
@@ -301,7 +303,7 @@
       "control": "GrupoMultiple",
       "id": "antecedentes",
       "archivo": "PreConsulta.jsx",
-      "linea": 719,
+      "linea": 788,
       "valor": "{hc.antecedentesSeleccionados}"
     },
     {
@@ -309,7 +311,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 734,
+      "linea": 803,
       "valor": "{hc.embarazos}"
     },
     {
@@ -317,7 +319,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 735,
+      "linea": 804,
       "valor": "{hc.partos}"
     },
     {
@@ -325,7 +327,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 736,
+      "linea": 805,
       "valor": "{hc.cesareas}"
     },
     {
@@ -333,7 +335,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 737,
+      "linea": 806,
       "valor": "{hc.abortos}"
     },
     {
@@ -341,7 +343,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 739,
+      "linea": 808,
       "valor": "{hc.cirugias}"
     },
     {
@@ -349,7 +351,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 740,
+      "linea": 809,
       "valor": "{hc.medicamentos}"
     },
     {
@@ -357,7 +359,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 741,
+      "linea": 810,
       "valor": "{hc.alergias}"
     },
     {
@@ -365,7 +367,7 @@
       "control": "GrupoOpciones",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 742,
+      "linea": 811,
       "valor": "{hc.tabacoEstado}"
     },
     {
@@ -373,7 +375,7 @@
       "control": "GrupoOpciones",
       "id": "tieneCuelloUterino",
       "archivo": "PreConsulta.jsx",
-      "linea": 756,
+      "linea": 825,
       "valor": "{hc.tieneCuelloUterino}"
     },
     {
@@ -381,7 +383,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 763,
+      "linea": 832,
       "valor": "{hc.ultimoPapFecha}"
     },
     {
@@ -389,7 +391,7 @@
       "control": "GrupoOpciones",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 764,
+      "linea": 833,
       "valor": "{hc.ultimoPapResultado}"
     },
     {
@@ -397,7 +399,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 774,
+      "linea": 843,
       "valor": "{hc.ultimaMastografiaFecha}"
     },
     {
@@ -405,7 +407,7 @@
       "control": "GrupoOpciones",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 775,
+      "linea": 844,
       "valor": "{hc.ultimaMastografiaResultado}"
     },
     {
@@ -413,7 +415,7 @@
       "control": "GrupoMultiple",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 783,
+      "linea": 852,
       "valor": "{hc.cancerFamiliarTipos}"
     },
     {
@@ -421,7 +423,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 796,
+      "linea": 865,
       "valor": "{hc.cancerFamiliarDetalle}"
     },
     {
@@ -429,7 +431,7 @@
       "control": "CampoSelect",
       "id": "canalReserva",
       "archivo": "PreConsulta.jsx",
-      "linea": 830,
+      "linea": 900,
       "valor": "{atribucion.booking_channel}"
     },
     {
@@ -437,7 +439,7 @@
       "control": "CampoSelect",
       "id": "fuenteDeclarada",
       "archivo": "PreConsulta.jsx",
-      "linea": 832,
+      "linea": 902,
       "valor": "{atribucion.patient_reported_source}"
     }
   ],
@@ -2600,6 +2602,1224 @@
       "condicional": false,
       "fuente": "Dominios del PCOSQ (Polycystic Ovary Syndrome Questionnaire; Cronin y cols., 1998) con el dominio de acné del PCOSQ modificado (Barnard y cols., 2007). Se usan los seis dominios como preguntas de impacto en calidad de vida. NO es el PCOSQ de 26/30 reactivos puntuado ni un test diagnóstico: es una versión breve, orientativa, de autoinforme. Esta implementación no ha verificado una traducción autorizada ni equivalencia psicométrica; el texto es una adaptación propia.",
       "validacion": "Adaptación local, no acreditada como instrumento oficial"
+    }
+  ],
+  "validados": [
+    {
+      "cuestionario": "phq9",
+      "id": "item1",
+      "texto": "Poco interés o placer en hacer las cosas",
+      "opciones": [
+        [
+          0,
+          "Para nada"
+        ],
+        [
+          1,
+          "Varios días"
+        ],
+        [
+          2,
+          "Más de la mitad de los días"
+        ],
+        [
+          3,
+          "Casi todos los días"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "PHQ-9, traducción oficial «Spanish for Mexico» (phqscreeners.com, Pfizer Inc.). Severidad: Kroenke 2001. Validación en mujeres mexicanas: Familiar 2015.",
+      "licencia": "Sin permiso requerido (manual PHQ, Pfizer)"
+    },
+    {
+      "cuestionario": "phq9",
+      "id": "item2",
+      "texto": "Se ha sentido decaído(a), deprimido(a), o sin esperanzas",
+      "opciones": [
+        [
+          0,
+          "Para nada"
+        ],
+        [
+          1,
+          "Varios días"
+        ],
+        [
+          2,
+          "Más de la mitad de los días"
+        ],
+        [
+          3,
+          "Casi todos los días"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "PHQ-9, traducción oficial «Spanish for Mexico» (phqscreeners.com, Pfizer Inc.). Severidad: Kroenke 2001. Validación en mujeres mexicanas: Familiar 2015.",
+      "licencia": "Sin permiso requerido (manual PHQ, Pfizer)"
+    },
+    {
+      "cuestionario": "phq9",
+      "id": "item3",
+      "texto": "Dificultad para dormir o permanecer dormido(a), o ha dormido demasiado",
+      "opciones": [
+        [
+          0,
+          "Para nada"
+        ],
+        [
+          1,
+          "Varios días"
+        ],
+        [
+          2,
+          "Más de la mitad de los días"
+        ],
+        [
+          3,
+          "Casi todos los días"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "PHQ-9, traducción oficial «Spanish for Mexico» (phqscreeners.com, Pfizer Inc.). Severidad: Kroenke 2001. Validación en mujeres mexicanas: Familiar 2015.",
+      "licencia": "Sin permiso requerido (manual PHQ, Pfizer)"
+    },
+    {
+      "cuestionario": "phq9",
+      "id": "item4",
+      "texto": "Se ha sentido cansado(a) o con poca energía",
+      "opciones": [
+        [
+          0,
+          "Para nada"
+        ],
+        [
+          1,
+          "Varios días"
+        ],
+        [
+          2,
+          "Más de la mitad de los días"
+        ],
+        [
+          3,
+          "Casi todos los días"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "PHQ-9, traducción oficial «Spanish for Mexico» (phqscreeners.com, Pfizer Inc.). Severidad: Kroenke 2001. Validación en mujeres mexicanas: Familiar 2015.",
+      "licencia": "Sin permiso requerido (manual PHQ, Pfizer)"
+    },
+    {
+      "cuestionario": "phq9",
+      "id": "item5",
+      "texto": "Con poco apetito o ha comido en exceso",
+      "opciones": [
+        [
+          0,
+          "Para nada"
+        ],
+        [
+          1,
+          "Varios días"
+        ],
+        [
+          2,
+          "Más de la mitad de los días"
+        ],
+        [
+          3,
+          "Casi todos los días"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "PHQ-9, traducción oficial «Spanish for Mexico» (phqscreeners.com, Pfizer Inc.). Severidad: Kroenke 2001. Validación en mujeres mexicanas: Familiar 2015.",
+      "licencia": "Sin permiso requerido (manual PHQ, Pfizer)"
+    },
+    {
+      "cuestionario": "phq9",
+      "id": "item6",
+      "texto": "Se ha sentido mal con usted mismo(a) – o que es un fracaso o que ha quedado mal con usted mismo(a) o con su familia",
+      "opciones": [
+        [
+          0,
+          "Para nada"
+        ],
+        [
+          1,
+          "Varios días"
+        ],
+        [
+          2,
+          "Más de la mitad de los días"
+        ],
+        [
+          3,
+          "Casi todos los días"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "PHQ-9, traducción oficial «Spanish for Mexico» (phqscreeners.com, Pfizer Inc.). Severidad: Kroenke 2001. Validación en mujeres mexicanas: Familiar 2015.",
+      "licencia": "Sin permiso requerido (manual PHQ, Pfizer)"
+    },
+    {
+      "cuestionario": "phq9",
+      "id": "item7",
+      "texto": "Ha tenido dificultad para concentrarse en cosas tales como leer el periódico o ver televisión",
+      "opciones": [
+        [
+          0,
+          "Para nada"
+        ],
+        [
+          1,
+          "Varios días"
+        ],
+        [
+          2,
+          "Más de la mitad de los días"
+        ],
+        [
+          3,
+          "Casi todos los días"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "PHQ-9, traducción oficial «Spanish for Mexico» (phqscreeners.com, Pfizer Inc.). Severidad: Kroenke 2001. Validación en mujeres mexicanas: Familiar 2015.",
+      "licencia": "Sin permiso requerido (manual PHQ, Pfizer)"
+    },
+    {
+      "cuestionario": "phq9",
+      "id": "item8",
+      "texto": "¿Se ha estado moviendo o hablando tan lento que otras personas podrían notarlo?, o por el contrario – ha estado tan inquieto(a) o agitado(a), que se ha estado moviendo mucho más de lo normal",
+      "opciones": [
+        [
+          0,
+          "Para nada"
+        ],
+        [
+          1,
+          "Varios días"
+        ],
+        [
+          2,
+          "Más de la mitad de los días"
+        ],
+        [
+          3,
+          "Casi todos los días"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "PHQ-9, traducción oficial «Spanish for Mexico» (phqscreeners.com, Pfizer Inc.). Severidad: Kroenke 2001. Validación en mujeres mexicanas: Familiar 2015.",
+      "licencia": "Sin permiso requerido (manual PHQ, Pfizer)"
+    },
+    {
+      "cuestionario": "phq9",
+      "id": "item9",
+      "texto": "Ha pensado que estaría mejor muerto(a) o se le ha ocurrido lastimarse de alguna manera",
+      "opciones": [
+        [
+          0,
+          "Para nada"
+        ],
+        [
+          1,
+          "Varios días"
+        ],
+        [
+          2,
+          "Más de la mitad de los días"
+        ],
+        [
+          3,
+          "Casi todos los días"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "PHQ-9, traducción oficial «Spanish for Mexico» (phqscreeners.com, Pfizer Inc.). Severidad: Kroenke 2001. Validación en mujeres mexicanas: Familiar 2015.",
+      "licencia": "Sin permiso requerido (manual PHQ, Pfizer)"
+    },
+    {
+      "cuestionario": "phq9",
+      "id": "dificultad",
+      "texto": "Si usted marcó cualquiera de estos problemas, ¿qué tan difícil fue hacer su trabajo, las tareas del hogar o llevarse bien con otras personas debido a tales problemas?",
+      "opciones": [
+        [
+          0,
+          "Para nada difícil"
+        ],
+        [
+          1,
+          "Un poco difícil"
+        ],
+        [
+          2,
+          "Muy difícil"
+        ],
+        [
+          3,
+          "Extremadamente difícil"
+        ]
+      ],
+      "puntua": false,
+      "fuente": "PHQ-9, traducción oficial «Spanish for Mexico» (phqscreeners.com, Pfizer Inc.). Severidad: Kroenke 2001. Validación en mujeres mexicanas: Familiar 2015.",
+      "licencia": "Sin permiso requerido (manual PHQ, Pfizer)"
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a1",
+      "texto": "Me siento cansado y desanimado cuando me levanto por las mañanas.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a2",
+      "texto": "Mis músculos están tensos y doloridos.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a3",
+      "texto": "Tengo ataques de pánico.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a4",
+      "texto": "Rechino los dientes o aprieto la mandíbula.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a5",
+      "texto": "Tengo problemas de diarrea o estreñimiento.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a6",
+      "texto": "Necesito ayuda para realizar mis actividades diarias.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a7",
+      "texto": "Soy sensible a la luz brillante.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a8",
+      "texto": "Me canso fácilmente cuando estoy físicamente activo.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a9",
+      "texto": "Siento dolor en todo mi cuerpo.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a10",
+      "texto": "Tengo dolores de cabeza.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a11",
+      "texto": "Tengo molestia en mi vejiga o sensación de quemazón al orinar.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a12",
+      "texto": "No duermo bien.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a13",
+      "texto": "Tengo dificultad para concentrarme.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a14",
+      "texto": "Tengo problemas en la piel como resequedad, picor o sarpullido.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a15",
+      "texto": "El estrés hace que mis síntomas físicos empeoren.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a16",
+      "texto": "Me siento triste o deprimido.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a17",
+      "texto": "Me siento con poca energía.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a18",
+      "texto": "Tengo tensión muscular en mi cuello y hombros.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a19",
+      "texto": "Tengo dolor en mi mandíbula.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a20",
+      "texto": "Algunos olores, como perfumes, me hacen sentir mareado y con náuseas.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a21",
+      "texto": "Tengo que orinar frecuentemente.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a22",
+      "texto": "Mis piernas se sienten incómodas e inquietas cuando intento dormir por la noche.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a23",
+      "texto": "Tengo dificultad para recordar cosas.",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a24",
+      "texto": "Sufrí algún trauma cuando era niño(a).",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "a25",
+      "texto": "Tengo dolor en mi zona pélvica",
+      "opciones": [
+        [
+          0,
+          "Nunca"
+        ],
+        [
+          1,
+          "Pocas Veces"
+        ],
+        [
+          2,
+          "Algunas veces"
+        ],
+        [
+          3,
+          "Continuamente"
+        ],
+        [
+          4,
+          "Siempre"
+        ]
+      ],
+      "puntua": true,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "b1",
+      "texto": "Síndrome de Piernas Inquietas.",
+      "opciones": [
+        [
+          "no",
+          "NO"
+        ],
+        [
+          "si",
+          "SÍ"
+        ]
+      ],
+      "puntua": false,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "b2",
+      "texto": "Síndrome de Fatiga Crónica.",
+      "opciones": [
+        [
+          "no",
+          "NO"
+        ],
+        [
+          "si",
+          "SÍ"
+        ]
+      ],
+      "puntua": false,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "b3",
+      "texto": "Fibromialgia.",
+      "opciones": [
+        [
+          "no",
+          "NO"
+        ],
+        [
+          "si",
+          "SÍ"
+        ]
+      ],
+      "puntua": false,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "b4",
+      "texto": "Trastornos Temporomandibulares.",
+      "opciones": [
+        [
+          "no",
+          "NO"
+        ],
+        [
+          "si",
+          "SÍ"
+        ]
+      ],
+      "puntua": false,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "b5",
+      "texto": "Migrañas o Cefalea Tensional.",
+      "opciones": [
+        [
+          "no",
+          "NO"
+        ],
+        [
+          "si",
+          "SÍ"
+        ]
+      ],
+      "puntua": false,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "b6",
+      "texto": "Síndrome de Colon Irritable.",
+      "opciones": [
+        [
+          "no",
+          "NO"
+        ],
+        [
+          "si",
+          "SÍ"
+        ]
+      ],
+      "puntua": false,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "b7",
+      "texto": "Sensibilidad Química Múltiple.",
+      "opciones": [
+        [
+          "no",
+          "NO"
+        ],
+        [
+          "si",
+          "SÍ"
+        ]
+      ],
+      "puntua": false,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "b8",
+      "texto": "Latigazo o Lesión en el Cuello (incluir la lesión de Whiplash).",
+      "opciones": [
+        [
+          "no",
+          "NO"
+        ],
+        [
+          "si",
+          "SÍ"
+        ]
+      ],
+      "puntua": false,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "b9",
+      "texto": "Ansiedad o Ataques de Pánico.",
+      "opciones": [
+        [
+          "no",
+          "NO"
+        ],
+        [
+          "si",
+          "SÍ"
+        ]
+      ],
+      "puntua": false,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    },
+    {
+      "cuestionario": "csi",
+      "id": "b10",
+      "texto": "Depresión.",
+      "opciones": [
+        [
+          "no",
+          "NO"
+        ],
+        [
+          "si",
+          "SÍ"
+        ]
+      ],
+      "puntua": false,
+      "fuente": "CSI-Sp (Cuesta-Vargas 2016, CC BY 4.0). Cortes: Neblett 2013 y 2017, versión original en inglés.",
+      "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
+    }
+  ],
+  "pendientesLicencia": [
+    {
+      "clave": "pcs",
+      "nombre": "Pain Catastrophizing Scale (PCS)",
+      "estado": "pendiente_licencia",
+      "textoIncluido": false
+    },
+    {
+      "clave": "bpi_sf",
+      "nombre": "Brief Pain Inventory, forma corta (BPI-SF)",
+      "estado": "pendiente_licencia",
+      "textoIncluido": false
+    },
+    {
+      "clave": "gsrs",
+      "nombre": "Gastrointestinal Symptom Rating Scale (GSRS), autoadministrada",
+      "estado": "pendiente_licencia",
+      "textoIncluido": false
+    },
+    {
+      "clave": "iciq_ui_sf",
+      "nombre": "ICIQ-UI Short Form (incontinencia urinaria)",
+      "estado": "pendiente_registro",
+      "textoIncluido": false
     }
   ]
 }

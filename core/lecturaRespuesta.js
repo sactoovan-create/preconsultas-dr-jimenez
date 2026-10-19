@@ -318,11 +318,17 @@ function alertasGuardadas(r) {
       }
     }
   }
+  // PHQ-9 (2026.10.1): mensaje congelado al enviar; mismo texto que la bandera del
+  // ruteo, por eso se fusionan en una sola alerta con ambas fuentes.
+  const phq9 = objeto(seguridad.phq9);
+  if (typeof phq9.mensaje === 'string' && phq9.mensaje.trim()) agregar(phq9.mensaje, 'alertaSeguridad.phq9');
   for (const [campo, mensaje] of [
     ['urgente', 'Alerta de urgencia guardada en el env\u00edo.'],
     ['embarazoConSintomas', 'Alerta de embarazo con s\u00edntomas guardada en el env\u00edo.'],
     ['saludMental', 'Alerta de salud mental guardada en el env\u00edo.'],
   ]) {
+    // La alerta específica del PHQ-9 ya explica la de salud mental.
+    if (campo === 'saludMental' && phq9.alerta === true) continue;
     if (seguridad[campo] === true) agregar(mensaje, `alertaSeguridad.${campo}`);
   }
   for (const bandera of lista(r.ruteoClinico?.banderas)) {
@@ -352,6 +358,10 @@ export function resumenLectura(r = {}) {
   if (mrs.puntaje == null && !escalaOmitida) pendientes.push(mrs.texto);
   for (const p of lista(registro.resumen?.profundizaciones)) {
     if (p?.completo === false) pendientes.push(`${p.instrumento || p.id || 'Valoraci\u00f3n dirigida'}: incompleto.`);
+  }
+  for (const clave of ['phq9', 'csi']) {
+    const c = objeto(registro.resumen?.[clave]);
+    if (c.completo === false) pendientes.push(`${c.instrumento || clave}: incompleto (${c.respondidos ?? 0} respuestas); sin total.`);
   }
   return { motivo: motivo || 'No registrado', temas, dolor, mrs, alertas: alertasGuardadas(registro), pendientes: [...new Set(pendientes)] };
 }

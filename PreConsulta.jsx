@@ -27,6 +27,15 @@ import {
 } from './core/profundos/index.js';
 import Profundizaciones from './paciente/Profundizaciones.jsx';
 import {
+  combinarAlertaSeguridad,
+  cuestionariosParaEnviar,
+  cuestionariosSugeridos,
+  esPasoCuestionario,
+  insertarPasosCuestionarios,
+  recordatorioCuestionario,
+} from './core/cuestionarios/index.js';
+import CuestionarioValidado, { AvisoCrisisPhq9 } from './paciente/CuestionariosValidados.jsx';
+import {
   CampoNumero,
   CampoTexto,
   CampoSelect,
@@ -196,6 +205,13 @@ export default function PreConsulta({
     ...(borrador?.hc || {}),
   }));
   const [profundos, setProfundos] = useState(() => borrador?.profundos || ar.profundos || {});
+  // Cuestionarios validados: { phq9: { version, respuestas }, csi: {...} }.
+  const [cuestionarios, setCuestionarios] = useState(() => borrador?.cuestionarios || {
+    ...(ar.phq9 ? { phq9: ar.phq9 } : {}),
+    ...(ar.csi ? { csi: ar.csi } : {}),
+  });
+  // Pasos donde ya se mostró el recordatorio suave; el segundo «Continuar» avanza.
+  const [recordatoriosVistos, setRecordatoriosVistos] = useState([]);
   const [pasoId, setPasoId] = useState(() => borrador?.pasoId || 'inicio');
   const [acepto, setAcepto] = useState(false);
   const [enviando, setEnviando] = useState(false);
@@ -212,9 +228,16 @@ export default function PreConsulta({
     () => profundizacionesSugeridas({ hc, mrs, dolor }),
     [dolor, hc, mrs],
   );
+  const cuestionariosOfrecidos = useMemo(
+    () => cuestionariosSugeridos({ hc, dolor }),
+    [dolor, hc],
+  );
   const pasos = useMemo(
-    () => expandirPasosProfundos(pasosPara({ hc, mrs, dolor }), sugeridas),
-    [dolor, hc, mrs, sugeridas],
+    () => insertarPasosCuestionarios(
+      expandirPasosProfundos(pasosPara({ hc, mrs, dolor }), sugeridas),
+      cuestionariosOfrecidos,
+    ),
+    [cuestionariosOfrecidos, dolor, hc, mrs, sugeridas],
   );
   const indice = Math.max(0, pasos.findIndex((p) => p.id === pasoId));
   const paso = pasos[indice] || pasos[0];
@@ -224,6 +247,12 @@ export default function PreConsulta({
     () => filtrarProfundizacionesActivas({ mrs, dolor, hc }, profundos),
     [dolor, hc, mrs, profundos],
   );
+  // Solo los cuestionarios que siguen ofrecidos, con reactivos y valores válidos.
+  const cuestionariosSeguros = useMemo(
+    () => cuestionariosParaEnviar({ hc, dolor }, cuestionarios),
+    [cuestionarios, dolor, hc],
+  );
+  const crisisPhq9 = Number(cuestionariosSeguros.phq9?.respuestas?.item9) > 0;
 
   useEffect(() => {
     if (!borrador?.demografia) return;
@@ -232,8 +261,21 @@ export default function PreConsulta({
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    guardarAutoReporte({ mrs, dolor, hc, profundos: profundosSeguros });
-  }, [mrs, dolor, hc, profundosSeguros, guardarAutoReporte]);
+    guardarAutoReporte({
+      mrs, dolor, hc, profundos: profundosSeguros,
+      phq9: cuestionariosSeguros.phq9 || null,
+      csi: cuestionariosSeguros.csi || null,
+    });
+  }, [mrs, dolor, hc, profundosSeguros, cuestionariosSeguros, guardarAutoReporte]);
+
+  // Igual que las profundizaciones: si la paciente desmarca el tema que abrió un
+  // cuestionario, sus respuestas se descartan en vez de quedar ocultas.
+  useEffect(() => {
+    const ofrecidos = new Set(cuestionariosOfrecidos.map((c) => c.id));
+    if (Object.keys(cuestionarios).some((k) => !ofrecidos.has(k))) {
+      setCuestionarios((c) => Object.fromEntries(Object.entries(c).filter(([k]) => ofrecidos.has(k))));
+    }
+  }, [cuestionarios, cuestionariosOfrecidos]);
 
   useEffect(() => {
     const actuales = Object.keys(profundos).sort().join('|');
@@ -248,12 +290,13 @@ export default function PreConsulta({
     const contenido = {
       demografia: { nombre: dem.nombre || '', edad: dem.edad ?? null },
       mrs, dolor, hc, profundos: profundosSeguros, pasoId,
+      cuestionarios: cuestionariosSeguros,
       atribucion,
       formularioVersion: FORMULARIO_VERSION,
     };
     guardarBorrador(contenido);
     onBorradorCambio?.(contenido);
-  }, [atribucion, dem.edad, dem.nombre, dolor, hc, mrs, onBorradorCambio, onEnviar, pasoId, profundosSeguros]);
+  }, [atribucion, cuestionariosSeguros, dem.edad, dem.nombre, dolor, hc, mrs, onBorradorCambio, onEnviar, pasoId, profundosSeguros]);
 
   useEffect(() => {
     if (!pasos.some((p) => p.id === pasoId)) setPasoId(pasos[Math.min(indice, pasos.length - 1)].id);
@@ -313,6 +356,16 @@ export default function PreConsulta({
   const siguiente = () => {
     const resultado = validarPaso(paso.id, { demografia: dem, hc, mrs, dolor });
     if (!resultado.ok) { mostrarError(resultado); return; }
+    // Cuestionario validado incompleto: un recordatorio amable, una sola vez.
+    // Nunca bloquea: el segundo «Continuar» avanza aunque falten respuestas.
+    if (paso.cuestionarioId && !recordatoriosVistos.includes(paso.id)) {
+      const aviso = recordatorioCuestionario(paso.cuestionarioId, cuestionarios[paso.cuestionarioId]?.respuestas);
+      if (aviso) {
+        setRecordatoriosVistos((v) => [...v, paso.id]);
+        mostrarError(aviso);
+        return;
+      }
+    }
     if (volverRevision) { setVolverRevision(false); irPaso('envio'); return; }
     const siguientePaso = pasos[indice + 1];
     if (siguientePaso) { setPasoId(siguientePaso.id); limpiarError(); moverVista(); }
@@ -383,6 +436,9 @@ export default function PreConsulta({
         { mrs: mrsActiva, dolor: dolorActivo, hc: hcActiva },
         profundos,
       ),
+      // Los mismos cuestionarios que la paciente vio en pantalla (phq9 siempre, csi
+      // con dolor pélvico), con su versión y solo reactivos válidos.
+      ...cuestionariosSeguros,
     };
   };
 
@@ -392,6 +448,7 @@ export default function PreConsulta({
     dolor,
     hc,
     profundos: profundosSeguros,
+    cuestionarios: cuestionariosSeguros,
     pasoId: paso.id,
     formularioVersion: FORMULARIO_VERSION,
     atribucion,
@@ -404,7 +461,7 @@ export default function PreConsulta({
       return;
     }
     for (const p of pasos) {
-      if (p.id.startsWith('profundizacion:') || ['prevencion', 'envio'].includes(p.id)) continue;
+      if (p.id.startsWith('profundizacion:') || esPasoCuestionario(p.id) || ['prevencion', 'envio'].includes(p.id)) continue;
       const resultado = validarPaso(p.id, { demografia: dem, hc, mrs, dolor });
       if (!resultado.ok) { setVolverRevision(true); setPasoId(p.id); mostrarError(resultado); return; }
     }
@@ -442,7 +499,7 @@ export default function PreConsulta({
         consentimientoFecha: new Date().toISOString(),
         formularioVersion: FORMULARIO_VERSION,
         atribucion: normalizarAtribucion(atribucion),
-        alertaSeguridad: alertaUrgente(reporte),
+        alertaSeguridad: combinarAlertaSeguridad(alertaUrgente(reporte), reporte),
       });
       borrarBorrador();
     } catch (e) {
@@ -702,6 +759,18 @@ export default function PreConsulta({
       </>
     );
 
+    if (paso.cuestionarioId) return (
+      <CuestionarioValidado
+        clave={paso.cuestionarioId}
+        valor={cuestionarios[paso.cuestionarioId]}
+        onChange={(v) => {
+          setCuestionarios((c) => ({ ...c, [paso.cuestionarioId]: v }));
+          setGuardado(false);
+          limpiarError();
+        }}
+      />
+    );
+
     if (paso.id.startsWith('profundizacion:')) return (
       <>
         <p className="pc-paso-intro">Puedes responder lo que quieras compartir y dejar lo demás para la consulta.</p>
@@ -803,6 +872,7 @@ export default function PreConsulta({
     return (
       <>
         {avisoUrgenteTexto(alerta)}
+        {crisisPhq9 && <AvisoCrisisPhq9 />}
         <h2 className="pc-subtitulo"><Paperclip aria-hidden="true" />Tus estudios</h2>
         {onEnviar && (
           <>
@@ -823,7 +893,7 @@ export default function PreConsulta({
             : extraAntesDeEnviar}
         </div>
         <h2 className="pc-subtitulo"><ClipboardList aria-hidden="true" />Revisa tus respuestas</h2>
-        <RevisionPreconsulta dem={dem} hc={hc} mrs={mrs} dolor={dolor} profundos={profundosSeguros} pasos={pasos} irPaso={irPaso} />
+        <RevisionPreconsulta dem={dem} hc={hc} mrs={mrs} dolor={dolor} profundos={profundosSeguros} cuestionarios={cuestionariosSeguros} pasos={pasos} irPaso={irPaso} />
         {onEnviar && <div className="pc-atribucion">
           <h2 className="pc-subtitulo">Tu cita</h2>
           <div className="pc-datos">

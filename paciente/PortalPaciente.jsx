@@ -14,6 +14,8 @@ import { guardarRespuesta, modoAlmacenamiento } from '../core/respuestas.js';
 import { construirResumen } from '../core/resumenPaciente.js';
 import { bloqueoEnvioEstudios, eliminarEstudioPaciente } from '../core/estudios.js';
 import { instrumentosPara } from '../core/ruteoClinico.js';
+import { combinarAlertaSeguridad } from '../core/cuestionarios/index.js';
+import { AvisoCrisisPhq9 } from './CuestionariosValidados.jsx';
 import { CREDITO } from '../core/marca.js';
 import SubirEstudios from './SubirEstudios.jsx';
 import { FORMULARIO_VERSION } from '../core/preconsultaFlow.js';
@@ -67,7 +69,15 @@ export function construirRegistro(datos, estudiosFolder, archivos = [], respuest
       correo: datos.contacto?.correo || null,
       domicilio,
     },
-    autoReporte: { mrs: datos.mrs, dolor: datos.dolor, hc: hcNormalizada, profundos: datos.profundos || {} },
+    autoReporte: {
+      mrs: datos.mrs,
+      dolor: datos.dolor,
+      hc: hcNormalizada,
+      profundos: datos.profundos || {},
+      // Cuestionarios validados (2026.10.1): solo los que se ofrecieron.
+      ...(datos.phq9 ? { phq9: datos.phq9 } : {}),
+      ...(datos.csi ? { csi: datos.csi } : {}),
+    },
     resumen: construirResumen(datos),
     consentimiento: {
       aceptado: true,
@@ -75,13 +85,15 @@ export function construirRegistro(datos, estudiosFolder, archivos = [], respuest
       avisoVersion: '2026-07',
       finalidades: ['atencion-clinica'],
     },
-    alertaSeguridad: datos.alertaSeguridad || {
+    // La regla del reactivo 9 del PHQ-9 se recalcula aquí para que ningún envío
+    // quede sin su bandera aunque el llamador no la haya calculado.
+    alertaSeguridad: combinarAlertaSeguridad(datos.alertaSeguridad || {
       urgente: false,
       embarazoConSintomas: false,
       saludMental: false,
       senales: [],
       senalesMaternas: [],
-    },
+    }, { phq9: datos.phq9 }),
     // La carpeta solo viaja cuando existe por lo menos un archivo confirmado.
     estudiosFolder: archivos.length ? (estudiosFolder || null) : null,
     adjuntos: archivos.map((a) => ({
@@ -268,6 +280,7 @@ function PortalInterno() {
     if (estudiosEstado.errores > 0) partesEstudios.push(`No pudimos recibir ${estudiosEstado.errores === 1 ? 'uno de tus estudios' : `${estudiosEstado.errores} de tus estudios`}; si quieres, llévalos impresos a tu consulta.`);
     const estudiosTexto = partesEstudios.length ? ' ' + partesEstudios.join(' ') : '';
     const urgente = enviado.alertaSeguridad?.urgente === true;
+    const crisisPhq9 = enviado.alertaSeguridad?.phq9?.positivo === true;
     const folio = String(enviado.id || '').slice(0, 8).toUpperCase() || 'CONFIRMADO';
     const enviadoEn = new Date(enviado.submittedAtClient || Date.now());
     const fechaEnvio = Number.isNaN(enviadoEn.getTime())
@@ -293,6 +306,7 @@ function PortalInterno() {
               </ul>
             )}
           </div>
+          {crisisPhq9 && <AvisoCrisisPhq9 final />}
           {urgente ? (
             <div className="portal-fin-urgente" role="alert">
               <b>El envío no sustituye atención urgente.</b>

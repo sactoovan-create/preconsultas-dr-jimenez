@@ -13,8 +13,10 @@
  */
 
 import { MRS_IDS } from './preconsultaFlow.js';
+import { banderasCuestionarios } from './cuestionarios/index.js';
 
-export const RUTEO_VERSION = 5;
+// v6 (2026.10.1): bandera del PHQ-9 (reactivo 9 > 0, total ≥ 20 o reactivo 9 sin dato).
+export const RUTEO_VERSION = 6;
 
 // Catálogo de instrumentos (ids = carpetas en instruments/).
 const NOMBRE = {
@@ -220,6 +222,9 @@ export function instrumentosPara(pre) {
       instrumentoRelacionado: hc.sangrado ? 'hemorragia' : (dolor.tiene ? 'dolor-pelvico' : ''),
     });
   }
+  // Seguridad del PHQ-9: va primero porque exige contacto el mismo día hábil.
+  banderas.unshift(...banderasCuestionarios(ar));
+
   sug.sort((a, b) => ORDEN_PRIORIDAD[a.prioridad] - ORDEN_PRIORIDAD[b.prioridad]);
   return { version: RUTEO_VERSION, instrumentosSugeridos: sug, banderas };
 }

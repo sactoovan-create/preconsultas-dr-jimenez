@@ -95,7 +95,7 @@ try {
   const rol = await pedir('/rest/v1/rpc/es_medico_principal', { method: 'POST', body: {} });
   check('Rol medico autorizado', rol.ok && rol.data === true);
   const version = await (await fetch(base + '/version-preconsulta.json')).json();
-  check('Version del formulario correcta', version.formulario === '2026.09.4' && version.precarga === '2.0.0');
+  check('Version del formulario correcta', version.formulario === '2026.10.1' && version.precarga === '2.0.0');
 
   etapa = 'archivos ficticios';
   const artefacto = await browser.newPage();
@@ -148,7 +148,7 @@ try {
   const guardada = await pedir('/rest/v1/respuestas' + filtro + '&select=id,contenido,nombre');
   check('Servidor contiene solo una respuesta con ese UUID', guardada.ok && guardada.data?.length === 1);
   assert.deepEqual(guardada.data[0], enviado); check('Contenido y manifiesto coinciden exactamente con el envio');
-  check('Campos nuevos y contrato sobreviven al envio', enviado.contenido.autoReporte.hc.fracturaBajoImpacto === true && enviado.contenido.autoReporte.hc.sangradoDuracionDias === 9 && enviado.contenido.ruteoClinico.version === 5);
+  check('Campos nuevos y contrato sobreviven al envio', enviado.contenido.autoReporte.hc.fracturaBajoImpacto === true && enviado.contenido.autoReporte.hc.sangradoDuracionDias === 9 && enviado.contenido.ruteoClinico.version === 6);
   await writeFile(path.join(out, 'respuesta-ficticia.json'), JSON.stringify(guardada.data[0], null, 2));
   const anon = await pedir('/rest/v1/respuestas' + filtro + '&select=id', { anon: true });
   check('Anon no puede leer respuesta existente', [401, 403].includes(anon.status) || (anon.ok && Array.isArray(anon.data) && anon.data.length === 0));

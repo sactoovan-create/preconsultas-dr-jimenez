@@ -1,0 +1,95 @@
+/* Cuestionarios validados (PHQ-9, CSI-Sp). Heredan los tokens de marca y el
+   lenguaje visual de la pre-consulta (.pc-*). */
+
+.cv-cuestionario { display: grid; gap: 4px; }
+.cv-encabezado {
+  margin: 0 0 6px;
+  color: var(--oro-texto, #6D5730);
+  font: 700 11.5px var(--sans, 'Inter', sans-serif);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.cv-parte { margin: 22px 0 4px; color: var(--verde, #1F3A2E); font: 700 17px var(--sans, 'Inter', sans-serif); }
+.cv-instruccion { margin: 0 0 4px; color: var(--verde, #1F3A2E); font-size: 15px; font-weight: 600; line-height: 1.5; }
+.cv-instruccion-formato { margin: 0 0 14px; color: rgba(31, 58, 46, .68); font-size: 13px; line-height: 1.5; }
+
+.cv-item { min-width: 0; margin: 0; padding: 16px 0 18px; border: 0; border-bottom: 1px solid var(--linea-suave, rgba(31,58,46,.08)); }
+.cv-item legend { margin-bottom: 11px; padding: 0; color: var(--verde, #1F3A2E); font-size: 14px; font-weight: 640; line-height: 1.45; }
+.cv-num { margin-right: 6px; color: var(--oro-texto, #6D5730); font-variant-numeric: tabular-nums; }
+.cv-opciones { display: grid; grid-template-columns: repeat(var(--cv-columnas, 4), minmax(0, 1fr)); gap: 7px; }
+.cv-opciones button {
+  min-height: 48px;
+  padding: 8px 6px;
+  border: 1px solid rgba(31, 58, 46, .2);
+  border-radius: 7px;
+  background: var(--papel, #FDFBF6);
+  color: var(--verde, #1F3A2E);
+  font: 600 12.5px/1.25 var(--sans, 'Inter', sans-serif);
+  text-align: center;
+  cursor: pointer;
+}
+.cv-opciones button:hover { border-color: var(--verde, #1F3A2E); }
+.cv-opciones button:focus-visible { outline: 3px solid var(--salvia, #7E9C8B); outline-offset: 2px; }
+.cv-opciones button.on { border-color: var(--verde, #1F3A2E); background: var(--verde, #1F3A2E); color: #fff; }
+.cv-item[aria-invalid="true"] legend,
+.cv-opciones button[aria-invalid="true"] { color: #7D2D24; }
+
+.cv-item-b .cv-item { border-bottom: 0; padding-bottom: 8px; }
+.cv-item-b { border-bottom: 1px solid var(--linea-suave, rgba(31,58,46,.08)); padding-bottom: 12px; }
+.cv-item-b .cv-opciones { max-width: 260px; }
+.cv-anio { display: flex; align-items: center; gap: 10px; color: var(--verde, #1F3A2E); font-size: 13px; font-weight: 600; }
+.cv-anio input {
+  width: 110px;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid rgba(31, 58, 46, .22);
+  border-radius: 7px;
+  background: var(--papel, #FDFBF6);
+  color: var(--verde, #1F3A2E);
+  font: 600 15px var(--sans, 'Inter', sans-serif);
+}
+
+.cv-credito { margin: 18px 0 0; color: rgba(31, 58, 46, .6); font-size: 11.5px; line-height: 1.55; }
+.cv-credito a { color: inherit; word-break: break-all; }
+
+/* Aviso de seguridad del reactivo 9: cálido, claro, sin puntajes ni diagnósticos. */
+.cv-crisis {
+  margin: 14px 0 6px;
+  padding: 17px 18px;
+  border: 2px solid var(--terracota, #B85042);
+  border-radius: 7px;
+  background: #FFF2EF;
+  color: #7D2D24;
+  text-align: left;
+}
+.cv-crisis b { display: block; font-size: 16px; line-height: 1.4; }
+.cv-crisis p { margin: 8px 0 0; font-size: 13.5px; line-height: 1.55; color: #7D2D24; }
+.cv-crisis p a { color: inherit; font-weight: 700; white-space: nowrap; }
+.cv-crisis-botones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.cv-crisis-boton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: #7D2D24;
+  color: #fff;
+  font: 700 14px var(--sans, 'Inter', sans-serif);
+  text-decoration: none;
+}
+.cv-crisis-boton svg { width: 17px; height: 17px; }
+.cv-crisis-boton:focus-visible { outline: 3px solid #7D2D24; outline-offset: 2px; }
+
+@media (max-width: 620px) {
+  .cv-opciones { grid-template-columns: 1fr; gap: 6px; }
+  .cv-opciones button { min-height: 46px; text-align: left; padding: 10px 14px; font-size: 14px; }
+  .cv-item-b .cv-opciones { grid-template-columns: 1fr 1fr; max-width: none; }
+  .cv-crisis-boton { flex: 1 1 100%; justify-content: center; }
+}
+
+/* En la pantalla final la tarjeta tiene sus propios estilos de párrafo. */
+.portal-tarjeta-fin .cv-crisis { margin-top: 22px; }
+.portal-tarjeta-fin .cv-crisis p { margin: 8px 0 0; color: #7D2D24; font-size: 13.5px; line-height: 1.55; }
+.portal-tarjeta-fin .cv-crisis p a { color: #7D2D24; }
+@media print { .cv-crisis { break-inside: avoid; } }
