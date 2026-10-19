@@ -54,9 +54,28 @@ seguridad, revisar».
 - El registro lleva `alertaSeguridad.saludMental`, `alertaSeguridad.phq9` y una
   bandera al inicio de `ruteoClinico.banderas` (CONTRATO-PRECONSULTA.md, §3).
 
+### Revisión del 19/10/2026: contrato con el ERP y pruebas
+
+- El ERP leía otras llaves (`"9"` en lugar de `item9`) y marcaba todo PHQ-9 del portal
+  como «sin dato de seguridad». Se quedan las llaves del portal; el ERP las traduce en
+  una sola función. El contrato se prueba en los dos lados con el mismo archivo,
+  `tests/fixtures/contrato-cuestionarios.json`, generado con la función del envío real
+  (`core/registroPreconsulta.js`); `npm test` falla si se desactualiza.
+- `tests/cuestionarios-browser.mjs` (`npm run test:cuestionarios`, servidor local y
+  sin red): el aviso de crisis aparece con ítem 9 = 1, 2 y 3 junto al reactivo, en
+  «Revisar y enviar» y en la pantalla final, con `tel:8009112000` y `tel:911`; no
+  aparece con 0, sin respuesta o con total grave e ítem 9 = 0; nunca bloquea; sin
+  desplazamiento horizontal a 390 y 1280 px; y lo que guarda el navegador es igual al
+  archivo del contrato.
+
 ### Decisiones pendientes del Dr. antes de publicar
 
 1. Aprobar el protocolo clínico del reactivo 9 y nombrar quién atiende la alerta.
+   Decidir también (revisión del 19/10/2026): si el reactivo 9 se vuelve obligatorio con
+   una opción explícita «Prefiero no responder» que no bloquee (hoy se recuerda una vez y
+   se puede omitir; en el ERP cada omisión crea una alerta «sin dato»), a qué pacientes
+   se ofrece el PHQ-9 (hoy a todas) y si una alerta «sin dato» puede cerrarse con una
+   nota breve sin contacto.
 2. Definir horario y plazo de revisión (hoy el texto solo dice que no es en tiempo
    real) y el intervalo de sincronización de la Mac, porque el retraso de la alerta en
    el ERP es igual a ese intervalo.
