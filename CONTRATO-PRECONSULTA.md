@@ -5,8 +5,10 @@
 > liga al expediente). Este documento congela la forma de los datos para que ambos
 > evolucionen sin romperse. **Si cambias la forma, sube `version` y actualiza aquí.**
 
-Estado: **versión 3** (formulario preparado localmente `2026.09.4`; publicación no verificada). Producido por
-`paciente/PortalPaciente.jsx` (`construirRegistro`) y `core/resumenPaciente.js`.
+Estado: **versión 3** (formulario preparado localmente `2026.10.1`, rama
+`claude/cuestionarios-dolor`; **no publicado**: requiere el visto bueno del Dr.). Producido por
+`paciente/PortalPaciente.jsx` (`construirRegistro`), `core/resumenPaciente.js` y
+`core/cuestionarios/` (cuestionarios validados, §3).
 Almacenado por `core/respuestas.js`.
 
 La versión 2 conserva `paciente`, `autoReporte`, `resumen`, `estudiosFolder` y
@@ -68,7 +70,10 @@ Cada envío de una paciente es **un objeto JSON** con esta forma:
     "mrs":   { /* síntomas de menopausia, ver §3 */ },
     "dolor": { "tiene": true, "intensidad": 6, "meses": 4 },  // ver §3
     "hc":    { /* historia clínica adaptativa, ver §3 */ },
-    "profundos": { /* instrumentos dirigidos opcionales, ver §3 */ }
+    "profundos": { /* instrumentos dirigidos opcionales, ver §3 */ },
+    // Desde 2026.10.1 (§3, «Cuestionarios validados»):
+    "phq9": { "version": 1, "respuestas": { "item1": 1, "item9": 0, "dificultad": 1 } },
+    "csi":  { "version": 1, "respuestas": { "a1": 2, "a25": 3, "b3": "si", "b3_anio": 2019 } }
   },
 
   "resumen": {
@@ -287,6 +292,88 @@ elimina las respuestas de un módulo si la paciente desmarca el tema que lo abri
 `resumen.profundizaciones` congela su lectura orientativa para que el ERP no tenga
 que recalcular con reglas futuras.
 
+### Cuestionarios validados (formulario `2026.10.1`, no publicado)
+
+Decisión del Dr. del 19/10/2026. Cambio **aditivo**: el sobre sigue en `version: 3`;
+`formularioVersion` sube a `2026.10.1` y `ruteoClinico.version` a **6**. Puntajes e
+interpretaciones solo con las reglas publicadas de cada versión validada (sin modelos
+ni inteligencia artificial). Código: `core/cuestionarios/` (motores puros, pruebas en
+`tests/cuestionarios.mjs`). Licencias, fuentes y pendientes del Dr.:
+`docs/CUESTIONARIOS-VALIDADOS-2026-10.md`.
+
+**Cuándo se ofrecen.** `phq9`: siempre. `csi`: solo con dolor pélvico, con el mismo
+criterio que el ruteo de dolor pélvico y endometriosis (`hc.temasConsulta` incluye
+`dolor` o `dolor.tiene === true`). Un cuestionario ofrecido **viaja aunque esté vacío**
+(`respuestas: {}`); uno no ofrecido **no tiene clave**. Los registros anteriores a
+`2026.10.1` no tienen estas claves: para ellos no existe PHQ-9 (no es «sin dato»).
+Si la paciente desmarca el tema que abrió el CSI, sus respuestas se descartan.
+
+**Forma.** `autoReporte.<clave> = { version, respuestas: { <reactivo>: valor } }`.
+Claves ausentes = no contestadas (nunca se rellenan con cero).
+
+| Clave | Reactivo | Valores | Puntúa |
+|---|---|---|---|
+| `phq9` | `item1` … `item9` | entero 0..3 (Para nada, Varios días, Más de la mitad de los días, Casi todos los días) | sí, total 0..27 |
+| `phq9` | `dificultad` | entero 0..3 (Para nada difícil … Extremadamente difícil) | no |
+| `csi` | `a1` … `a25` (Parte A) | entero 0..4 (Nunca, Pocas Veces, Algunas veces, Continuamente, Siempre) | sí, total 0..100 |
+| `csi` | `b1` … `b10` (Parte B) | `"si"` / `"no"` | no |
+| `csi` | `b1_anio` … `b10_anio` | entero 1900..año actual; solo existe con `"si"` | no |
+
+**Lectura congelada en `resumen`** (el ERP la muestra sin recalcular; si recalcula,
+con las mismas reglas):
+
+- `resumen.phq9`: `instrumento: "PHQ-9"`, `version`, `validado: true`, `completo`,
+  `respondidos`, `total` (0..27 o `null` si falta algún reactivo 1-9), `severidad`
+  (`minima` 0-4, `leve` 5-9, `moderada` 10-14, `moderadamente_grave` 15-19, `grave`
+  20-27; Kroenke 2001) y `severidadEtiqueta`, `item9`, `dificultad`,
+  `dificultadEtiqueta`, `seguridad` (`item9`, `positivo`, `alerta`, `sinDatoItem9`,
+  `prioridad`, `motivos`; mismas reglas que `alertaSeguridad.phq9`),
+  `fuenteCortes` y `resumen` (texto para el médico).
+- `resumen.csi`: `instrumento: "CSI-Sp"`, `version`, `validado: true`, `completo`,
+  `respondidos`, `total` (0..100 o `null` sin los 25), `nivel` (`subclinico` 0-29,
+  `leve` 30-39, `moderado` 40-49, `grave` 50-59, `extremo` 60-100; Neblett 2017) y
+  `nivelEtiqueta`, `sobreCorte40` (Neblett 2013; `null` si incompleto), `parteB`
+  (lista `{ id, diagnostico, anio }` de los marcados «sí»), `parteBRespondidos`,
+  `fuenteCortes` y `resumen`. **Los cortes del CSI vienen de la versión original en
+  inglés**; el CSI-Sp solo publicó la media normativa 24.6 ± 12.0. Mostrarlo así.
+- Ambos son tamizaje, no diagnóstico. La paciente nunca ve puntajes ni etiquetas.
+
+**Seguridad del PHQ-9 (regla fija).** `alertaSeguridad.phq9` existe cuando se ofreció:
+
+```jsonc
+"alertaSeguridad": {
+  "urgente": false, "embarazoConSintomas": false, "senales": [], "senalesMaternas": [],
+  "saludMental": true,                // true si phq9.alerta
+  "phq9": {
+    "version": 1,
+    "item9": 2,                       // 0..3 o null si no contestó
+    "positivo": true,                 // item9 > 0
+    "alerta": true,                   // item9 > 0 o total >= 20
+    "sinDatoItem9": false,            // ofrecido y sin respuesta en el ítem 9
+    "prioridad": "maxima",            // "maxima" (ítem 9 = 2-3 o total >= 20) | "alta" (ítem 9 = 1) | "revisar" (sin dato) | null
+    "motivos": ["item9_positivo"],    // y/o "total_grave"
+    "total": 6,                       // total del PHQ-9 o null
+    "mensaje": "PHQ-9 ítem 9 = 2 (pensamientos de muerte o de lastimarse): contactar a la paciente el mismo día hábil y hacer una evaluación breve de seguridad."
+  }
+}
+```
+
+La misma regla agrega, **al inicio** de `ruteoClinico.banderas`, una bandera con el
+mismo `mensaje` y un campo nuevo `codigo`: `tipo: "roja"` con `codigo:
+"phq9_item9_positivo"` o `"phq9_total_grave"`; `tipo: "aviso"` con `codigo:
+"phq9_sin_dato_item9"`. `instrumentoRelacionado: "phq9"`. El ERP actual ya lista las
+banderas como pendientes hasta marcarlas revisadas. Para el ERP: alerta roja arriba en
+agenda, expediente y panel Instrumentos; no cerrarla sin registrar quién contactó,
+cuándo, qué evaluación se hizo y qué plan se acordó; en modo recepción solo «alerta
+clínica para el Dr.», sin contenido. El portal muestra a la paciente, en cuanto marca
+un ítem 9 > 0, recursos de crisis (911 y Línea de la Vida 800 911 2000, 24 horas) y que
+su médico será avisado, sin prometer revisión en tiempo real; nunca bloquea el envío.
+
+**Pendientes de licencia o registro.** `pcs`, `bpi_sf`, `gsrs` e `iciq_ui_sf` están
+reservados: hoy **no se emiten**. `core/cuestionarios/pendientes.js` guarda solo la
+estructura (sin texto) y el motor de puntaje. La entrevista urinaria local
+(`profundos.incontinencia`) sigue siendo una adaptación no validada, no el ICIQ-UI SF.
+
 ### `ruteoClinico` — instrumentos sugeridos para revisión médica
 
 Campo aditivo producido por `core/ruteoClinico.js`. El motor es puro: no usa reloj
@@ -296,7 +383,8 @@ ni estado; `generadoEn` lo agrega `PortalPaciente.jsx` al construir el registro.
   `instrumento`, `nombre`, `prioridad`, `motivo`, `fuente`, `precarga` y
   `accionSugerida`.
 - `banderas`: alertas para revisión médica. No se borran solas; el ERP debe permitir
-  marcarlas como revisadas o descartadas por el médico.
+  marcarlas como revisadas o descartadas por el médico. Desde ruteo v6 una bandera
+  puede traer `codigo` (hoy solo las del PHQ-9) e `instrumentoRelacionado: "phq9"`.
 - `instrumento` puede ser: `menopausia`, `cardiometabolico`, `mama`,
   `osea`, `sop`, `hemorragia`, `dolor-pelvico`, `endometriosis`,
   `anticoncepcion`, `incontinencia`.
@@ -364,6 +452,17 @@ la consulta.
 ---
 
 ## 5. Política de versión
+
+### Ampliación local 2026.10.1 (no publicada)
+
+- Sobre v3 conservado; `formularioVersion=2026.10.1`; `ruteoClinico.version=6`.
+- Campos opcionales nuevos: `autoReporte.phq9`, `autoReporte.csi`, `resumen.phq9`,
+  `resumen.csi`, `alertaSeguridad.phq9` y `banderas[].codigo` (§3, «Cuestionarios
+  validados»). `alertaSeguridad.saludMental` ya existía y ahora puede valer `true`.
+- Marcadores públicos `public/version-preconsulta.json` y `version-panel.json`
+  actualizados para la verificación posterior al despliegue que el Dr. autorice.
+- Sin migración SQL ni cambios en Supabase; el tope de 60 000 caracteres del `jsonb`
+  sobra (PHQ-9 + CSI completos suman menos de 1 KB).
 
 ### Ampliación local 2026.09.4 (no publicada)
 

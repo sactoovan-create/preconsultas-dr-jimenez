@@ -76,6 +76,12 @@ ella auto-reporta las escalas que puede responder (síntomas de menopausia y dol
 Las respuestas quedan en el auto-reporte del paciente compartido (`autoReporte`) y
 prellenan los instrumentos del médico al abrirlos.
 
+Desde el formulario `2026.10.1` (rama local, no publicado) la pre-consulta incluye
+cuestionarios validados con su texto oficial en español: PHQ-9 siempre (con la regla
+de seguridad del reactivo 9) y CSI-Sp con dolor pélvico. Viven en `core/cuestionarios/`;
+los que requieren licencia (PCS, BPI-SF, GSRS, ICIQ-UI SF) solo tienen estructura y
+motor de puntaje. Detalle en `docs/CUESTIONARIOS-VALIDADOS-2026-10.md`.
+
 El **seguimiento metabólico longitudinal** vive solo en el expediente del ERP. Este
 portal conserva calculadoras puntuales y hojas clínicas, pero no captura series de
 peso, grasa, músculo o cintura para evitar doble registro.
