@@ -15,7 +15,9 @@
     "build": "vite build",
     "test:precarga": "node tests/precarga-clinica-browser.mjs",
     "test:carga": "node tests/carga-browser.mjs",
-    "questions:check": "node scripts/inventario-preguntas.mjs --check"
+    "questions:check": "node scripts/inventario-preguntas.mjs --check",
+    "contrato:cuestionarios": "node scripts/contrato-cuestionarios.mjs",
+    "test:cuestionarios": "node tests/cuestionarios-browser.mjs"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",

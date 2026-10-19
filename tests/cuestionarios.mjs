@@ -21,6 +21,9 @@ import { construirResumen } from '../core/resumenPaciente.js';
 import { instrumentosPara, RUTEO_VERSION } from '../core/ruteoClinico.js';
 import { pasosPara, validarPaso, FORMULARIO_VERSION } from '../core/preconsultaFlow.js';
 import { resumenLectura } from '../core/lecturaRespuesta.js';
+import { construirRegistro } from '../core/registroPreconsulta.js';
+import { construirFixture, RUTA_FIXTURE, serializar } from '../scripts/contrato-cuestionarios.mjs';
+import { readFileSync } from 'node:fs';
 
 let ok = 0, fail = 0;
 const check = (nombre, fn) => {
@@ -197,6 +200,54 @@ check('panel del portal: PHQ-9 incompleto aparece en datos por precisar', () => 
   const autoReporte = { hc: { motivo: 'Prueba QA' }, dolor: {}, mrs: {}, phq9: { version: 1, respuestas: { item9: 0 } } };
   const p = resumenLectura({ autoReporte, resumen: construirResumen(autoReporte) }).pendientes;
   assert.ok(p.some((x) => /PHQ-9: incompleto \(1 respuestas\)/.test(x)), JSON.stringify(p));
+});
+
+console.log('\nRegistro completo (construirRegistro) y contrato con el ERP');
+const datosRegistro = (phqRespuestas, alertaSeguridad) => ({
+  demografia: { nombre: 'Prueba QA', edad: 34 }, contacto: { telefono: '5512345678' },
+  mrs: {}, dolor: { tiene: false }, hc: { temasConsulta: ['control'], senalesUrgencia: ['ninguna'] }, profundos: {},
+  phq9: { version: 1, respuestas: phqRespuestas }, consentimientoFecha: '2026-10-19T16:00:00.000Z',
+  ...(alertaSeguridad ? { alertaSeguridad } : {}),
+});
+check('construirRegistro recalcula alertaSeguridad.phq9 aunque el llamador no la mande', () => {
+  // Sin alertaSeguridad del llamador y con una que no trae phq9: el registro igual la lleva.
+  for (const base of [undefined, { urgente: false, embarazoConSintomas: false, saludMental: false, senales: [], senalesMaternas: [] }]) {
+    const r = construirRegistro(datosRegistro(phqCon([1, 1, 1, 1, 1, 1, 1, 1, 3]), base), null);
+    assert.equal(r.alertaSeguridad.phq9.item9, 3); assert.equal(r.alertaSeguridad.phq9.positivo, true);
+    assert.equal(r.alertaSeguridad.phq9.prioridad, 'maxima'); assert.equal(r.alertaSeguridad.saludMental, true);
+    assert.equal(r.ruteoClinico.banderas[0].codigo, 'phq9_item9_positivo');
+  }
+  // Una alerta del llamador que dice «ítem 9 = 0» no puede tapar un ítem 9 positivo de las respuestas.
+  const falsa = { urgente: false, saludMental: false, senales: [], senalesMaternas: [], phq9: { item9: 0, positivo: false, alerta: false } };
+  assert.equal(construirRegistro(datosRegistro(phqCon([0, 0, 0, 0, 0, 0, 0, 0, 1]), falsa), null).alertaSeguridad.phq9.positivo, true);
+  const cero = construirRegistro(datosRegistro(phqCon([0, 0, 0, 0, 0, 0, 0, 0, 0])), null);
+  assert.equal(cero.alertaSeguridad.phq9.positivo, false); assert.equal(cero.alertaSeguridad.saludMental, false);
+  assert.equal(cero.ruteoClinico.banderas.length, 0);
+  const sinDato = construirRegistro(datosRegistro(phqCon([0, 0, 0, 0, 0, 0, 0, 0])), null);
+  assert.equal(sinDato.alertaSeguridad.phq9.sinDatoItem9, true); assert.equal(sinDato.alertaSeguridad.phq9.prioridad, 'revisar');
+});
+check('construirRegistro: PHQ-9 y CSI viajan en autoReporte con las llaves del contrato', () => {
+  const r = construirRegistro({ ...datosRegistro(phqCon([1, 1, 1, 1, 1, 1, 1, 1, 2])), csi: { version: 1, respuestas: csiCon(Array(25).fill(2), { b3: 'si', b3_anio: 2019 }) } }, null);
+  assert.deepEqual(Object.keys(r.autoReporte.phq9.respuestas), ['item1', 'item2', 'item3', 'item4', 'item5', 'item6', 'item7', 'item8', 'item9']);
+  assert.equal(r.autoReporte.csi.respuestas.a25, 2); assert.equal(r.autoReporte.csi.respuestas.b3, 'si');
+  assert.equal(r.resumen.phq9.total, 10); assert.equal(r.resumen.csi.total, 50);
+});
+const fixtureEnDisco = readFileSync(RUTA_FIXTURE, 'utf8');
+check('contrato con el ERP al día: tests/fixtures/contrato-cuestionarios.json = construirRegistro de hoy', () => {
+  assert.equal(fixtureEnDisco, serializar(construirFixture()),
+    'Regenera con «node scripts/contrato-cuestionarios.mjs» y copia el archivo al ERP (instrumentos/tests/fixtures/contrato_portal_cuestionarios.json).');
+});
+check('contrato: cada caso trae lo que el ERP debe concluir y coincide con la regla del portal', () => {
+  const fx = JSON.parse(fixtureEnDisco);
+  const tipos = { ideacion: (p) => p.positivo, total_grave: (p) => !p.positivo && p.motivos.includes('total_grave'), sin_dato: (p) => p.sinDatoItem9 };
+  for (const [id, { esperadoErp: e, contenido: c }] of Object.entries(fx.casos)) {
+    const p = c.alertaSeguridad.phq9;
+    assert.equal(p.item9, e.item9, id); assert.equal(p.total, e.phq9Total, id); assert.equal(c.resumen.phq9.total, e.phq9Total, id);
+    assert.equal(p.prioridad === 'maxima', e.prioridadMaxima, id);
+    if (e.alerta) assert.ok(tipos[e.alerta](p), id); else assert.equal(p.alerta || p.sinDatoItem9, false, id);
+    assert.equal(c.resumen.csi ? c.resumen.csi.total : null, e.csiTotal, id);
+  }
+  assert.deepEqual(fx.textos.phq9.items, phq9.ITEMS.map((it) => it.texto));
 });
 
 console.log('\nPendientes de licencia o registro (sin texto)');

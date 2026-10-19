@@ -1,0 +1,1106 @@
+{
+ "descripcion": "Contrato portal → ERP de los cuestionarios validados. Generado por scripts/contrato-cuestionarios.mjs con construirRegistro (core/registroPreconsulta.js); no editar a mano. El ERP guarda una copia idéntica en instrumentos/tests/fixtures/contrato_portal_cuestionarios.json. Datos inventados («Prueba QA»).",
+ "formularioVersion": "2026.10.1",
+ "llaves": {
+  "phq9": "item1..item9 (0..3), dificultad (0..3)",
+  "csi": "a1..a25 (0..4), b1..b10 (\"si\"/\"no\"), bN_anio (año, solo con \"si\")"
+ },
+ "casos": {
+  "item9_0": {
+   "esperadoErp": {
+    "alerta": null,
+    "item9": 0,
+    "phq9Total": 0,
+    "csiTotal": null,
+    "prioridadMaxima": false
+   },
+   "contenido": {
+    "version": 3,
+    "formularioVersion": "2026.10.1",
+    "submittedAtClient": "2026-10-19T16:00:00.000Z",
+    "atribucion": {
+     "version": 1,
+     "booking_channel": "whatsapp",
+     "patient_reported_source": "google_maps",
+     "acquisition_source": "unknown",
+     "attribution_captured_at": "",
+     "lead_id": ""
+    },
+    "paciente": {
+     "nombre": "Prueba QA item9_0",
+     "edad": 34,
+     "telefono": "5512345678",
+     "correo": null,
+     "domicilio": {
+      "dom_calle_numero": "",
+      "dom_colonia": "Colonia QA",
+      "dom_cp": "01000",
+      "dom_municipio": "Municipio QA",
+      "dom_estado": "Jalisco"
+     }
+    },
+    "autoReporte": {
+     "mrs": {},
+     "dolor": {
+      "tiene": false,
+      "intensidad": null,
+      "meses": null
+     },
+     "hc": {
+      "telefono": "5512345678",
+      "motivo": "Prueba QA contrato",
+      "temasConsulta": [
+       "control"
+      ],
+      "senalesUrgencia": [
+       "ninguna"
+      ],
+      "etapaReproductiva": "menstrua_regular",
+      "reglasRegulares": true,
+      "antecedentesSeleccionados": [
+       "ninguna"
+      ],
+      "antecedentesRevisados": true,
+      "dom_colonia": "Colonia QA",
+      "dom_cp": "01000",
+      "dom_municipio": "Municipio QA",
+      "dom_estado": "Jalisco",
+      "formularioVersion": "2026.10.1",
+      "dom_calle_numero": ""
+     },
+     "profundos": {},
+     "phq9": {
+      "version": 1,
+      "respuestas": {
+       "item1": 0,
+       "item2": 0,
+       "item3": 0,
+       "item4": 0,
+       "item5": 0,
+       "item6": 0,
+       "item7": 0,
+       "item8": 0,
+       "item9": 0
+      }
+     }
+    },
+    "resumen": {
+     "menopausia": {
+      "total": null,
+      "intensidad": null,
+      "completa": false,
+      "respondidos": 0
+     },
+     "dolor": null,
+     "profundizaciones": [],
+     "phq9": {
+      "instrumento": "PHQ-9",
+      "version": 1,
+      "validado": true,
+      "completo": true,
+      "respondidos": 9,
+      "total": 0,
+      "severidad": "minima",
+      "severidadEtiqueta": "mínima o ninguna",
+      "item9": 0,
+      "dificultad": null,
+      "dificultadEtiqueta": null,
+      "seguridad": {
+       "item9": 0,
+       "positivo": false,
+       "alerta": false,
+       "sinDatoItem9": false,
+       "prioridad": null,
+       "motivos": []
+      },
+      "fuenteCortes": "Kroenke 2001 (versión original); validación de estructura en mujeres mexicanas: Familiar 2015.",
+      "resumen": "PHQ-9 0/27: síntomas depresivos de severidad mínima o ninguna (cortes de Kroenke 2001). Ítem 9 = 0. Tamizaje, no diagnóstico."
+     }
+    },
+    "consentimiento": {
+     "aceptado": true,
+     "aceptadoEnCliente": "2026-10-19T16:00:00.000Z",
+     "avisoVersion": "2026-07",
+     "finalidades": [
+      "atencion-clinica"
+     ]
+    },
+    "alertaSeguridad": {
+     "urgente": false,
+     "embarazoConSintomas": false,
+     "saludMental": false,
+     "senales": [],
+     "senalesMaternas": [],
+     "phq9": {
+      "version": 1,
+      "item9": 0,
+      "positivo": false,
+      "alerta": false,
+      "sinDatoItem9": false,
+      "prioridad": null,
+      "motivos": [],
+      "total": 0,
+      "mensaje": null
+     }
+    },
+    "estudiosFolder": null,
+    "adjuntos": [],
+    "estudiosDeclaracion": "no_los_tengo_ahora",
+    "ruteoClinico": {
+     "version": 6,
+     "instrumentosSugeridos": [],
+     "banderas": [],
+     "generadoEn": "2026-10-19T16:00:00.000Z"
+    }
+   }
+  },
+  "item9_1": {
+   "esperadoErp": {
+    "alerta": "ideacion",
+    "item9": 1,
+    "phq9Total": 9,
+    "csiTotal": null,
+    "prioridadMaxima": false
+   },
+   "contenido": {
+    "version": 3,
+    "formularioVersion": "2026.10.1",
+    "submittedAtClient": "2026-10-19T16:00:00.000Z",
+    "atribucion": {
+     "version": 1,
+     "booking_channel": "whatsapp",
+     "patient_reported_source": "google_maps",
+     "acquisition_source": "unknown",
+     "attribution_captured_at": "",
+     "lead_id": ""
+    },
+    "paciente": {
+     "nombre": "Prueba QA item9_1",
+     "edad": 34,
+     "telefono": "5512345678",
+     "correo": null,
+     "domicilio": {
+      "dom_calle_numero": "",
+      "dom_colonia": "Colonia QA",
+      "dom_cp": "01000",
+      "dom_municipio": "Municipio QA",
+      "dom_estado": "Jalisco"
+     }
+    },
+    "autoReporte": {
+     "mrs": {},
+     "dolor": {
+      "tiene": false,
+      "intensidad": null,
+      "meses": null
+     },
+     "hc": {
+      "telefono": "5512345678",
+      "motivo": "Prueba QA contrato",
+      "temasConsulta": [
+       "control"
+      ],
+      "senalesUrgencia": [
+       "ninguna"
+      ],
+      "etapaReproductiva": "menstrua_regular",
+      "reglasRegulares": true,
+      "antecedentesSeleccionados": [
+       "ninguna"
+      ],
+      "antecedentesRevisados": true,
+      "dom_colonia": "Colonia QA",
+      "dom_cp": "01000",
+      "dom_municipio": "Municipio QA",
+      "dom_estado": "Jalisco",
+      "formularioVersion": "2026.10.1",
+      "dom_calle_numero": ""
+     },
+     "profundos": {},
+     "phq9": {
+      "version": 1,
+      "respuestas": {
+       "item1": 1,
+       "item2": 1,
+       "item3": 1,
+       "item4": 1,
+       "item5": 1,
+       "item6": 1,
+       "item7": 1,
+       "item8": 1,
+       "item9": 1
+      }
+     }
+    },
+    "resumen": {
+     "menopausia": {
+      "total": null,
+      "intensidad": null,
+      "completa": false,
+      "respondidos": 0
+     },
+     "dolor": null,
+     "profundizaciones": [],
+     "phq9": {
+      "instrumento": "PHQ-9",
+      "version": 1,
+      "validado": true,
+      "completo": true,
+      "respondidos": 9,
+      "total": 9,
+      "severidad": "leve",
+      "severidadEtiqueta": "leve",
+      "item9": 1,
+      "dificultad": null,
+      "dificultadEtiqueta": null,
+      "seguridad": {
+       "item9": 1,
+       "positivo": true,
+       "alerta": true,
+       "sinDatoItem9": false,
+       "prioridad": "alta",
+       "motivos": [
+        "item9_positivo"
+       ]
+      },
+      "fuenteCortes": "Kroenke 2001 (versión original); validación de estructura en mujeres mexicanas: Familiar 2015.",
+      "resumen": "ALERTA DE SEGURIDAD: ítem 9 = 1. PHQ-9 9/27: síntomas depresivos de severidad leve (cortes de Kroenke 2001). Tamizaje, no diagnóstico."
+     }
+    },
+    "consentimiento": {
+     "aceptado": true,
+     "aceptadoEnCliente": "2026-10-19T16:00:00.000Z",
+     "avisoVersion": "2026-07",
+     "finalidades": [
+      "atencion-clinica"
+     ]
+    },
+    "alertaSeguridad": {
+     "urgente": false,
+     "embarazoConSintomas": false,
+     "saludMental": true,
+     "senales": [],
+     "senalesMaternas": [],
+     "phq9": {
+      "version": 1,
+      "item9": 1,
+      "positivo": true,
+      "alerta": true,
+      "sinDatoItem9": false,
+      "prioridad": "alta",
+      "motivos": [
+       "item9_positivo"
+      ],
+      "total": 9,
+      "mensaje": "PHQ-9 ítem 9 = 1 (pensamientos de muerte o de lastimarse): contactar a la paciente el mismo día hábil y hacer una evaluación breve de seguridad."
+     }
+    },
+    "estudiosFolder": null,
+    "adjuntos": [],
+    "estudiosDeclaracion": "no_los_tengo_ahora",
+    "ruteoClinico": {
+     "version": 6,
+     "instrumentosSugeridos": [],
+     "banderas": [
+      {
+       "tipo": "roja",
+       "codigo": "phq9_item9_positivo",
+       "mensaje": "PHQ-9 ítem 9 = 1 (pensamientos de muerte o de lastimarse): contactar a la paciente el mismo día hábil y hacer una evaluación breve de seguridad.",
+       "instrumentoRelacionado": "phq9"
+      }
+     ],
+     "generadoEn": "2026-10-19T16:00:00.000Z"
+    }
+   }
+  },
+  "item9_2_csi": {
+   "esperadoErp": {
+    "alerta": "ideacion",
+    "item9": 2,
+    "phq9Total": 10,
+    "csiTotal": 50,
+    "prioridadMaxima": true
+   },
+   "contenido": {
+    "version": 3,
+    "formularioVersion": "2026.10.1",
+    "submittedAtClient": "2026-10-19T16:00:00.000Z",
+    "atribucion": {
+     "version": 1,
+     "booking_channel": "whatsapp",
+     "patient_reported_source": "google_maps",
+     "acquisition_source": "unknown",
+     "attribution_captured_at": "",
+     "lead_id": ""
+    },
+    "paciente": {
+     "nombre": "Prueba QA item9_2_csi",
+     "edad": 34,
+     "telefono": "5512345678",
+     "correo": null,
+     "domicilio": {
+      "dom_calle_numero": "",
+      "dom_colonia": "Colonia QA",
+      "dom_cp": "01000",
+      "dom_municipio": "Municipio QA",
+      "dom_estado": "Jalisco"
+     }
+    },
+    "autoReporte": {
+     "mrs": {},
+     "dolor": {
+      "tiene": true,
+      "intensidad": 6,
+      "inicio": "recurrente",
+      "meses": 12
+     },
+     "hc": {
+      "telefono": "5512345678",
+      "motivo": "Prueba QA contrato",
+      "temasConsulta": [
+       "dolor"
+      ],
+      "senalesUrgencia": [
+       "ninguna"
+      ],
+      "etapaReproductiva": "menstrua_regular",
+      "reglasRegulares": true,
+      "antecedentesSeleccionados": [
+       "ninguna"
+      ],
+      "antecedentesRevisados": true,
+      "dom_colonia": "Colonia QA",
+      "dom_cp": "01000",
+      "dom_municipio": "Municipio QA",
+      "dom_estado": "Jalisco",
+      "formularioVersion": "2026.10.1",
+      "dom_calle_numero": ""
+     },
+     "profundos": {},
+     "phq9": {
+      "version": 1,
+      "respuestas": {
+       "item1": 1,
+       "item2": 1,
+       "item3": 1,
+       "item4": 1,
+       "item5": 1,
+       "item6": 1,
+       "item7": 1,
+       "item8": 1,
+       "item9": 2,
+       "dificultad": 2
+      }
+     },
+     "csi": {
+      "version": 1,
+      "respuestas": {
+       "a1": 2,
+       "a2": 2,
+       "a3": 2,
+       "a4": 2,
+       "a5": 2,
+       "a6": 2,
+       "a7": 2,
+       "a8": 2,
+       "a9": 2,
+       "a10": 2,
+       "a11": 2,
+       "a12": 2,
+       "a13": 2,
+       "a14": 2,
+       "a15": 2,
+       "a16": 2,
+       "a17": 2,
+       "a18": 2,
+       "a19": 2,
+       "a20": 2,
+       "a21": 2,
+       "a22": 2,
+       "a23": 2,
+       "a24": 2,
+       "a25": 2,
+       "b3": "si",
+       "b3_anio": 2019,
+       "b10": "no"
+      }
+     }
+    },
+    "resumen": {
+     "menopausia": {
+      "total": null,
+      "intensidad": null,
+      "completa": false,
+      "respondidos": 0
+     },
+     "dolor": {
+      "intensidad": 6,
+      "meses": 12
+     },
+     "profundizaciones": [],
+     "csi": {
+      "instrumento": "CSI-Sp",
+      "version": 1,
+      "validado": true,
+      "completo": true,
+      "respondidos": 25,
+      "total": 50,
+      "nivel": "grave",
+      "nivelEtiqueta": "grave",
+      "sobreCorte40": true,
+      "parteB": [
+       {
+        "id": "b3",
+        "diagnostico": "Fibromialgia",
+        "anio": 2019
+       }
+      ],
+      "parteBRespondidos": 2,
+      "fuenteCortes": "Neblett 2013 (corte 40) y Neblett 2017 (niveles), versión original en inglés; el CSI-Sp no fijó corte propio.",
+      "resumen": "CSI-Sp 50/100: nivel grave; por encima del corte de 40, sugiere síntomas posiblemente relacionados con sensibilización central. Cortes derivados de la versión original en inglés (Neblett 2013 y 2017); media normativa CSI-Sp 24.6 ± 12.0. Parte B: Fibromialgia (2019). Tamizaje, no diagnóstico."
+     },
+     "phq9": {
+      "instrumento": "PHQ-9",
+      "version": 1,
+      "validado": true,
+      "completo": true,
+      "respondidos": 9,
+      "total": 10,
+      "severidad": "moderada",
+      "severidadEtiqueta": "moderada",
+      "item9": 2,
+      "dificultad": 2,
+      "dificultadEtiqueta": "Muy difícil",
+      "seguridad": {
+       "item9": 2,
+       "positivo": true,
+       "alerta": true,
+       "sinDatoItem9": false,
+       "prioridad": "maxima",
+       "motivos": [
+        "item9_positivo"
+       ]
+      },
+      "fuenteCortes": "Kroenke 2001 (versión original); validación de estructura en mujeres mexicanas: Familiar 2015.",
+      "resumen": "ALERTA DE SEGURIDAD: ítem 9 = 2. PHQ-9 10/27: síntomas depresivos de severidad moderada (cortes de Kroenke 2001). Dificultad funcional: Muy difícil. Tamizaje, no diagnóstico."
+     }
+    },
+    "consentimiento": {
+     "aceptado": true,
+     "aceptadoEnCliente": "2026-10-19T16:00:00.000Z",
+     "avisoVersion": "2026-07",
+     "finalidades": [
+      "atencion-clinica"
+     ]
+    },
+    "alertaSeguridad": {
+     "urgente": false,
+     "embarazoConSintomas": false,
+     "saludMental": true,
+     "senales": [],
+     "senalesMaternas": [],
+     "phq9": {
+      "version": 1,
+      "item9": 2,
+      "positivo": true,
+      "alerta": true,
+      "sinDatoItem9": false,
+      "prioridad": "maxima",
+      "motivos": [
+       "item9_positivo"
+      ],
+      "total": 10,
+      "mensaje": "PHQ-9 ítem 9 = 2 (pensamientos de muerte o de lastimarse): contactar a la paciente el mismo día hábil y hacer una evaluación breve de seguridad."
+     }
+    },
+    "estudiosFolder": null,
+    "adjuntos": [],
+    "estudiosDeclaracion": "no_los_tengo_ahora",
+    "ruteoClinico": {
+     "version": 6,
+     "instrumentosSugeridos": [
+      {
+       "instrumento": "dolor-pelvico",
+       "nombre": "Dolor pélvico",
+       "prioridad": "alta",
+       "motivo": "Reportó dolor pélvico (6/10), 12 meses.",
+       "fuente": [
+        "dolor"
+       ],
+       "precarga": {
+        "dolor": {
+         "tiene": true,
+         "intensidad": 6,
+         "inicio": "recurrente",
+         "meses": 12
+        }
+       },
+       "accionSugerida": "revisar_en_consulta"
+      }
+     ],
+     "banderas": [
+      {
+       "tipo": "roja",
+       "codigo": "phq9_item9_positivo",
+       "mensaje": "PHQ-9 ítem 9 = 2 (pensamientos de muerte o de lastimarse): contactar a la paciente el mismo día hábil y hacer una evaluación breve de seguridad.",
+       "instrumentoRelacionado": "phq9"
+      }
+     ],
+     "generadoEn": "2026-10-19T16:00:00.000Z"
+    }
+   }
+  },
+  "item9_3": {
+   "esperadoErp": {
+    "alerta": "ideacion",
+    "item9": 3,
+    "phq9Total": 27,
+    "csiTotal": null,
+    "prioridadMaxima": true
+   },
+   "contenido": {
+    "version": 3,
+    "formularioVersion": "2026.10.1",
+    "submittedAtClient": "2026-10-19T16:00:00.000Z",
+    "atribucion": {
+     "version": 1,
+     "booking_channel": "whatsapp",
+     "patient_reported_source": "google_maps",
+     "acquisition_source": "unknown",
+     "attribution_captured_at": "",
+     "lead_id": ""
+    },
+    "paciente": {
+     "nombre": "Prueba QA item9_3",
+     "edad": 34,
+     "telefono": "5512345678",
+     "correo": null,
+     "domicilio": {
+      "dom_calle_numero": "",
+      "dom_colonia": "Colonia QA",
+      "dom_cp": "01000",
+      "dom_municipio": "Municipio QA",
+      "dom_estado": "Jalisco"
+     }
+    },
+    "autoReporte": {
+     "mrs": {},
+     "dolor": {
+      "tiene": false,
+      "intensidad": null,
+      "meses": null
+     },
+     "hc": {
+      "telefono": "5512345678",
+      "motivo": "Prueba QA contrato",
+      "temasConsulta": [
+       "control"
+      ],
+      "senalesUrgencia": [
+       "ninguna"
+      ],
+      "etapaReproductiva": "menstrua_regular",
+      "reglasRegulares": true,
+      "antecedentesSeleccionados": [
+       "ninguna"
+      ],
+      "antecedentesRevisados": true,
+      "dom_colonia": "Colonia QA",
+      "dom_cp": "01000",
+      "dom_municipio": "Municipio QA",
+      "dom_estado": "Jalisco",
+      "formularioVersion": "2026.10.1",
+      "dom_calle_numero": ""
+     },
+     "profundos": {},
+     "phq9": {
+      "version": 1,
+      "respuestas": {
+       "item1": 3,
+       "item2": 3,
+       "item3": 3,
+       "item4": 3,
+       "item5": 3,
+       "item6": 3,
+       "item7": 3,
+       "item8": 3,
+       "item9": 3
+      }
+     }
+    },
+    "resumen": {
+     "menopausia": {
+      "total": null,
+      "intensidad": null,
+      "completa": false,
+      "respondidos": 0
+     },
+     "dolor": null,
+     "profundizaciones": [],
+     "phq9": {
+      "instrumento": "PHQ-9",
+      "version": 1,
+      "validado": true,
+      "completo": true,
+      "respondidos": 9,
+      "total": 27,
+      "severidad": "grave",
+      "severidadEtiqueta": "grave",
+      "item9": 3,
+      "dificultad": null,
+      "dificultadEtiqueta": null,
+      "seguridad": {
+       "item9": 3,
+       "positivo": true,
+       "alerta": true,
+       "sinDatoItem9": false,
+       "prioridad": "maxima",
+       "motivos": [
+        "item9_positivo",
+        "total_grave"
+       ]
+      },
+      "fuenteCortes": "Kroenke 2001 (versión original); validación de estructura en mujeres mexicanas: Familiar 2015.",
+      "resumen": "ALERTA DE SEGURIDAD: ítem 9 = 3. PHQ-9 27/27: síntomas depresivos de severidad grave (cortes de Kroenke 2001). Tamizaje, no diagnóstico."
+     }
+    },
+    "consentimiento": {
+     "aceptado": true,
+     "aceptadoEnCliente": "2026-10-19T16:00:00.000Z",
+     "avisoVersion": "2026-07",
+     "finalidades": [
+      "atencion-clinica"
+     ]
+    },
+    "alertaSeguridad": {
+     "urgente": false,
+     "embarazoConSintomas": false,
+     "saludMental": true,
+     "senales": [],
+     "senalesMaternas": [],
+     "phq9": {
+      "version": 1,
+      "item9": 3,
+      "positivo": true,
+      "alerta": true,
+      "sinDatoItem9": false,
+      "prioridad": "maxima",
+      "motivos": [
+       "item9_positivo",
+       "total_grave"
+      ],
+      "total": 27,
+      "mensaje": "PHQ-9 ítem 9 = 3 (pensamientos de muerte o de lastimarse): contactar a la paciente el mismo día hábil y hacer una evaluación breve de seguridad."
+     }
+    },
+    "estudiosFolder": null,
+    "adjuntos": [],
+    "estudiosDeclaracion": "no_los_tengo_ahora",
+    "ruteoClinico": {
+     "version": 6,
+     "instrumentosSugeridos": [],
+     "banderas": [
+      {
+       "tipo": "roja",
+       "codigo": "phq9_item9_positivo",
+       "mensaje": "PHQ-9 ítem 9 = 3 (pensamientos de muerte o de lastimarse): contactar a la paciente el mismo día hábil y hacer una evaluación breve de seguridad.",
+       "instrumentoRelacionado": "phq9"
+      }
+     ],
+     "generadoEn": "2026-10-19T16:00:00.000Z"
+    }
+   }
+  },
+  "item9_falta": {
+   "esperadoErp": {
+    "alerta": "sin_dato",
+    "item9": null,
+    "phq9Total": null,
+    "csiTotal": null,
+    "prioridadMaxima": false
+   },
+   "contenido": {
+    "version": 3,
+    "formularioVersion": "2026.10.1",
+    "submittedAtClient": "2026-10-19T16:00:00.000Z",
+    "atribucion": {
+     "version": 1,
+     "booking_channel": "whatsapp",
+     "patient_reported_source": "google_maps",
+     "acquisition_source": "unknown",
+     "attribution_captured_at": "",
+     "lead_id": ""
+    },
+    "paciente": {
+     "nombre": "Prueba QA item9_falta",
+     "edad": 34,
+     "telefono": "5512345678",
+     "correo": null,
+     "domicilio": {
+      "dom_calle_numero": "",
+      "dom_colonia": "Colonia QA",
+      "dom_cp": "01000",
+      "dom_municipio": "Municipio QA",
+      "dom_estado": "Jalisco"
+     }
+    },
+    "autoReporte": {
+     "mrs": {},
+     "dolor": {
+      "tiene": false,
+      "intensidad": null,
+      "meses": null
+     },
+     "hc": {
+      "telefono": "5512345678",
+      "motivo": "Prueba QA contrato",
+      "temasConsulta": [
+       "control"
+      ],
+      "senalesUrgencia": [
+       "ninguna"
+      ],
+      "etapaReproductiva": "menstrua_regular",
+      "reglasRegulares": true,
+      "antecedentesSeleccionados": [
+       "ninguna"
+      ],
+      "antecedentesRevisados": true,
+      "dom_colonia": "Colonia QA",
+      "dom_cp": "01000",
+      "dom_municipio": "Municipio QA",
+      "dom_estado": "Jalisco",
+      "formularioVersion": "2026.10.1",
+      "dom_calle_numero": ""
+     },
+     "profundos": {},
+     "phq9": {
+      "version": 1,
+      "respuestas": {
+       "item1": 0,
+       "item2": 0,
+       "item3": 0,
+       "item4": 0,
+       "item5": 0,
+       "item6": 0,
+       "item7": 0,
+       "item8": 0
+      }
+     }
+    },
+    "resumen": {
+     "menopausia": {
+      "total": null,
+      "intensidad": null,
+      "completa": false,
+      "respondidos": 0
+     },
+     "dolor": null,
+     "profundizaciones": [],
+     "phq9": {
+      "instrumento": "PHQ-9",
+      "version": 1,
+      "validado": true,
+      "completo": false,
+      "respondidos": 8,
+      "total": null,
+      "severidad": null,
+      "severidadEtiqueta": null,
+      "item9": null,
+      "dificultad": null,
+      "dificultadEtiqueta": null,
+      "seguridad": {
+       "item9": null,
+       "positivo": false,
+       "alerta": false,
+       "sinDatoItem9": true,
+       "prioridad": "revisar",
+       "motivos": []
+      },
+      "fuenteCortes": "Kroenke 2001 (versión original); validación de estructura en mujeres mexicanas: Familiar 2015.",
+      "resumen": "Sin dato de seguridad (ítem 9 sin respuesta), revisar. PHQ-9 incompleto (8/9): sin total; una escala incompleta no equivale a cero. Tamizaje, no diagnóstico."
+     }
+    },
+    "consentimiento": {
+     "aceptado": true,
+     "aceptadoEnCliente": "2026-10-19T16:00:00.000Z",
+     "avisoVersion": "2026-07",
+     "finalidades": [
+      "atencion-clinica"
+     ]
+    },
+    "alertaSeguridad": {
+     "urgente": false,
+     "embarazoConSintomas": false,
+     "saludMental": false,
+     "senales": [],
+     "senalesMaternas": [],
+     "phq9": {
+      "version": 1,
+      "item9": null,
+      "positivo": false,
+      "alerta": false,
+      "sinDatoItem9": true,
+      "prioridad": "revisar",
+      "motivos": [],
+      "total": null,
+      "mensaje": "PHQ-9 sin dato de seguridad (ítem 9 sin respuesta): revisar."
+     }
+    },
+    "estudiosFolder": null,
+    "adjuntos": [],
+    "estudiosDeclaracion": "no_los_tengo_ahora",
+    "ruteoClinico": {
+     "version": 6,
+     "instrumentosSugeridos": [],
+     "banderas": [
+      {
+       "tipo": "aviso",
+       "codigo": "phq9_sin_dato_item9",
+       "mensaje": "PHQ-9 sin dato de seguridad (ítem 9 sin respuesta): revisar.",
+       "instrumentoRelacionado": "phq9"
+      }
+     ],
+     "generadoEn": "2026-10-19T16:00:00.000Z"
+    }
+   }
+  },
+  "total_grave_item9_0": {
+   "esperadoErp": {
+    "alerta": "total_grave",
+    "item9": 0,
+    "phq9Total": 24,
+    "csiTotal": null,
+    "prioridadMaxima": true
+   },
+   "contenido": {
+    "version": 3,
+    "formularioVersion": "2026.10.1",
+    "submittedAtClient": "2026-10-19T16:00:00.000Z",
+    "atribucion": {
+     "version": 1,
+     "booking_channel": "whatsapp",
+     "patient_reported_source": "google_maps",
+     "acquisition_source": "unknown",
+     "attribution_captured_at": "",
+     "lead_id": ""
+    },
+    "paciente": {
+     "nombre": "Prueba QA total_grave_item9_0",
+     "edad": 34,
+     "telefono": "5512345678",
+     "correo": null,
+     "domicilio": {
+      "dom_calle_numero": "",
+      "dom_colonia": "Colonia QA",
+      "dom_cp": "01000",
+      "dom_municipio": "Municipio QA",
+      "dom_estado": "Jalisco"
+     }
+    },
+    "autoReporte": {
+     "mrs": {},
+     "dolor": {
+      "tiene": false,
+      "intensidad": null,
+      "meses": null
+     },
+     "hc": {
+      "telefono": "5512345678",
+      "motivo": "Prueba QA contrato",
+      "temasConsulta": [
+       "control"
+      ],
+      "senalesUrgencia": [
+       "ninguna"
+      ],
+      "etapaReproductiva": "menstrua_regular",
+      "reglasRegulares": true,
+      "antecedentesSeleccionados": [
+       "ninguna"
+      ],
+      "antecedentesRevisados": true,
+      "dom_colonia": "Colonia QA",
+      "dom_cp": "01000",
+      "dom_municipio": "Municipio QA",
+      "dom_estado": "Jalisco",
+      "formularioVersion": "2026.10.1",
+      "dom_calle_numero": ""
+     },
+     "profundos": {},
+     "phq9": {
+      "version": 1,
+      "respuestas": {
+       "item1": 3,
+       "item2": 3,
+       "item3": 3,
+       "item4": 3,
+       "item5": 3,
+       "item6": 3,
+       "item7": 3,
+       "item8": 3,
+       "item9": 0
+      }
+     }
+    },
+    "resumen": {
+     "menopausia": {
+      "total": null,
+      "intensidad": null,
+      "completa": false,
+      "respondidos": 0
+     },
+     "dolor": null,
+     "profundizaciones": [],
+     "phq9": {
+      "instrumento": "PHQ-9",
+      "version": 1,
+      "validado": true,
+      "completo": true,
+      "respondidos": 9,
+      "total": 24,
+      "severidad": "grave",
+      "severidadEtiqueta": "grave",
+      "item9": 0,
+      "dificultad": null,
+      "dificultadEtiqueta": null,
+      "seguridad": {
+       "item9": 0,
+       "positivo": false,
+       "alerta": true,
+       "sinDatoItem9": false,
+       "prioridad": "maxima",
+       "motivos": [
+        "total_grave"
+       ]
+      },
+      "fuenteCortes": "Kroenke 2001 (versión original); validación de estructura en mujeres mexicanas: Familiar 2015.",
+      "resumen": "PHQ-9 24/27: síntomas depresivos de severidad grave (cortes de Kroenke 2001). Ítem 9 = 0. Tamizaje, no diagnóstico."
+     }
+    },
+    "consentimiento": {
+     "aceptado": true,
+     "aceptadoEnCliente": "2026-10-19T16:00:00.000Z",
+     "avisoVersion": "2026-07",
+     "finalidades": [
+      "atencion-clinica"
+     ]
+    },
+    "alertaSeguridad": {
+     "urgente": false,
+     "embarazoConSintomas": false,
+     "saludMental": true,
+     "senales": [],
+     "senalesMaternas": [],
+     "phq9": {
+      "version": 1,
+      "item9": 0,
+      "positivo": false,
+      "alerta": true,
+      "sinDatoItem9": false,
+      "prioridad": "maxima",
+      "motivos": [
+       "total_grave"
+      ],
+      "total": 24,
+      "mensaje": "PHQ-9 total 24/27 (grave): prioridad máxima; contactar a la paciente el mismo día hábil."
+     }
+    },
+    "estudiosFolder": null,
+    "adjuntos": [],
+    "estudiosDeclaracion": "no_los_tengo_ahora",
+    "ruteoClinico": {
+     "version": 6,
+     "instrumentosSugeridos": [],
+     "banderas": [
+      {
+       "tipo": "roja",
+       "codigo": "phq9_total_grave",
+       "mensaje": "PHQ-9 total 24/27 (grave): prioridad máxima; contactar a la paciente el mismo día hábil.",
+       "instrumentoRelacionado": "phq9"
+      }
+     ],
+     "generadoEn": "2026-10-19T16:00:00.000Z"
+    }
+   }
+  }
+ },
+ "textos": {
+  "phq9": {
+   "instruccion": "Durante las últimas 2 semanas, ¿qué tan seguido le han afectado cualquiera de los siguientes problemas?",
+   "opciones": [
+    "Para nada",
+    "Varios días",
+    "Más de la mitad de los días",
+    "Casi todos los días"
+   ],
+   "items": [
+    "Poco interés o placer en hacer las cosas",
+    "Se ha sentido decaído(a), deprimido(a), o sin esperanzas",
+    "Dificultad para dormir o permanecer dormido(a), o ha dormido demasiado",
+    "Se ha sentido cansado(a) o con poca energía",
+    "Con poco apetito o ha comido en exceso",
+    "Se ha sentido mal con usted mismo(a) – o que es un fracaso o que ha quedado mal con usted mismo(a) o con su familia",
+    "Ha tenido dificultad para concentrarse en cosas tales como leer el periódico o ver televisión",
+    "¿Se ha estado moviendo o hablando tan lento que otras personas podrían notarlo?, o por el contrario – ha estado tan inquieto(a) o agitado(a), que se ha estado moviendo mucho más de lo normal",
+    "Ha pensado que estaría mejor muerto(a) o se le ha ocurrido lastimarse de alguna manera"
+   ],
+   "dificultad": "Si usted marcó cualquiera de estos problemas, ¿qué tan difícil fue hacer su trabajo, las tareas del hogar o llevarse bien con otras personas debido a tales problemas?",
+   "opcionesDificultad": [
+    "Para nada difícil",
+    "Un poco difícil",
+    "Muy difícil",
+    "Extremadamente difícil"
+   ],
+   "credito": "Desarrollado por los Drs. Robert L. Spitzer, Janet B.W. Williams, Kurt Kroenke y colegas, con una beca educacional por parte de Pfizer Inc. No se requiere permiso para reproducir, traducir, mostrar o distribuir."
+  },
+  "csi": {
+   "opciones": [
+    "Nunca",
+    "Pocas Veces",
+    "Algunas veces",
+    "Continuamente",
+    "Siempre"
+   ],
+   "parteA": [
+    "Me siento cansado y desanimado cuando me levanto por las mañanas.",
+    "Mis músculos están tensos y doloridos.",
+    "Tengo ataques de pánico.",
+    "Rechino los dientes o aprieto la mandíbula.",
+    "Tengo problemas de diarrea o estreñimiento.",
+    "Necesito ayuda para realizar mis actividades diarias.",
+    "Soy sensible a la luz brillante.",
+    "Me canso fácilmente cuando estoy físicamente activo.",
+    "Siento dolor en todo mi cuerpo.",
+    "Tengo dolores de cabeza.",
+    "Tengo molestia en mi vejiga o sensación de quemazón al orinar.",
+    "No duermo bien.",
+    "Tengo dificultad para concentrarme.",
+    "Tengo problemas en la piel como resequedad, picor o sarpullido.",
+    "El estrés hace que mis síntomas físicos empeoren.",
+    "Me siento triste o deprimido.",
+    "Me siento con poca energía.",
+    "Tengo tensión muscular en mi cuello y hombros.",
+    "Tengo dolor en mi mandíbula.",
+    "Algunos olores, como perfumes, me hacen sentir mareado y con náuseas.",
+    "Tengo que orinar frecuentemente.",
+    "Mis piernas se sienten incómodas e inquietas cuando intento dormir por la noche.",
+    "Tengo dificultad para recordar cosas.",
+    "Sufrí algún trauma cuando era niño(a).",
+    "Tengo dolor en mi zona pélvica"
+   ],
+   "parteB": [
+    "Síndrome de Piernas Inquietas.",
+    "Síndrome de Fatiga Crónica.",
+    "Fibromialgia.",
+    "Trastornos Temporomandibulares.",
+    "Migrañas o Cefalea Tensional.",
+    "Síndrome de Colon Irritable.",
+    "Sensibilidad Química Múltiple.",
+    "Latigazo o Lesión en el Cuello (incluir la lesión de Whiplash).",
+    "Ansiedad o Ataques de Pánico.",
+    "Depresión."
+   ]
+  }
+ }
+}

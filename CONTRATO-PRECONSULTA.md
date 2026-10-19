@@ -7,8 +7,9 @@
 
 Estado: **versión 3** (formulario preparado localmente `2026.10.1`, rama
 `claude/cuestionarios-dolor`; **no publicado**: requiere el visto bueno del Dr.). Producido por
-`paciente/PortalPaciente.jsx` (`construirRegistro`), `core/resumenPaciente.js` y
-`core/cuestionarios/` (cuestionarios validados, §3).
+`core/registroPreconsulta.js` (`construirRegistro`, módulo puro que usa el envío de
+`paciente/PortalPaciente.jsx`), `core/resumenPaciente.js` y `core/cuestionarios/`
+(cuestionarios validados, §3).
 Almacenado por `core/respuestas.js`.
 
 La versión 2 conserva `paciente`, `autoReporte`, `resumen`, `estudiosFolder` y
@@ -319,6 +320,22 @@ Claves ausentes = no contestadas (nunca se rellenan con cero).
 | `csi` | `b1` … `b10` (Parte B) | `"si"` / `"no"` | no |
 | `csi` | `b1_anio` … `b10_anio` | entero 1900..año actual; solo existe con `"si"` | no |
 
+**Estas llaves son el contrato** (revisión del 19/10/2026). El ERP no las cambia: las
+traduce en una sola función (`instrumentos/contrato_portal.py`,
+`normalizar_respuestas_portal`): `itemN` → `"N"`, `aN` → `"N"`, `"si"`/`"no"` → `1`/`0`;
+`dificultad` y `bN_anio` pasan igual. Antes de esa traducción el ERP buscaba `"1"…"9"` y
+todo PHQ-9 del portal le llegaba como «sin dato de seguridad», aun con el ítem 9 en 3.
+
+**Prueba del contrato.** `tests/fixtures/contrato-cuestionarios.json` trae registros
+completos armados con `construirRegistro` (ítem 9 = 0, 1, 2 con CSI, 3, sin respuesta y
+total 24 con ítem 9 = 0), lo que el ERP debe concluir de cada uno (`esperadoErp`) y los
+textos del PHQ-9 y del CSI-Sp. Lo genera `node scripts/contrato-cuestionarios.mjs`;
+`npm test` falla si quedó desactualizado. El ERP guarda una copia idéntica en
+`instrumentos/tests/fixtures/contrato_portal_cuestionarios.json` y prueba con ella su
+lectura, sus alertas y que su PHQ-9 tenga el mismo texto. **Si cambia el contrato:**
+regenerar, copiar el archivo al ERP y correr las dos suites. `npm run test:cuestionarios`
+(navegador) comprueba además que lo que guarda el navegador es igual a ese archivo.
+
 **Lectura congelada en `resumen`** (el ERP la muestra sin recalcular; si recalcula,
 con las mismas reglas):
 
@@ -361,7 +378,10 @@ con las mismas reglas):
 La misma regla agrega, **al inicio** de `ruteoClinico.banderas`, una bandera con el
 mismo `mensaje` y un campo nuevo `codigo`: `tipo: "roja"` con `codigo:
 "phq9_item9_positivo"` o `"phq9_total_grave"`; `tipo: "aviso"` con `codigo:
-"phq9_sin_dato_item9"`. `instrumentoRelacionado: "phq9"`. El ERP actual ya lista las
+"phq9_sin_dato_item9"`. `instrumentoRelacionado: "phq9"`. El ERP usa
+`alertaSeguridad.phq9` y estos `codigo` como segunda línea de defensa: si por cualquier
+razón no puede leer las respuestas, la alerta nace igual (solo sube la gravedad, nunca
+la baja; el puntaje lo sigue calculando su motor). El ERP actual ya lista las
 banderas como pendientes hasta marcarlas revisadas. Para el ERP: alerta roja arriba en
 agenda, expediente y panel Instrumentos; no cerrarla sin registrar quién contactó,
 cuándo, qué evaluación se hizo y qué plan se acordó; en modo recepción solo «alerta
@@ -371,7 +391,10 @@ su médico será avisado, sin prometer revisión en tiempo real; nunca bloquea e
 
 **Pendientes de licencia o registro.** `pcs`, `bpi_sf`, `gsrs` e `iciq_ui_sf` están
 reservados: hoy **no se emiten**. `core/cuestionarios/pendientes.js` guarda solo la
-estructura (sin texto) y el motor de puntaje. La entrevista urinaria local
+estructura (sin texto) y el motor de puntaje. Llaves reservadas (el ERP ya las traduce):
+`pcs` `item1`…`item13`; `gsrs` `item1`…`item15`; `bpi_sf` `q3`…`q6`, `q8`, `q9a`…`q9g`;
+`iciq_ui_sf` `q3`…`q5` y `q6_1`…`q6_8` (`true` = marcada, en el orden del formulario
+oficial). La entrevista urinaria local
 (`profundos.incontinencia`) sigue siendo una adaptación no validada, no el ICIQ-UI SF.
 
 ### `ruteoClinico` — instrumentos sugeridos para revisión médica

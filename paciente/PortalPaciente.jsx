@@ -11,16 +11,11 @@ import {
 import { PacienteProvider } from '../core/PacienteContext.jsx';
 import PreConsulta from '../PreConsulta.jsx';
 import { guardarRespuesta, modoAlmacenamiento } from '../core/respuestas.js';
-import { construirResumen } from '../core/resumenPaciente.js';
 import { bloqueoEnvioEstudios, eliminarEstudioPaciente } from '../core/estudios.js';
-import { instrumentosPara } from '../core/ruteoClinico.js';
-import { combinarAlertaSeguridad } from '../core/cuestionarios/index.js';
 import { AvisoCrisisPhq9 } from './CuestionariosValidados.jsx';
 import { CREDITO } from '../core/marca.js';
 import SubirEstudios from './SubirEstudios.jsx';
-import { FORMULARIO_VERSION } from '../core/preconsultaFlow.js';
-import { normalizarAtribucion } from '../core/atribucion.js';
-import { normalizarDomicilio } from '../core/domicilio.js';
+import { construirRegistro } from '../core/registroPreconsulta.js';
 import {
   borrarIntentoEnvio,
   cargarIntentoEnvio,
@@ -37,6 +32,11 @@ import {
 } from '../core/borradores.js';
 import './PortalPaciente.css';
 
+// El registro que viaja a Supabase se arma en un módulo puro (sin React ni CSS) para que las
+// pruebas de Node y el contrato con el ERP (tests/fixtures/contrato-cuestionarios.json) usen
+// exactamente la misma función que el envío real.
+export { construirRegistro };
+
 /**
  * Portal público de la paciente: un "dossier" editorial. Se comparte por enlace;
  * la paciente responde desde casa y, al enviar, sus respuestas llegan al consultorio.
@@ -48,64 +48,6 @@ import './PortalPaciente.css';
 /** Textura de grano fino sobre todo el lienzo (sensación de papel premium). */
 function Grano() {
   return <div className="portal-grano" aria-hidden="true" />;
-}
-
-export function construirRegistro(datos, estudiosFolder, archivos = [], respuestaId = null, estudiosDecision = null) {
-  const submittedAtClient = datos.consentimientoFecha || new Date().toISOString();
-  const domicilio = normalizarDomicilio(datos.domicilio || datos.hc || datos.paciente || {});
-  const hcNormalizada = datos.hc ? { ...datos.hc, ...domicilio } : { ...domicilio };
-  const registro = {
-    // v2 conserva los campos canónicos de v1 para una migración gradual, pero
-    // distingue respuesta parcial, consentimiento, reloj del cliente y adjuntos.
-    version: 3,
-    id: respuestaId,
-    formularioVersion: datos.formularioVersion || FORMULARIO_VERSION,
-    submittedAtClient,
-    atribucion: normalizarAtribucion(datos.atribucion),
-    paciente: {
-      nombre: datos.demografia?.nombre || null,
-      edad: datos.demografia?.edad ?? null,
-      telefono: datos.contacto?.telefono || null,
-      correo: datos.contacto?.correo || null,
-      domicilio,
-    },
-    autoReporte: {
-      mrs: datos.mrs,
-      dolor: datos.dolor,
-      hc: hcNormalizada,
-      profundos: datos.profundos || {},
-      // Cuestionarios validados (2026.10.1): solo los que se ofrecieron.
-      ...(datos.phq9 ? { phq9: datos.phq9 } : {}),
-      ...(datos.csi ? { csi: datos.csi } : {}),
-    },
-    resumen: construirResumen(datos),
-    consentimiento: {
-      aceptado: true,
-      aceptadoEnCliente: submittedAtClient,
-      avisoVersion: '2026-07',
-      finalidades: ['atencion-clinica'],
-    },
-    // La regla del reactivo 9 del PHQ-9 se recalcula aquí para que ningún envío
-    // quede sin su bandera aunque el llamador no la haya calculado.
-    alertaSeguridad: combinarAlertaSeguridad(datos.alertaSeguridad || {
-      urgente: false,
-      embarazoConSintomas: false,
-      saludMental: false,
-      senales: [],
-      senalesMaternas: [],
-    }, { phq9: datos.phq9 }),
-    // La carpeta solo viaja cuando existe por lo menos un archivo confirmado.
-    estudiosFolder: archivos.length ? (estudiosFolder || null) : null,
-    adjuntos: archivos.map((a) => ({
-      nombre: a.nombre,
-      ruta: a.path,
-      bytes: a.size,
-      estado: 'recibido',
-    })),
-    estudiosDeclaracion: estudiosDecision === 'si' ? 'adjunto_estudios' : 'no_los_tengo_ahora',
-  };
-  registro.ruteoClinico = { ...instrumentosPara(registro), generadoEn: new Date().toISOString() };
-  return registro;
 }
 
 export default function PortalPaciente() {

@@ -4,7 +4,7 @@
  * Entrevista: core/entrevista.js (resumenEntrevista / valorEntrevista).
  * Ramas y MRS: core/preconsultaFlow.js (filtrarHistoriaActiva / MRS_IDS).
  * Alertas: ruteoClinico.banderas y alertaSeguridad GUARDADAS por
- * paciente/PortalPaciente.jsx (construirRegistro); no invoca motores clinicos.
+ * core/registroPreconsulta.js (construirRegistro); no invoca motores clinicos.
  * API: etiquetaCampo, formatoRespuesta, gruposHistoria, resumenLectura,
  * filtrarRespuestas. Prueba local: node tests/lectura-respuesta.mjs.
  */
