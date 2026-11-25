@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import { parse } from '@babel/parser';
+import { PREGUNTA_PROBLEMA, PREGUNTA_MOLESTIA, PREGUNTA_TEMA, PREGUNTA_PRIORIDAD, REPETIR_MRS, PREGUNTAS_SEGUIMIENTO } from '../core/seguimiento.js';
 import { ENTREVISTA } from '../core/entrevista.js';
 import { MODULOS } from '../core/profundos/index.js';
 import { FORMULARIO_VERSION } from '../core/preconsultaFlow.js';
@@ -14,7 +15,8 @@ function recorrer(n) {
   if (!n || typeof n !== 'object') return;
   if (n.type === 'JSXOpeningElement' && ['CampoNumero','CampoTexto','CampoSelect','GrupoMultiple','GrupoOpciones','EscalaNumerica'].includes(n.name?.name)) {
     const atr = id => n.attributes.find(a=>a.name?.name === id)?.value;
-    const etiqueta = texto(atr('etiqueta'));
+    const expEtiqueta = atr('etiqueta')?.expression;
+    const etiqueta = texto(atr('etiqueta')) || (expEtiqueta?.type === 'ConditionalExpression' ? texto(expEtiqueta.alternate) : null);
     if (etiqueta) base.push({ etiqueta, control:n.name.name, id:texto(atr('id')), archivo:'PreConsulta.jsx', linea:n.loc.start.line,
       valor:atr('valor') ? codigo.slice(atr('valor').start,atr('valor').end) : null });
   }
@@ -32,8 +34,9 @@ const validados = [
   ...csi.ITEMS_B.map(q=>({cuestionario:csi.CLAVE,id:q.id,texto:q.texto,opciones:csi.OPCIONES_B.map(o=>[o.valor,o.etiqueta]),puntua:false,fuente:csi.FUENTE,licencia:'CC BY 4.0; '+csi.CAMBIOS})),
 ];
 const pendientesLicencia = PENDIENTES.map(m=>({clave:m.CLAVE,nombre:m.NOMBRE,estado:m.ESTADO,textoIncluido:false}));
+const seguimiento = [{id:'problema',pregunta:PREGUNTA_PROBLEMA},{id:'tema',pregunta:PREGUNTA_TEMA},{id:'problemaClave',pregunta:PREGUNTA_PRIORIDAD},{id:'molestiaUltimos7Dias',pregunta:PREGUNTA_MOLESTIA},{id:'repetirMrs',pregunta:REPETIR_MRS},...PREGUNTAS_SEGUIMIENTO];
 const inventario = { formulario:FORMULARIO_VERSION, alcance:'Captura base, 11 dominios de síntomas, entrevista dirigida, módulos complementarios y cuestionarios validados; excluye consentimiento, honeypot y controles de navegación. No es conteo de preguntas obligatorias ni certificación clínica.',
-  conteo:{controlesBase:base.length,mrs:mrs.length,entrevistaDirigida:dirigida.length,complementarias:complementarias.length,validados:validados.length,pendientesLicencia:pendientesLicencia.length},base,mrs,dirigida,complementarias,validados,pendientesLicencia};
+  conteo:{controlesBase:base.length,mrs:mrs.length,entrevistaDirigida:dirigida.length,complementarias:complementarias.length,validados:validados.length,seguimiento:seguimiento.length,pendientesLicencia:pendientesLicencia.length},base,mrs,dirigida,complementarias,validados,seguimiento,pendientesLicencia};
 const salida = new URL('../docs/INVENTARIO-PREGUNTAS-2026-09.json',import.meta.url);
 const contenido=JSON.stringify(inventario,null,2)+'\n';
 if(process.argv.includes('--check')) {

@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, LoaderCircle, Send, ClipboardList, ShieldCheck, HeartPulse, History, Paperclip, Save } from 'lucide-react';
 import { ENTREVISTA_VERSION, limpiarEntrevista } from './core/entrevista.js';
+import Seguimiento, { MedidaSeguimiento } from './paciente/Seguimiento.jsx';
+import { aplicarPrioridadIntima, esSeguimiento, intervaloYaReportado, PREGUNTA_PROBLEMA, seguimientoBreve, temaPrincipal } from './core/seguimiento.js';
 import EntrevistaDirigida from './paciente/EntrevistaDirigida.jsx';
 import AreaClinica from './core/AreaClinica.jsx';
 import { estiloArea } from './core/areasClinicas.js';
@@ -112,20 +114,21 @@ const ANTECEDENTE_CAMPO = {
 
 const BORRADOR = 'drj_preconsulta_borrador_v3';
 const BORRADOR_VIGENCIA_MS = 4 * 60 * 60 * 1000;
-function leerBorrador() {
+function leerBorrador(ambito) {
   try {
     const valor = JSON.parse(sessionStorage.getItem(BORRADOR) || 'null');
     if (!valor || Date.now() - Number(valor.guardadoEn || 0) > BORRADOR_VIGENCIA_MS) {
       sessionStorage.removeItem(BORRADOR);
       return null;
     }
-    return valor;
+    return (valor.ambito || '') === ambito ? valor : null;
   } catch (_) { return null; }
 }
 function guardarBorrador(valor) {
   try { sessionStorage.setItem(BORRADOR, JSON.stringify({ ...valor, guardadoEn: Date.now() })); } catch (_) { /* sin almacenamiento de sesión */ }
 }
-function borrarBorrador() {
+function borrarBorrador(ambito) {
+  if (!leerBorrador(ambito)) return;
   try { sessionStorage.removeItem(BORRADOR); } catch (_) { /* sin almacenamiento de sesión */ }
 }
 
@@ -183,6 +186,7 @@ export default function PreConsulta({
   envioBloqueadoMensaje = 'Espera a que terminen de subir tus estudios para enviar.',
   estudiosEstado = null,
   borradorInicial = null,
+  ambito = '',
   onGuardarParaDespues = null,
   onBorradorCambio = null,
   guardandoParaDespues = false,
@@ -191,7 +195,7 @@ export default function PreConsulta({
   const { paciente, actualizar, guardarAutoReporte } = usePaciente();
   const dem = paciente.demografia;
   const ar = paciente.autoReporte || {};
-  const borradorRef = useRef(onEnviar ? (borradorInicial || leerBorrador()) : null);
+  const borradorRef = useRef(onEnviar ? (borradorInicial || leerBorrador(ambito)) : null);
   const borrador = borradorRef.current;
   const [atribucion, setAtribucion] = useState(() => normalizarAtribucion(borrador?.atribucion || atribucionDesdeEnlace()));
   const [mrs, setMrs] = useState(() => ({ ...(ar.mrs || {}), ...(borrador?.mrs || {}) }));
@@ -289,14 +293,14 @@ export default function PreConsulta({
     if (!hayDatos) return;
     const contenido = {
       demografia: { nombre: dem.nombre || '', edad: dem.edad ?? null },
-      mrs, dolor, hc, profundos: profundosSeguros, pasoId,
+      mrs, dolor, hc, profundos: profundosSeguros, pasoId, ambito,
       cuestionarios: cuestionariosSeguros,
       atribucion,
       formularioVersion: FORMULARIO_VERSION,
     };
     guardarBorrador(contenido);
     onBorradorCambio?.(contenido);
-  }, [atribucion, cuestionariosSeguros, dem.edad, dem.nombre, dolor, hc, mrs, onBorradorCambio, onEnviar, pasoId, profundosSeguros]);
+  }, [ambito, atribucion, cuestionariosSeguros, dem.edad, dem.nombre, dolor, hc, mrs, onBorradorCambio, onEnviar, pasoId, profundosSeguros]);
 
   useEffect(() => {
     if (!pasos.some((p) => p.id === pasoId)) setPasoId(pasos[Math.min(indice, pasos.length - 1)].id);
@@ -323,6 +327,15 @@ export default function PreConsulta({
   const limpiarError = () => { setBloqueo(''); setCampoError(''); };
   const setDem = (k, valor) => { actualizar('demografia', k, valor); limpiarError(); };
   const setH = (k, valor) => { setHc((p) => ({ ...p, [k]: valor })); setGuardado(false); limpiarError(); };
+  const cambiarSeguimiento = cambios => {
+    setHc(previa => {
+      const actual = previa.seguimientoActual || {};
+      const cambiaProblema = ['tema', 'problemaClave'].some(k => Object.hasOwn(cambios, k) && actual[k] !== cambios[k]);
+      const seguimientoActual = cambiaProblema ? { tema: temaPrincipal(previa), ...cambios } : { ...actual, ...cambios };
+      return aplicarPrioridadIntima(previa, { seguimientoActual });
+    });
+    setGuardado(false); limpiarError();
+  };
   const setD = (k, valor) => { setDolor((p) => ({ ...p, [k]: valor })); setGuardado(false); limpiarError(); };
   const setSintoma = (id, valor) => { setMrs((p) => ({ ...p, [id]: valor })); setGuardado(false); limpiarError(); };
 
@@ -418,21 +431,27 @@ export default function PreConsulta({
     const temas = Array.isArray(historia.temasConsulta) ? historia.temasConsulta : [];
     const reportaDolor = temas.includes('dolor') || senalFuerzaDolor(historia);
     const reportaSangrado = temas.includes('sangrado') || senalFuerzaSangrado(historia);
-    const mrsActiva = temas.includes('climaterio') ? mrs : {};
-    const dolorActivo = reportaDolor
+    const breve = seguimientoBreve(historia);
+    const mrsActiva = pasos.some(p=>p.id==='climaterio') ? mrs : {};
+    const dolorActivo = breve ? {} : reportaDolor
       ? { ...dolor, tiene: true }
       : { tiene: false, intensidad: null, meses: null };
     const hcActiva = {
-      ...historia,
+      ...(breve ? Object.fromEntries([
+        'motivo','temasConsulta','telefono','correo','visitaSeguimiento','consultaTipo','seguimientoActual',
+        'senalesUrgencia','etapaReproductiva','ultimaMenstruacion','anticonceptivo','histerectomiaConfirmada',
+        'causaAusenciaRegla','edadMenopausiaReportada','entrevistaVersion','consultaPrioridad',
+      ].filter(k=>historia[k]!=null).map(k=>[k,historia[k]])) : historia),
       ...domicilio,
-      sangrado: reportaSangrado,
+      ...(!breve ? {sangrado:reportaSangrado} : {}),
+      ...(intervaloYaReportado(historia) && !breve ? {diasEntreReglas:historia.sangradoIntervaloDias} : {}),
       formularioVersion: FORMULARIO_VERSION,
     };
     return {
       mrs: mrsActiva,
       dolor: dolorActivo,
       hc: hcActiva,
-      profundos: filtrarProfundizacionesActivas(
+      profundos: breve ? {} : filtrarProfundizacionesActivas(
         { mrs: mrsActiva, dolor: dolorActivo, hc: hcActiva },
         profundos,
       ),
@@ -450,6 +469,7 @@ export default function PreConsulta({
     profundos: profundosSeguros,
     cuestionarios: cuestionariosSeguros,
     pasoId: paso.id,
+    ambito,
     formularioVersion: FORMULARIO_VERSION,
     atribucion,
   });
@@ -501,7 +521,7 @@ export default function PreConsulta({
         atribucion: normalizarAtribucion(atribucion),
         alertaSeguridad: combinarAlertaSeguridad(alertaUrgente(reporte), reporte),
       });
-      borrarBorrador();
+      borrarBorrador(ambito);
     } catch (e) {
       setBloqueo((e && e.message) || 'No se pudieron enviar tus respuestas. Inténtalo de nuevo.');
       alertaRef.current?.focus();
@@ -514,14 +534,21 @@ export default function PreConsulta({
     if (['cervical', 'vulvar', 'metabolico', 'piso-pelvico'].includes(paso.id)) return null;
     if (paso.id === 'inicio') return (
       <>
-        <p className="pc-paso-intro">Estos datos permiten identificar tu cuestionario y asociarlo de forma segura con tu cita.</p>
+        <p className="pc-paso-intro">Tus respuestas me ayudan a entender qué te pasa, orientar el diagnóstico y comparar cómo te sientes en las siguientes consultas. Puedes explicarlo con tus propias palabras.</p>
+        <p className="pc-paso-intro">Ten a la mano todos los estudios que tengas sobre el motivo de tu visita, también los anteriores. Al final podrás subir los archivos o fotografiar cada hoja con tu celular.</p>
         <div className="pc-datos pc-datos-identidad">
           <CampoTexto id="nombre" etiqueta="Nombre y apellidos" requerido valor={dem.nombre} onChange={(v) => setDem('nombre', v)} placeholder="Como aparece en tu cita" />
           <CampoNumero id="edad" etiqueta="Edad" requerido min={1} max={110} valor={dem.edad} onChange={(v) => setDem('edad', v)} placeholder="años" />
           <CampoTexto id="telefono" etiqueta="Teléfono o WhatsApp de México" requerido tipo="tel" valor={hc.telefono} onChange={(v) => setH('telefono', v)} placeholder="10 dígitos; puedes incluir +52" />
           <CampoTexto id="correo" etiqueta="Correo (opcional)" tipo="email" valor={hc.correo} onChange={(v) => setH('correo', v)} placeholder="tu@correo.com" />
         </div>
-        <div className="pc-domicilio">
+        <GrupoOpciones id="visitaSeguimiento" etiqueta="¿Ya viste al Dr. Iván por el problema que quieres revisar hoy?"
+          valor={hc.visitaSeguimiento} opciones={[{valor:true,etiqueta:'Sí, vengo a seguimiento'},{valor:false,etiqueta:'Es mi primera visita o es un motivo distinto'}]}
+          onChange={v => {
+            setHc(previa => previa.visitaSeguimiento === v ? previa : aplicarPrioridadIntima(previa, { visitaSeguimiento: v, seguimientoActual: {} }));
+            limpiarError();
+          }} />
+        {(!esSeguimiento(hc) || tieneDatosDomicilio(hc)) && <div className="pc-domicilio">
           <h2 className="pc-subtitulo">Tu domicilio, como aparece en tu INE</h2>
           <p className="pc-paso-intro pc-domicilio-intro">Lo necesitamos por norma sanitaria en caso de que tu receta lo requiera.</p>
           <div className="pc-datos pc-datos-domicilio">
@@ -531,14 +558,15 @@ export default function PreConsulta({
             <CampoTexto id="dom_municipio" etiqueta="Municipio o alcaldía" requerido valor={hc.dom_municipio} onChange={(v) => setH('dom_municipio', v)} placeholder="Ej. Benito Juárez, Zapopan..." maxLength={120} />
             <CampoSelect id="dom_estado" etiqueta="Estado" requerido opciones={OPCIONES_ENTIDADES_FEDERATIVAS} valor={hc.dom_estado} onChange={(v) => setH('dom_estado', v)} />
           </div>
-        </div>
+        </div>}
       </>
     );
 
+    if (paso.id === 'seguimiento') return <Seguimiento hc={hc} cambiar={cambiarSeguimiento} irAMotivos={() => irPaso('motivo')}/>;
     if (paso.id === 'motivo') return (
       <>
-        <p className="pc-paso-intro">Cuéntanos qué necesitas. Solo abriremos las preguntas relacionadas con los temas que elijas.</p>
-        <CampoTexto id="motivo" etiqueta="¿Qué te gustaría resolver en esta consulta?" requerido area valor={hc.motivo} onChange={(v) => setH('motivo', v)} placeholder="Cuéntalo con tus palabras; esto será lo primero que vea el doctor." />
+        <p className="pc-paso-intro">Piensa en lo que más te preocupa o en algo que has dejado de hacer por cómo te sientes.</p>
+        <CampoTexto id="motivo" etiqueta={esSeguimiento(hc) ? PREGUNTA_PROBLEMA : "¿Qué te gustaría resolver en esta consulta?"} requerido area valor={hc.motivo} onChange={(v) => setH('motivo', v)} placeholder="Cuéntalo con tus palabras; esto será lo primero que vea el doctor." />
         <GrupoMultiple
           id="temasConsulta"
           etiqueta="¿Qué temas quieres revisar?"
@@ -549,6 +577,13 @@ export default function PreConsulta({
           onChange={(v) => {
             setHc((p) => {
               const siguiente = { ...p, temasConsulta: v };
+              const temaPrevio = temaPrincipal(p);
+              if (temaPrevio && v.includes(temaPrevio)) {
+                siguiente.seguimientoActual = { ...p.seguimientoActual, tema: temaPrevio };
+              } else if (temaPrevio !== temaPrincipal(siguiente)) {
+                siguiente.seguimientoActual = {};
+              }
+
               if (!v.includes('intimidad')) siguiente.molestiasIntimas = [];
               if (!v.includes('sangrado') && !senalFuerzaSangrado(siguiente)) {
                 siguiente.sangrado = false;
@@ -580,7 +615,7 @@ export default function PreConsulta({
                 siguiente.objetivoReproductivo = null;
                 siguiente.mesesBuscandoEmbarazo = null;
               }
-              return siguiente;
+              return aplicarPrioridadIntima(p,siguiente);
             });
             if (!v.includes('climaterio')) setMrs({});
             setGuardado(false);
@@ -593,12 +628,13 @@ export default function PreConsulta({
           }}
           exclusiva="__sin_exclusiva__"
         />
+        {!esSeguimiento(hc) && <MedidaSeguimiento hc={hc} cambiar={cambiarSeguimiento}/>}
       </>
     );
 
     if (paso.id === 'seguridad') return (
       <>
-        <p className="pc-paso-intro">Estas preguntas no diagnostican. Sirven para avisarte si no conviene esperar a que el consultorio revise el formulario.</p>
+        <p className="pc-paso-intro">Cuéntame cómo te sientes hoy. Algunas señales requieren atención antes de tu cita.</p>
         <GrupoMultiple id="senalesUrgencia" etiqueta="¿Tienes hoy alguna de estas señales?" requerido opciones={SENALES_URGENCIA} valor={hc.senalesUrgencia} onChange={(v) => setH('senalesUrgencia', v)} />
         {avisoUrgenteTexto(alerta)}
       </>
@@ -617,6 +653,7 @@ export default function PreConsulta({
 
     if (paso.id === 'sangrado') return (
       <>
+        <p className="pc-paso-intro">Saber cómo era tu regla antes y qué cambió me ayuda a decidir qué revisar contigo.</p>
         <GrupoMultiple
           id="sangradoTipos"
           etiqueta="¿Qué cambio de sangrado has notado?"
@@ -644,6 +681,7 @@ export default function PreConsulta({
 
     if (paso.id === 'dolor') return (
       <>
+        <p className="pc-paso-intro">El momento y el lugar del dolor me ayudan a saber qué explorar durante tu consulta.</p>
         <EscalaNumerica id="dolorIntensidad" etiqueta="¿Qué tan fuerte ha sido el dolor en su peor momento?" valor={dolor.intensidad} onChange={(v) => setD('intensidad', v)} />
         <GrupoOpciones id="dolorInicio" etiqueta="¿Cómo comenzó?" requerido opciones={[
           { valor: 'subito', etiqueta: 'De repente' },
@@ -684,7 +722,8 @@ export default function PreConsulta({
         ]} valor={hc.reglasRegulares} onChange={(v) => setH('reglasRegulares', v)} />
         <div className="pc-datos">
           <CampoNumero etiqueta="Edad de tu primera menstruación" valor={hc.edadMenarca} onChange={(v) => setH('edadMenarca', v)} max={30} placeholder="años" />
-          <CampoNumero etiqueta="Días entre una menstruación y otra" valor={hc.diasEntreReglas} onChange={(v) => setH('diasEntreReglas', v)} max={180} placeholder="aprox." />
+          {intervaloYaReportado(hc) ? <div className="pc-campo"><span>Días entre una menstruación y otra</span><p>{hc.sangradoIntervaloDias} días · Respuesta de «Tu sangrado»</p><button type="button" className="pc-anterior" onClick={()=>irPaso('sangrado')}>Revisar respuesta</button></div>
+          : <CampoNumero etiqueta="Días entre una menstruación y otra" valor={hc.diasEntreReglas} onChange={(v) => setH('diasEntreReglas', v)} max={180} placeholder="aprox." />}
         </div>
         <GrupoMultiple etiqueta="¿Has notado alguno de estos cambios?" opciones={[
           { id: 'acne', etiqueta: 'Acné o piel más grasa' },
@@ -705,6 +744,7 @@ export default function PreConsulta({
 
     if (paso.id === 'urinario') return (
       <>
+        <p className="pc-paso-intro">Si a veces se te sale la orina o te cuesta vaciar la vejiga, cuéntame cuándo pasa. Así podremos elegir qué revisar y comparar cómo sigues después.</p>
         <GrupoMultiple id="sintomasUrinarios" etiqueta="¿Qué has notado en las últimas 4 semanas?" requerido opciones={[
           { id: 'escapes', etiqueta: 'Escapes de orina' },
           { id: 'urgencia', etiqueta: 'Ganas súbitas o muy frecuentes de orinar' },
@@ -720,13 +760,15 @@ export default function PreConsulta({
     if (paso.id === 'intimidad') return (
       <>
         <p className="pc-paso-intro">Este tema es privado. Puedes responder solo lo que te haga sentir cómoda.</p>
-        <GrupoMultiple id="molestiasIntimas" etiqueta="¿Qué te gustaría revisar?" requerido exclusiva="prefiero_no" opciones={[
+        {hc.intimidadDesdePrioridad && <p className="pc-paso-intro">Ya incluiste {hc.intimidadDesdePrioridad === 'sequedad' ? 'la resequedad vaginal' : hc.intimidadDesdePrioridad === 'deseo' ? 'los cambios en el deseo' : 'el dolor durante las relaciones'} para esta visita.</p>}
+        <GrupoMultiple id="molestiasIntimas" etiqueta={hc.intimidadDesdePrioridad ? '¿Quieres revisar algo más sobre tu salud íntima?' : '¿Qué te gustaría revisar?'} requerido={!hc.intimidadDesdePrioridad} exclusiva="prefiero_no" opciones={[
           { id: 'sequedad', etiqueta: 'Sequedad, ardor o irritación' },
           { id: 'dolor_relaciones', etiqueta: 'Dolor durante las relaciones' },
           { id: 'deseo', etiqueta: 'Cambios en el deseo o interés sexual' },
           { id: 'satisfaccion', etiqueta: 'Dificultad con excitación, orgasmo o satisfacción' },
           { id: 'prefiero_no', etiqueta: 'Prefiero no responder aquí; lo hablaré en consulta' },
-        ]} valor={hc.molestiasIntimas} onChange={(v) => setH('molestiasIntimas', v)} />
+        ].filter(o=>o.id!==hc.intimidadDesdePrioridad)} valor={hc.molestiasIntimas} onChange={v=>
+            setHc(p=>aplicarPrioridadIntima(p,{molestiasIntimas:v}))} />
       </>
     );
 
@@ -893,7 +935,7 @@ export default function PreConsulta({
             : extraAntesDeEnviar}
         </div>
         <h2 className="pc-subtitulo"><ClipboardList aria-hidden="true" />Revisa tus respuestas</h2>
-        <RevisionPreconsulta dem={dem} hc={hc} mrs={mrs} dolor={dolor} profundos={profundosSeguros} cuestionarios={cuestionariosSeguros} pasos={pasos} irPaso={irPaso} />
+        <RevisionPreconsulta dem={dem} hc={hc} mrs={mrs} reactivosMrs={MRS} opcionesMrs={ESCALA_MRS} dolor={dolor} profundos={profundosSeguros} cuestionarios={cuestionariosSeguros} pasos={pasos} irPaso={irPaso} />
         {onEnviar && <div className="pc-atribucion">
           <h2 className="pc-subtitulo">Tu cita</h2>
           <div className="pc-datos">
@@ -973,7 +1015,7 @@ export default function PreConsulta({
 
           {bloqueo && <div id="pc-error" ref={alertaRef} tabIndex={-1} className="pc-bloqueo" role="alert">{bloqueo}</div>}
           {contenidoPaso()}
-          <EntrevistaDirigida paso={paso.id} hc={hc} onChange={setH} />
+          {!(paso.id === 'climaterio' && seguimientoBreve(hc)) && <EntrevistaDirigida paso={paso.id} hc={hc} onChange={setH} />}
 
           {(
             <nav className="pc-navegacion" aria-label="Navegación del cuestionario">

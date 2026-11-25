@@ -1,6 +1,6 @@
 {
  "descripcion": "Contrato portal → ERP de los cuestionarios validados. Generado por scripts/contrato-cuestionarios.mjs con construirRegistro (core/registroPreconsulta.js); no editar a mano. El ERP guarda una copia idéntica en instrumentos/tests/fixtures/contrato_portal_cuestionarios.json. Datos inventados («Prueba QA»).",
- "formularioVersion": "2026.10.1",
+ "formularioVersion": "2026.11.2",
  "llaves": {
   "phq9": "item1..item9 (0..3), dificultad (0..3)",
   "csi": "a1..a25 (0..4), b1..b10 (\"si\"/\"no\"), bN_anio (año, solo con \"si\")"
@@ -16,7 +16,7 @@
    },
    "contenido": {
     "version": 3,
-    "formularioVersion": "2026.10.1",
+    "formularioVersion": "2026.11.2",
     "submittedAtClient": "2026-10-19T16:00:00.000Z",
     "atribucion": {
      "version": 1,
@@ -65,8 +65,12 @@
       "dom_cp": "01000",
       "dom_municipio": "Municipio QA",
       "dom_estado": "Jalisco",
-      "formularioVersion": "2026.10.1",
+      "formularioVersion": "2026.11.2",
       "dom_calle_numero": ""
+     },
+     "entrevistaDirigida": {
+      "version": "2.1.0",
+      "grupos": []
      },
      "profundos": {},
      "phq9": {
@@ -164,7 +168,7 @@
    },
    "contenido": {
     "version": 3,
-    "formularioVersion": "2026.10.1",
+    "formularioVersion": "2026.11.2",
     "submittedAtClient": "2026-10-19T16:00:00.000Z",
     "atribucion": {
      "version": 1,
@@ -213,8 +217,12 @@
       "dom_cp": "01000",
       "dom_municipio": "Municipio QA",
       "dom_estado": "Jalisco",
-      "formularioVersion": "2026.10.1",
+      "formularioVersion": "2026.11.2",
       "dom_calle_numero": ""
+     },
+     "entrevistaDirigida": {
+      "version": "2.1.0",
+      "grupos": []
      },
      "profundos": {},
      "phq9": {
@@ -323,7 +331,7 @@
    },
    "contenido": {
     "version": 3,
-    "formularioVersion": "2026.10.1",
+    "formularioVersion": "2026.11.2",
     "submittedAtClient": "2026-10-19T16:00:00.000Z",
     "atribucion": {
      "version": 1,
@@ -373,8 +381,12 @@
       "dom_cp": "01000",
       "dom_municipio": "Municipio QA",
       "dom_estado": "Jalisco",
-      "formularioVersion": "2026.10.1",
+      "formularioVersion": "2026.11.2",
       "dom_calle_numero": ""
+     },
+     "entrevistaDirigida": {
+      "version": "2.1.0",
+      "grupos": []
      },
      "profundos": {},
      "phq9": {
@@ -560,7 +572,7 @@
    },
    "contenido": {
     "version": 3,
-    "formularioVersion": "2026.10.1",
+    "formularioVersion": "2026.11.2",
     "submittedAtClient": "2026-10-19T16:00:00.000Z",
     "atribucion": {
      "version": 1,
@@ -609,8 +621,12 @@
       "dom_cp": "01000",
       "dom_municipio": "Municipio QA",
       "dom_estado": "Jalisco",
-      "formularioVersion": "2026.10.1",
+      "formularioVersion": "2026.11.2",
       "dom_calle_numero": ""
+     },
+     "entrevistaDirigida": {
+      "version": "2.1.0",
+      "grupos": []
      },
      "profundos": {},
      "phq9": {
@@ -721,7 +737,7 @@
    },
    "contenido": {
     "version": 3,
-    "formularioVersion": "2026.10.1",
+    "formularioVersion": "2026.11.2",
     "submittedAtClient": "2026-10-19T16:00:00.000Z",
     "atribucion": {
      "version": 1,
@@ -770,8 +786,12 @@
       "dom_cp": "01000",
       "dom_municipio": "Municipio QA",
       "dom_estado": "Jalisco",
-      "formularioVersion": "2026.10.1",
+      "formularioVersion": "2026.11.2",
       "dom_calle_numero": ""
+     },
+     "entrevistaDirigida": {
+      "version": "2.1.0",
+      "grupos": []
      },
      "profundos": {},
      "phq9": {
@@ -875,7 +895,7 @@
    },
    "contenido": {
     "version": 3,
-    "formularioVersion": "2026.10.1",
+    "formularioVersion": "2026.11.2",
     "submittedAtClient": "2026-10-19T16:00:00.000Z",
     "atribucion": {
      "version": 1,
@@ -924,8 +944,12 @@
       "dom_cp": "01000",
       "dom_municipio": "Municipio QA",
       "dom_estado": "Jalisco",
-      "formularioVersion": "2026.10.1",
+      "formularioVersion": "2026.11.2",
       "dom_calle_numero": ""
+     },
+     "entrevistaDirigida": {
+      "version": "2.1.0",
+      "grupos": []
      },
      "profundos": {},
      "phq9": {

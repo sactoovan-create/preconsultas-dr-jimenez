@@ -14,16 +14,26 @@ import { combinarAlertaSeguridad } from './cuestionarios/index.js';
 import { FORMULARIO_VERSION } from './preconsultaFlow.js';
 import { normalizarAtribucion } from './atribucion.js';
 import { normalizarDomicilio } from './domicilio.js';
+import { capturarSeguimiento, esSeguimiento, seguimientoBreve } from './seguimiento.js';
+import { invitacionDelBorrador } from './invitacionCita.js';
+import { ENTREVISTA_VERSION, resumenEntrevista } from './entrevista.js';
 
 export function construirRegistro(datos, estudiosFolder, archivos = [], respuestaId = null, estudiosDecision = null) {
   const submittedAtClient = datos.consentimientoFecha || new Date().toISOString();
   const domicilio = normalizarDomicilio(datos.domicilio || datos.hc || datos.paciente || {});
   const hcNormalizada = datos.hc ? { ...datos.hc, ...domicilio } : { ...domicilio };
+  const medicion = capturarSeguimiento(hcNormalizada);
+  if (medicion && seguimientoBreve(hcNormalizada) && hcNormalizada.temasConsulta?.includes('climaterio') && hcNormalizada.seguimientoActual?.repetirMrs !== true) {
+    medicion.escalaMenopausia = 'omitida';
+  }
+  delete hcNormalizada.seguimientoActual;
+  const invitacionCita = datos.invitacionCita ? invitacionDelBorrador(datos) : '';
   const registro = {
     // v2 conserva los campos canónicos de v1 para una migración gradual, pero
     // distingue respuesta parcial, consentimiento, reloj del cliente y adjuntos.
     version: 3,
     id: respuestaId,
+    ...(invitacionCita ? { invitacionCita } : {}),
     formularioVersion: datos.formularioVersion || FORMULARIO_VERSION,
     submittedAtClient,
     atribucion: normalizarAtribucion(datos.atribucion),
@@ -38,6 +48,11 @@ export function construirRegistro(datos, estudiosFolder, archivos = [], respuest
       mrs: datos.mrs,
       dolor: datos.dolor,
       hc: hcNormalizada,
+      ...(medicion ? { [esSeguimiento(hcNormalizada) ? 'seguimiento' : 'lineaBaseSeguimiento']: medicion } : {}),
+      entrevistaDirigida: {
+        version: ENTREVISTA_VERSION,
+        grupos: resumenEntrevista(hcNormalizada),
+      },
       profundos: datos.profundos || {},
       // Cuestionarios validados (2026.10.1): solo los que se ofrecieron.
       ...(datos.phq9 ? { phq9: datos.phq9 } : {}),

@@ -7,9 +7,10 @@
  */
 
 import { validarEntrevista } from './entrevista.js';
+import { esSeguimiento, seguimientoBreve, validarSeguimiento } from './seguimiento.js';
 import { validarDomicilio } from './domicilio.js';
 // 2026.10.1: cuestionarios validados PHQ-9 (siempre) y CSI-Sp (con dolor pélvico).
-export const FORMULARIO_VERSION = '2026.10.1';
+export const FORMULARIO_VERSION = '2026.11.2';
 
 export const TEMAS_CONSULTA = [
   { id: 'control', etiqueta: 'Revisión o chequeo ginecológico' },
@@ -206,6 +207,17 @@ export function pasosPara({ hc, mrs, dolor } = {}) {
     { id: 'contexto', titulo: 'Tu etapa actual' },
   ];
 
+  if (esSeguimiento(historia)) {
+    pasos.push({ id: 'seguimiento', titulo: 'Cómo sigues' });
+    if (seguimientoBreve(historia)) {
+      if (temas.includes('climaterio') && historia.seguimientoActual?.repetirMrs === true) {
+        pasos.push(PASO_TEMA.climaterio);
+      }
+      pasos.push({ id: 'envio', titulo: 'Revisar y enviar' });
+      return pasos;
+    }
+  }
+
   Object.keys(PASO_TEMA).forEach((tema) => {
     const forzado = (tema === 'dolor' && senalFuerzaDolor(historia))
       || (tema === 'sangrado' && senalFuerzaSangrado(historia));
@@ -272,7 +284,7 @@ export function validarPaso(id, { demografia, hc, mrs, dolor } = {}) {
     if (!Number.isInteger(edad) || edad < 1 || edad > 110) return error('Escribe una edad válida.', 'edad');
     if (!telefonoValido(historia.telefono)) return error('Escribe un teléfono mexicano válido de 10 dígitos; puedes incluir +52.', 'telefono');
     if (!correoValido(historia.correo)) return error('Revisa el formato de tu correo electrónico.', 'correo');
-    const domicilio = validarDomicilio(historia);
+    const domicilio = validarDomicilio(historia, { requerido: !esSeguimiento(historia) });
     if (!domicilio.ok) return domicilio;
   }
 
@@ -280,6 +292,8 @@ export function validarPaso(id, { demografia, hc, mrs, dolor } = {}) {
     if (!String(historia.motivo || '').trim()) return error('Cuéntanos brevemente qué te gustaría resolver.', 'motivo');
     if (!temas.length) return error('Elige al menos un tema para adaptar las siguientes preguntas.', 'temasConsulta');
   }
+
+  if (id === 'seguimiento') return validarSeguimiento(historia);
 
   if (id === 'seguridad') {
     if (!lista(historia.senalesUrgencia).length) {

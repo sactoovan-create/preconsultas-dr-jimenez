@@ -1,6 +1,6 @@
 /** Anamnesis complementaria, no escala validada. Fuentes y alcance en
  * docs/ENTREVISTA-2026-09.md. IDs compartidos por captura, resumen y lector. */
-export const ENTREVISTA_VERSION = '2.0.0';
+export const ENTREVISTA_VERSION = '2.1.0';
 const opciones = (pares) => pares.map(([valor, etiqueta]) => ({ valor, etiqueta }));
 const periodo = opciones([['dias', 'Hace días'], ['semanas', 'Hace semanas'], ['meses', 'Hace meses'], ['anios', 'Hace años'], ['no_se', 'No recuerdo']]);
 const impacto = opciones([['ninguno', 'No cambia mis actividades'], ['molesta', 'Me molesta, pero puedo continuar'], ['limita', 'He reducido o evitado actividades'], ['impide', 'Me impide trabajar, dormir o hacer actividades'], ['prefiero_no', 'Prefiero comentarlo en consulta']]);
@@ -12,7 +12,7 @@ export const ENTREVISTA = {
   motivo: {
     titulo: 'Prioridad de la consulta', fuente: 'MP-006 / Checklist 71',
     preguntas: [
-      eleccion('consultaTipo', '¿Qué necesitas de esta visita?', opciones([['primera', 'Valorar una molestia por primera vez'], ['seguimiento', 'Revisar cómo voy con un tratamiento'], ['resultados', 'Entender mis estudios o resultados'], ['segunda_opinion', 'Una segunda opinión'], ['prevencion', 'Revisión preventiva']])),
+      eleccion('consultaTipo', '¿Qué necesitas de esta visita?', opciones([['primera', 'Valorar una molestia por primera vez'], ['seguimiento', 'Revisar cómo voy con un tratamiento'], ['resultados', 'Entender mis estudios o resultados'], ['segunda_opinion', 'Una segunda opinión'], ['prevencion', 'Revisión preventiva']]), { mostrarSi: h => h.visitaSeguimiento !== true }),
       texto('consultaPrioridad', '¿Hay algo que te preocupe especialmente o que no quieras dejar pendiente?', 'Una preocupación concreta o una actividad que te gustaría recuperar'),
     ],
   },
@@ -23,19 +23,19 @@ export const ENTREVISTA = {
     ],
   },
   sangrado: {
-    titulo: 'Cómo te afecta el sangrado', fuente: 'MP-001 / Checklist 71',
+    titulo: 'Cómo te afecta el sangrado', fuente: 'MP-001 / Checklist 71 / NICE NG88, 1.2',
     preguntas: [
-      multiple('sangradoCambios', 'En un día de sangrado, ¿qué ha cambiado respecto a lo habitual?', [['proteccion', 'Necesito cambiar la protección mucho más seguido'], ['nocturno', 'Me levanto de noche a cambiarme'], ['mancha', 'Mancho ropa o sábanas'], ['coagulos', 'Expulso coágulos'], ['ninguna', 'Ninguna de estas']]),
-      eleccion('sangradoImpacto', '¿Cómo afecta el sangrado a tus actividades?', impacto),
-      texto('sangradoTratamientos', '¿Qué has usado para controlarlo y qué ocurrió?', 'Medicamento o tratamiento, cuándo lo usaste y si ayudó; o ninguno'),
+      multiple('sangradoCambios', 'En los días que sangras, ¿has notado alguno de estos cambios?', [['proteccion', 'Necesito cambiar mi toalla o tampón, o vaciar mi copa, mucho más seguido'], ['nocturno', 'Me levanto en la noche para cambiarme'], ['mancha', 'Llego a manchar la ropa o las sábanas'], ['coagulos', 'Salen coágulos'], ['ninguna', 'Ninguno de estos cambios']]),
+      eleccion('sangradoImpacto', '¿Cuánto te dificulta el sangrado seguir con tu día o dormir por la noche?', impacto),
+      texto('sangradoTratamientos', '¿Qué has probado para reducir el sangrado? ¿Te ayudó?', 'Puedes decir qué usaste y cuándo, o escribir «Todavía no he probado nada».'),
     ],
   },
   dolor: {
-    titulo: 'Evolución e impacto del dolor', fuente: 'MP-002 / Anamnesis de endometriosis',
+    titulo: 'Cómo es tu dolor', fuente: 'MP-002 / Anamnesis de endometriosis / NICE NG73, 1.3.1',
     preguntas: [
       eleccion('dolorFrecuencia', '¿Con qué frecuencia tienes dolor?', opciones([['diario', 'Todos o casi todos los días'], ['episodios', 'Por episodios, con días sin dolor'], ['ciclo', 'En momentos parecidos de cada ciclo'], ['primera', 'Es la primera vez'], ['no_se', 'No estoy segura']])),
-      eleccion('dolorImpacto', '¿Qué tanto ha cambiado tus actividades?', impacto),
-      texto('dolorTratamientos', '¿Qué has intentado y cuánto te ayudó?', 'Medicamentos, calor, fisioterapia, cirugía u otro; o nada todavía'),
+      eleccion('dolorImpacto', 'Cuando te duele, ¿qué tanto puedes seguir con tus actividades?', impacto),
+      texto('dolorTratamientos', '¿Qué has probado para aliviar el dolor? ¿Cuánto te ayudó?', 'Puede ser calor, algún medicamento, terapia física o cirugía. También puedes escribir «Nada todavía».'),
     ],
   },
   ciclos: {
@@ -53,11 +53,11 @@ export const ENTREVISTA = {
     ],
   },
   urinario: {
-    titulo: 'Patrón de las molestias urinarias', fuente: 'Walters-Karram capítulo 09 / MP-004',
+    titulo: 'Lo que notas al orinar', fuente: 'Walters-Karram capítulo 09 / MP-004 / NICE NG123, 1.3',
     preguntas: [
-      eleccion('urinarioDesde', '¿Desde cuándo tienes estas molestias?', periodo),
-      multiple('urinarioVaciado', 'Al orinar o después, ¿qué notas?', [['vaciado', 'Siento que no termino de vaciar la vejiga'], ['esfuerzo', 'Necesito hacer fuerza para orinar'], ['continuo', 'La pérdida es casi continua'], ['noche', 'Me despierto repetidamente para orinar'], ['ninguna', 'Ninguna de estas']]),
-      texto('urinarioTratamientos', '¿Qué tratamientos o estudios has tenido por este problema?', 'Medicamentos, cultivos, ejercicios, fisioterapia o cirugía; o ninguno'),
+      eleccion('urinarioDesde', '¿Cuándo empezaste a notar estas molestias al orinar?', periodo),
+      multiple('urinarioVaciado', 'Cuando vas al baño, o entre una ida y otra, ¿te pasa algo de esto?', [['vaciado', 'Termino de orinar y siento que todavía queda orina'], ['esfuerzo', 'Tengo que pujar para que salga la orina'], ['continuo', 'Se me sale la orina casi todo el tiempo'], ['noche', 'Me despierto varias veces en la noche para orinar'], ['ninguna', 'Ninguna de estas']]),
+      texto('urinarioTratamientos', '¿Qué estudios o tratamientos has tenido por estas molestias?', 'Por ejemplo, un cultivo de orina, medicamentos, ejercicios o cirugía. Si es la primera vez, puedes decirlo.'),
     ],
   },
   intimidad: {
@@ -129,23 +129,27 @@ ENTREVISTA.contexto.preguntas.push(
     { mostrarSi: h => h.causaAusenciaRegla === 'menopausia_confirmada' }),
 );
 ENTREVISTA.sangrado.preguntas.push(
-  numero('sangradoIntervaloDias', 'Días desde el inicio de una regla hasta el inicio de la siguiente (aproximados)', 10, 180, { mostrarSi: menstrua }),
-  binaria('sangradoDesdeMenarca', '¿Tus reglas han sido muy abundantes desde que comenzaste a menstruar?'),
-  multiple('sangradoOtrosSitios', 'Además de la regla, ¿has tenido sangrado difícil de detener?', [
-    ['dental', 'Después de una extracción dental'], ['cirugia', 'Después de una cirugía'],
-    ['nariz', 'De nariz, repetidamente'], ['moretones', 'Moretones frecuentes sin golpe claro'], ['ninguna', 'Ninguno de estos'],
+  numero('sangradoIntervaloDias', 'Del primer día de una regla al primer día de la siguiente, ¿cuántos días suelen pasar?', 10, 180, { mostrarSi: menstrua }),
+  binaria('sangradoDesdeMenarca', '¿Tus reglas han sido muy abundantes desde la primera vez que te bajó?'),
+  multiple('sangradoOtrosSitios', 'Aparte de la regla, ¿te ha pasado algo de esto?', [
+    ['dental', 'Me costó parar el sangrado después de que me sacaron un diente'], ['cirugia', 'Costó parar el sangrado después de una cirugía'],
+    ['nariz', 'Me sangra la nariz con frecuencia y cuesta parar el sangrado'], ['moretones', 'Me salen moretones seguido sin recordar un golpe'], ['ninguna', 'Ninguno de estos'],
   ]),
+  binaria('sangradoFamiliar', '¿Hay alguien en tu familia de sangre a quien le cueste parar un sangrado, por ejemplo, después de una cirugía o de que le saquen un diente?',
+    { mostrarSi: h => h.sangradoDesdeMenarca === true || h.sangradoTipos?.includes('muy_abundante') }),
 );
 ENTREVISTA.dolor.preguntas.push(
-  eleccion('dolorRelacionCiclo', 'En los últimos 3 meses, ¿cómo se relacionó el dolor con tu regla?', opciones([
+  eleccion('dolorRelacionCiclo', 'Pensando en los últimos 3 meses, ¿cuándo te duele en relación con tu regla?', opciones([
     ['solo_regla', 'Aparece solo con la regla'], ['empeora_regla', 'Existe otros días y empeora con la regla'],
     ['sin_relacion', 'No noto relación con la regla'], ['no_menstruo', 'No menstruo'], ['no_se', 'No estoy segura'],
   ])),
-  binaria('dolorProfundoPenetracion', 'Cuando hay penetración, ¿sientes dolor profundo dentro de la pelvis?',
+  binaria('dolorProfundoPenetracion', 'Durante una relación con penetración, ¿sientes dolor en el fondo, por dentro?',
     { opciones: [...siNo, { valor: 'no_aplica', etiqueta: 'No he tenido penetración recientemente' }] }),
-  binaria('dolorEvacuarCiclico', '¿El dolor al evacuar aparece o empeora alrededor de la menstruación?'),
-  binaria('dolorOrinarCiclico', '¿El dolor al orinar aparece o empeora alrededor de la menstruación?'),
-  binaria('dolorMejoraVaciar', '¿El dolor aumenta al llenarse la vejiga y mejora al orinar?'),
+  binaria('dolorEvacuarCiclico', 'En los días cercanos a tu regla, ¿aparece o aumenta el dolor al evacuar (hacer del baño)?',
+    { mostrarSi: h => h.dolorRelacionCiclo !== 'no_menstruo' }),
+  binaria('dolorOrinarCiclico', 'En los días cercanos a tu regla, ¿aparece o aumenta el dolor al orinar?',
+    { mostrarSi: h => h.dolorRelacionCiclo !== 'no_menstruo' }),
+  binaria('dolorMejoraVaciar', '¿Te duele más cuando tienes la vejiga llena y sientes alivio después de orinar?'),
   binaria('dolorMovimiento', '¿El dolor cambia al caminar, sentarte, hacer ejercicio o cambiar de postura?'),
 );
 ENTREVISTA.ciclos.preguntas.push(
@@ -154,9 +158,9 @@ ENTREVISTA.ciclos.preguntas.push(
   binaria('cambiosRapidosVozVello', '¿El vello aumentó rápidamente o tu voz cambió en pocos meses?'),
 );
 ENTREVISTA.urinario.preguntas.push(
-  binaria('urinarioProteccion', '¿Usas toalla o protector por los escapes de orina?', { mostrarSi: h => h.sintomasUrinarios?.includes('escapes') }),
-  numero('miccionesDia', 'En un día habitual, ¿cuántas veces orinas mientras estás despierta?', 0, 40),
-  numero('miccionesNoche', '¿Cuántas veces te despiertas del sueño para orinar?', 0, 15),
+  binaria('urinarioProteccion', '¿Usas una toalla o un protector porque a veces se te sale la orina?', { mostrarSi: h => h.sintomasUrinarios?.includes('escapes') }),
+  numero('miccionesDia', 'En un día normal, ¿cuántas veces vas a orinar mientras estás despierta?', 0, 40),
+  numero('miccionesNoche', 'Una vez que te duermes, ¿cuántas veces te despiertas para orinar?', 0, 15),
 );
 ENTREVISTA.mama.preguntas.push(
   binaria('mamaFamiliarPrimerGradoMenor50', '¿Tu madre, hermana o hija tuvo cáncer de mama antes de los 50 años?'),
@@ -227,9 +231,9 @@ export function limpiarEntrevista(hc, pasosActivos) {
   });
   return limpio;
 }
-export function resumenEntrevista(hc = {}) {
+export function resumenEntrevista(hc = {}, contextoVisible = hc) {
   return Object.entries(ENTREVISTA).map(([id, m]) => ({
     id, titulo: m.titulo,
-    respuestas: preguntasEntrevista(id, hc).filter(q => tieneRespuesta(hc[q.id])).map(q => ({ id: q.id, pregunta: q.etiqueta, respuesta: valorEntrevista(q, hc[q.id]) })),
+    respuestas: preguntasEntrevista(id, contextoVisible).filter(q => tieneRespuesta(hc[q.id])).map(q => ({ id: q.id, pregunta: q.etiqueta, respuesta: valorEntrevista(q, hc[q.id]) })),
   })).filter(m => m.respuestas.length);
 }

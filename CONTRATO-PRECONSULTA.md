@@ -5,8 +5,7 @@
 > liga al expediente). Este documento congela la forma de los datos para que ambos
 > evolucionen sin romperse. **Si cambias la forma, sube `version` y actualiza aquí.**
 
-Estado: **versión 3** (formulario preparado localmente `2026.10.1`, rama
-`claude/cuestionarios-dolor`; **no publicado**: requiere el visto bueno del Dr.). Producido por
+Estado del contrato **versión 3**, con los campos opcionales del formulario `2026.11.2`. Producido por
 `core/registroPreconsulta.js` (`construirRegistro`, módulo puro que usa el envío de
 `paciente/PortalPaciente.jsx`), `core/resumenPaciente.js` y `core/cuestionarios/`
 (cuestionarios validados, §3).
@@ -32,6 +31,25 @@ El ERP existente conserva todo el sobre en `raw_content`, sin migración.
 
 ---
 
+Desde el formulario `2026.11.1`, el campo adicional `autoReporte.entrevistaDirigida`
+conserva la versión de la entrevista y sus grupos contestados al enviar. Cada grupo
+tiene `id`, `titulo` y una lista de `respuestas` con `id`, `pregunta` y `respuesta`
+en texto. Contiene las etiquetas visibles de la entrevista dirigida, incluidos los
+negativos explícitos y el cero. El catálogo omite las ramas ocultas y los campos
+vacíos. Los valores estructurados originales siguen en `autoReporte.hc`.
+Los registros anteriores conservan su formato. Las imágenes de cámara y galería
+siguen el mismo proceso de confirmación que los demás archivos adjuntos.
+
+### Seguimiento y relación con la cita en el formulario `2026.11.2`
+
+La paciente indica si ya consultó por el mismo problema. Identifica con sus palabras lo que quiere revisar y elige el tema principal. La primera visita sigue abriendo las secciones por motivo. En seguimiento estable se recaban evolución, tratamiento, posibilidad de seguirlo, molestias persistentes, síntomas nuevos y cambios de salud. Una señal de alarma, una molestia nueva o la elección de ampliar abren las secciones completas. Se conservan seguridad, contexto, cuestionarios ofrecidos, estudios y consentimiento.
+
+- `autoReporte.seguimiento` guarda `version: 1`, `tema`, `problema` y los campos contestados. Si se eligió un síntoma del catálogo, `problemaClave` lo identifica dentro del tema. «Otro problema» conserva el texto de la paciente.
+- `evolucion`, `tratamiento`, `adherencia`, `persiste`, `nuevosSintomas`, `detalleNuevo` y `cambiosSalud` conservan los valores estructurados cuando hay respuesta. `respuestas` conserva las filas `{id, pregunta, respuesta}` en el idioma de la paciente.
+- `molestiaUltimos7Dias` es una valoración opcional de la molestia media durante los últimos siete días, con enteros del 0 al 10. En una primera consulta puede quedar en `autoReporte.lineaBaseSeguimiento`, con la misma estructura. El cero se conserva sólo por selección expresa. Una comparación entre visitas requiere el mismo problema, periodo y versión. Los registros antiguos siguen legibles.
+- Si se ofrece climaterio en seguimiento breve, la paciente puede repetir los once reactivos de la MRS. Las respuestas se guardan en `autoReporte.mrs`. Si omite esa opción, `seguimiento.escalaMenopausia` vale `omitida` y el total de la escala queda nulo. Elegir una molestia íntima como prioridad permite reutilizar esa selección, manteniendo independientes las respuestas sobre intensidad, frecuencia y actividad sexual.
+- El ERP genera una invitación individual con el fragmento `#cita=<64 hex>`. El portal conserva la referencia opaca en el campo raíz opcional `invitacionCita`, también cuando la paciente guarda su enlace privado de continuación. El enlace público permite responder sin invitación. La página no consulta antecedentes ni identifica pacientes a partir del token. Una referencia malformada se presenta al ERP como `invalida` para revisión. Los borradores locales, folios de envío y estudios se aíslan según la invitación o el enlace privado de continuación.
+
 ## 1. Forma canónica de una respuesta
 
 Cada envío de una paciente es **un objeto JSON** con esta forma:
@@ -39,7 +57,7 @@ Cada envío de una paciente es **un objeto JSON** con esta forma:
 ```jsonc
 {
   "version": 3,
-  "formularioVersion": "2026.09.4",
+  "formularioVersion": "2026.11.2",
   "atribucion": {
     "version": 1,
     "booking_channel": "whatsapp",

@@ -16,7 +16,7 @@
  */
 
 function entero(x, min, max) {
-  if (x == null || x === '' || typeof x === 'boolean') return null;
+  if (typeof x !== 'number' && (typeof x !== 'string' || !/^-?\d+(?:\.0)?$/.test(x.trim()))) return null;
   const n = Number(x);
   return Number.isInteger(n) && n >= min && n <= max ? n : null;
 }
@@ -180,12 +180,12 @@ export const ICIQ_UI_SF = {
   CLAVE: 'iciq_ui_sf',
   SIGLA: 'ICIQ-UI SF',
   NOMBRE: 'ICIQ-UI Short Form (incontinencia urinaria)',
-  ESTADO: 'pendiente_registro',
+  ESTADO: 'pendiente_version_oficial',
   LICENCIA: '«Copyright © ICIQ Group» (Bristol Urological Institute, iciq.net). Uso clínico rutinario gratuito, pero exige cuenta, solicitud y aprobación de un «Approved Purpose»; texto exacto, sin cambiar redacción, formato ni puntaje, y con el aviso de copyright.',
   INSTRUCCIONES_DR: [
-    'Registrarse en https://iciq.net y solicitar el módulo ICIQ-UI SF en la categoría «Clinical use – routine clinical care», versión «Spanish (Mexico)», administración electrónica en el portal y el ERP del consultorio, sin venta a terceros.',
-    'Aceptar el User Agreement y esperar la aprobación.',
-    'Usar el PDF aprobado sin cambiar la redacción y con el aviso «© ICIQ Group».',
+    'Registro aprobado el 26 de octubre de 2026 para el propósito solicitado.',
+    'En la cuenta de miembros de iciq.net, cotejar el propósito aprobado para la atención clínica digital y descargar el ICIQ-UI Short Form «Spanish (Mexico)».',
+    'Conservar el aviso de derechos y cotejar cada reactivo, opción e instrucción con el original antes de habilitarlo.',
   ],
   FUENTES: [
     'https://iciq.net/iciq-ui-sf',

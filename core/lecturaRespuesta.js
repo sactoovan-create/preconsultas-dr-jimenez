@@ -9,6 +9,7 @@
  * filtrarRespuestas. Prueba local: node tests/lectura-respuesta.mjs.
  */
 import { CAMPOS_ENTREVISTA, resumenEntrevista, valorEntrevista } from './entrevista.js';
+import { REDACCION_PREVIA } from './entrevistaHistorica.js';
 import { MRS_IDS } from './preconsultaFlow.js';
 import { PREGUNTAS as PREGUNTAS_DOLOR } from './profundos/dolorPelvico.js';
 
@@ -231,9 +232,30 @@ function falsoDeRamaOculta(k, v, hc) {
 }
 
 /** Orden fijo. Segundo argumento opcional: autoReporte.dolor, para el grupo dolor. */
-export function gruposHistoria(hc = {}, dolor = {}) {
+export function entrevistaDelEnvio(reporte = {}) {
+  const guardados = reporte.entrevistaDirigida?.grupos;
+  if (Array.isArray(guardados)) {
+    return guardados.filter(g => typeof g?.titulo === 'string' && Array.isArray(g.respuestas))
+      .map(g => ({ ...g, respuestas: g.respuestas.filter(r =>
+        typeof r?.pregunta === 'string' && typeof r.respuesta === 'string') }));
+  }
+  const hc = objeto(reporte.hc);
+  // Antes de 2.1, las dos preguntas sobre dolor cíclico también se mostraban
+  // si la paciente no menstruaba. Leer esas respuestas tal como se capturaron.
+  const grupos = resumenEntrevista(hc, { ...hc, dolorRelacionCiclo: undefined });
+  return grupos.map(g => ({
+    ...g, respuestas: g.respuestas.map(f => {
+      const anterior = REDACCION_PREVIA[f.id];
+      if (!anterior) return f;
+      return { ...f, pregunta: anterior.etiqueta || f.pregunta,
+        respuesta: anterior.opciones ? valorEntrevista(anterior, hc[f.id]) : f.respuesta };
+    }),
+  }));
+}
+
+export function gruposHistoria(hc = {}, dolor = {}, entrevista = null) {
   const historia = objeto(hc);
-  const yaMostrados = new Set(resumenEntrevista(historia).flatMap(g => g.respuestas.map(r => r.id)));
+  const yaMostrados = new Set((entrevista ?? resumenEntrevista(historia)).flatMap(g => g.respuestas.map(r => r.id)));
   const desconocidos = Object.keys(historia).filter(k => !CAMPOS_AGRUPADOS.has(k)).sort(comparar);
   return GRUPOS.map(({ id, titulo, campos }) => {
     if (id === 'dolor') return { id, titulo, respuestas: respuestasDolor(dolor) };
@@ -348,7 +370,7 @@ export function resumenLectura(r = {}) {
   const mrs = lecturaMrs(registro.autoReporte?.mrs);
   const rutaNueva = hc.entrevistaVersion === '1.0.0'
     || (hc.formularioVersion ?? registro.formularioVersion) === '2026.09.3';
-  const escalaOmitida = rutaNueva && Array.isArray(hc.temasConsulta) && !hc.temasConsulta.includes('climaterio')
+  const escalaOmitida = (registro.autoReporte?.seguimiento?.escalaMenopausia === 'omitida' || (rutaNueva && Array.isArray(hc.temasConsulta) && !hc.temasConsulta.includes('climaterio')))
     && Object.keys(objeto(registro.autoReporte?.mrs)).length === 0;
   if (escalaOmitida) mrs.texto = 'Sin escala registrada (0/11).';
   const pendientes = [];

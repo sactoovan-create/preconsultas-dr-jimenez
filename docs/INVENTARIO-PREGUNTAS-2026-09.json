@@ -1,12 +1,13 @@
 {
-  "formulario": "2026.10.1",
+  "formulario": "2026.11.2",
   "alcance": "Captura base, 11 dominios de síntomas, entrevista dirigida, módulos complementarios y cuestionarios validados; excluye consentimiento, honeypot y controles de navegación. No es conteo de preguntas obligatorias ni certificación clínica.",
   "conteo": {
-    "controlesBase": 54,
+    "controlesBase": 55,
     "mrs": 11,
-    "entrevistaDirigida": 75,
+    "entrevistaDirigida": 76,
     "complementarias": 38,
     "validados": 45,
+    "seguimiento": 12,
     "pendientesLicencia": 4
   },
   "base": [
@@ -15,7 +16,7 @@
       "control": "CampoTexto",
       "id": "nombre",
       "archivo": "PreConsulta.jsx",
-      "linea": 519,
+      "linea": 540,
       "valor": "{dem.nombre}"
     },
     {
@@ -23,7 +24,7 @@
       "control": "CampoNumero",
       "id": "edad",
       "archivo": "PreConsulta.jsx",
-      "linea": 520,
+      "linea": 541,
       "valor": "{dem.edad}"
     },
     {
@@ -31,7 +32,7 @@
       "control": "CampoTexto",
       "id": "telefono",
       "archivo": "PreConsulta.jsx",
-      "linea": 521,
+      "linea": 542,
       "valor": "{hc.telefono}"
     },
     {
@@ -39,15 +40,23 @@
       "control": "CampoTexto",
       "id": "correo",
       "archivo": "PreConsulta.jsx",
-      "linea": 522,
+      "linea": 543,
       "valor": "{hc.correo}"
+    },
+    {
+      "etiqueta": "¿Ya viste al Dr. Iván por el problema que quieres revisar hoy?",
+      "control": "GrupoOpciones",
+      "id": "visitaSeguimiento",
+      "archivo": "PreConsulta.jsx",
+      "linea": 545,
+      "valor": "{hc.visitaSeguimiento}"
     },
     {
       "etiqueta": "Calle y número (opcional)",
       "control": "CampoTexto",
       "id": "dom_calle_numero",
       "archivo": "PreConsulta.jsx",
-      "linea": 528,
+      "linea": 555,
       "valor": "{hc.dom_calle_numero}"
     },
     {
@@ -55,7 +64,7 @@
       "control": "CampoTexto",
       "id": "dom_colonia",
       "archivo": "PreConsulta.jsx",
-      "linea": 529,
+      "linea": 556,
       "valor": "{hc.dom_colonia}"
     },
     {
@@ -63,7 +72,7 @@
       "control": "CampoTexto",
       "id": "dom_cp",
       "archivo": "PreConsulta.jsx",
-      "linea": 530,
+      "linea": 557,
       "valor": "{hc.dom_cp}"
     },
     {
@@ -71,7 +80,7 @@
       "control": "CampoTexto",
       "id": "dom_municipio",
       "archivo": "PreConsulta.jsx",
-      "linea": 531,
+      "linea": 558,
       "valor": "{hc.dom_municipio}"
     },
     {
@@ -79,7 +88,7 @@
       "control": "CampoSelect",
       "id": "dom_estado",
       "archivo": "PreConsulta.jsx",
-      "linea": 532,
+      "linea": 559,
       "valor": "{hc.dom_estado}"
     },
     {
@@ -87,7 +96,7 @@
       "control": "CampoTexto",
       "id": "motivo",
       "archivo": "PreConsulta.jsx",
-      "linea": 541,
+      "linea": 569,
       "valor": "{hc.motivo}"
     },
     {
@@ -95,7 +104,7 @@
       "control": "GrupoMultiple",
       "id": "temasConsulta",
       "archivo": "PreConsulta.jsx",
-      "linea": 542,
+      "linea": 570,
       "valor": "{hc.temasConsulta}"
     },
     {
@@ -103,7 +112,7 @@
       "control": "GrupoMultiple",
       "id": "senalesUrgencia",
       "archivo": "PreConsulta.jsx",
-      "linea": 602,
+      "linea": 638,
       "valor": "{hc.senalesUrgencia}"
     },
     {
@@ -111,7 +120,7 @@
       "control": "GrupoOpciones",
       "id": "etapaReproductiva",
       "archivo": "PreConsulta.jsx",
-      "linea": 611,
+      "linea": 647,
       "valor": "{hc.etapaReproductiva}"
     },
     {
@@ -119,7 +128,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 612,
+      "linea": 648,
       "valor": "{hc.ultimaMenstruacion}"
     },
     {
@@ -127,7 +136,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 613,
+      "linea": 649,
       "valor": "{hc.anticonceptivo}"
     },
     {
@@ -135,7 +144,7 @@
       "control": "GrupoMultiple",
       "id": "sangradoTipos",
       "archivo": "PreConsulta.jsx",
-      "linea": 620,
+      "linea": 657,
       "valor": "{hc.sangradoTipos}"
     },
     {
@@ -143,7 +152,7 @@
       "control": "GrupoOpciones",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 636,
+      "linea": 673,
       "valor": "{hc.sangradoAhora}"
     },
     {
@@ -151,7 +160,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 638,
+      "linea": 675,
       "valor": "{hc.sangradoDuracionDias}"
     },
     {
@@ -159,7 +168,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 639,
+      "linea": 676,
       "valor": "{hc.sangradoDesde}"
     },
     {
@@ -167,7 +176,7 @@
       "control": "EscalaNumerica",
       "id": "dolorIntensidad",
       "archivo": "PreConsulta.jsx",
-      "linea": 647,
+      "linea": 685,
       "valor": "{dolor.intensidad}"
     },
     {
@@ -175,7 +184,7 @@
       "control": "GrupoOpciones",
       "id": "dolorInicio",
       "archivo": "PreConsulta.jsx",
-      "linea": 648,
+      "linea": 686,
       "valor": "{dolor.inicio}"
     },
     {
@@ -183,7 +192,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 655,
+      "linea": 693,
       "valor": "{dolor.meses}"
     },
     {
@@ -191,7 +200,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 656,
+      "linea": 694,
       "valor": "{dolor.localizacion}"
     },
     {
@@ -199,7 +208,7 @@
       "control": "GrupoMultiple",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 658,
+      "linea": 696,
       "valor": "{dolor.asociados}"
     },
     {
@@ -207,7 +216,7 @@
       "control": "GrupoOpciones",
       "id": "reglasRegulares",
       "archivo": "PreConsulta.jsx",
-      "linea": 679,
+      "linea": 717,
       "valor": "{hc.reglasRegulares}"
     },
     {
@@ -215,7 +224,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 686,
+      "linea": 724,
       "valor": "{hc.edadMenarca}"
     },
     {
@@ -223,7 +232,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 687,
+      "linea": 726,
       "valor": "{hc.diasEntreReglas}"
     },
     {
@@ -231,7 +240,7 @@
       "control": "GrupoMultiple",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 689,
+      "linea": 728,
       "valor": "{hc.cambiosAndrogenicos}"
     },
     {
@@ -239,7 +248,7 @@
       "control": "GrupoMultiple",
       "id": "sintomasUrinarios",
       "archivo": "PreConsulta.jsx",
-      "linea": 708,
+      "linea": 748,
       "valor": "{hc.sintomasUrinarios}"
     },
     {
@@ -247,7 +256,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 716,
+      "linea": 756,
       "valor": "{hc.urinarioDetalle}"
     },
     {
@@ -255,7 +264,7 @@
       "control": "GrupoMultiple",
       "id": "molestiasIntimas",
       "archivo": "PreConsulta.jsx",
-      "linea": 723,
+      "linea": 764,
       "valor": "{hc.molestiasIntimas}"
     },
     {
@@ -263,7 +272,7 @@
       "control": "GrupoMultiple",
       "id": "sintomasMama",
       "archivo": "PreConsulta.jsx",
-      "linea": 735,
+      "linea": 777,
       "valor": "{hc.sintomasMama}"
     },
     {
@@ -271,7 +280,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 742,
+      "linea": 784,
       "valor": "{hc.mamaDetalle}"
     },
     {
@@ -279,7 +288,7 @@
       "control": "GrupoOpciones",
       "id": "objetivoReproductivo",
       "archivo": "PreConsulta.jsx",
-      "linea": 748,
+      "linea": 790,
       "valor": "{hc.objetivoReproductivo}"
     },
     {
@@ -287,7 +296,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 756,
+      "linea": 798,
       "valor": "{hc.mesesBuscandoEmbarazo}"
     },
     {
@@ -295,7 +304,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 758,
+      "linea": 800,
       "valor": "{hc.anticonceptivo}"
     },
     {
@@ -303,7 +312,7 @@
       "control": "GrupoMultiple",
       "id": "antecedentes",
       "archivo": "PreConsulta.jsx",
-      "linea": 788,
+      "linea": 830,
       "valor": "{hc.antecedentesSeleccionados}"
     },
     {
@@ -311,7 +320,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 803,
+      "linea": 845,
       "valor": "{hc.embarazos}"
     },
     {
@@ -319,7 +328,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 804,
+      "linea": 846,
       "valor": "{hc.partos}"
     },
     {
@@ -327,7 +336,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 805,
+      "linea": 847,
       "valor": "{hc.cesareas}"
     },
     {
@@ -335,7 +344,7 @@
       "control": "CampoNumero",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 806,
+      "linea": 848,
       "valor": "{hc.abortos}"
     },
     {
@@ -343,7 +352,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 808,
+      "linea": 850,
       "valor": "{hc.cirugias}"
     },
     {
@@ -351,7 +360,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 809,
+      "linea": 851,
       "valor": "{hc.medicamentos}"
     },
     {
@@ -359,7 +368,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 810,
+      "linea": 852,
       "valor": "{hc.alergias}"
     },
     {
@@ -367,7 +376,7 @@
       "control": "GrupoOpciones",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 811,
+      "linea": 853,
       "valor": "{hc.tabacoEstado}"
     },
     {
@@ -375,7 +384,7 @@
       "control": "GrupoOpciones",
       "id": "tieneCuelloUterino",
       "archivo": "PreConsulta.jsx",
-      "linea": 825,
+      "linea": 867,
       "valor": "{hc.tieneCuelloUterino}"
     },
     {
@@ -383,7 +392,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 832,
+      "linea": 874,
       "valor": "{hc.ultimoPapFecha}"
     },
     {
@@ -391,7 +400,7 @@
       "control": "GrupoOpciones",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 833,
+      "linea": 875,
       "valor": "{hc.ultimoPapResultado}"
     },
     {
@@ -399,7 +408,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 843,
+      "linea": 885,
       "valor": "{hc.ultimaMastografiaFecha}"
     },
     {
@@ -407,7 +416,7 @@
       "control": "GrupoOpciones",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 844,
+      "linea": 886,
       "valor": "{hc.ultimaMastografiaResultado}"
     },
     {
@@ -415,7 +424,7 @@
       "control": "GrupoMultiple",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 852,
+      "linea": 894,
       "valor": "{hc.cancerFamiliarTipos}"
     },
     {
@@ -423,7 +432,7 @@
       "control": "CampoTexto",
       "id": null,
       "archivo": "PreConsulta.jsx",
-      "linea": 865,
+      "linea": 907,
       "valor": "{hc.cancerFamiliarDetalle}"
     },
     {
@@ -431,7 +440,7 @@
       "control": "CampoSelect",
       "id": "canalReserva",
       "archivo": "PreConsulta.jsx",
-      "linea": 900,
+      "linea": 942,
       "valor": "{atribucion.booking_channel}"
     },
     {
@@ -439,7 +448,7 @@
       "control": "CampoSelect",
       "id": "fuenteDeclarada",
       "archivo": "PreConsulta.jsx",
-      "linea": 902,
+      "linea": 944,
       "valor": "{atribucion.patient_reported_source}"
     }
   ],
@@ -520,7 +529,7 @@
       ],
       "min": null,
       "max": null,
-      "condicional": false,
+      "condicional": true,
       "obligatoria": false
     },
     {
@@ -615,30 +624,30 @@
     },
     {
       "grupo": "sangrado",
-      "fuenteObsidian": "MP-001 / Checklist 71",
+      "fuenteObsidian": "MP-001 / Checklist 71 / NICE NG88, 1.2",
       "id": "sangradoCambios",
-      "etiqueta": "En un día de sangrado, ¿qué ha cambiado respecto a lo habitual?",
+      "etiqueta": "En los días que sangras, ¿has notado alguno de estos cambios?",
       "tipo": "multiple",
       "opciones": [
         {
           "id": "proteccion",
-          "etiqueta": "Necesito cambiar la protección mucho más seguido"
+          "etiqueta": "Necesito cambiar mi toalla o tampón, o vaciar mi copa, mucho más seguido"
         },
         {
           "id": "nocturno",
-          "etiqueta": "Me levanto de noche a cambiarme"
+          "etiqueta": "Me levanto en la noche para cambiarme"
         },
         {
           "id": "mancha",
-          "etiqueta": "Mancho ropa o sábanas"
+          "etiqueta": "Llego a manchar la ropa o las sábanas"
         },
         {
           "id": "coagulos",
-          "etiqueta": "Expulso coágulos"
+          "etiqueta": "Salen coágulos"
         },
         {
           "id": "ninguna",
-          "etiqueta": "Ninguna de estas"
+          "etiqueta": "Ninguno de estos cambios"
         }
       ],
       "min": null,
@@ -648,9 +657,9 @@
     },
     {
       "grupo": "sangrado",
-      "fuenteObsidian": "MP-001 / Checklist 71",
+      "fuenteObsidian": "MP-001 / Checklist 71 / NICE NG88, 1.2",
       "id": "sangradoImpacto",
-      "etiqueta": "¿Cómo afecta el sangrado a tus actividades?",
+      "etiqueta": "¿Cuánto te dificulta el sangrado seguir con tu día o dormir por la noche?",
       "tipo": "opcion",
       "opciones": [
         {
@@ -681,9 +690,9 @@
     },
     {
       "grupo": "sangrado",
-      "fuenteObsidian": "MP-001 / Checklist 71",
+      "fuenteObsidian": "MP-001 / Checklist 71 / NICE NG88, 1.2",
       "id": "sangradoTratamientos",
-      "etiqueta": "¿Qué has usado para controlarlo y qué ocurrió?",
+      "etiqueta": "¿Qué has probado para reducir el sangrado? ¿Te ayudó?",
       "tipo": "texto",
       "opciones": null,
       "min": null,
@@ -693,9 +702,9 @@
     },
     {
       "grupo": "sangrado",
-      "fuenteObsidian": "MP-001 / Checklist 71",
+      "fuenteObsidian": "MP-001 / Checklist 71 / NICE NG88, 1.2",
       "id": "sangradoIntervaloDias",
-      "etiqueta": "Días desde el inicio de una regla hasta el inicio de la siguiente (aproximados)",
+      "etiqueta": "Del primer día de una regla al primer día de la siguiente, ¿cuántos días suelen pasar?",
       "tipo": "numero",
       "opciones": null,
       "min": 10,
@@ -705,9 +714,9 @@
     },
     {
       "grupo": "sangrado",
-      "fuenteObsidian": "MP-001 / Checklist 71",
+      "fuenteObsidian": "MP-001 / Checklist 71 / NICE NG88, 1.2",
       "id": "sangradoDesdeMenarca",
-      "etiqueta": "¿Tus reglas han sido muy abundantes desde que comenzaste a menstruar?",
+      "etiqueta": "¿Tus reglas han sido muy abundantes desde la primera vez que te bajó?",
       "tipo": "opcion",
       "opciones": [
         {
@@ -734,26 +743,26 @@
     },
     {
       "grupo": "sangrado",
-      "fuenteObsidian": "MP-001 / Checklist 71",
+      "fuenteObsidian": "MP-001 / Checklist 71 / NICE NG88, 1.2",
       "id": "sangradoOtrosSitios",
-      "etiqueta": "Además de la regla, ¿has tenido sangrado difícil de detener?",
+      "etiqueta": "Aparte de la regla, ¿te ha pasado algo de esto?",
       "tipo": "multiple",
       "opciones": [
         {
           "id": "dental",
-          "etiqueta": "Después de una extracción dental"
+          "etiqueta": "Me costó parar el sangrado después de que me sacaron un diente"
         },
         {
           "id": "cirugia",
-          "etiqueta": "Después de una cirugía"
+          "etiqueta": "Costó parar el sangrado después de una cirugía"
         },
         {
           "id": "nariz",
-          "etiqueta": "De nariz, repetidamente"
+          "etiqueta": "Me sangra la nariz con frecuencia y cuesta parar el sangrado"
         },
         {
           "id": "moretones",
-          "etiqueta": "Moretones frecuentes sin golpe claro"
+          "etiqueta": "Me salen moretones seguido sin recordar un golpe"
         },
         {
           "id": "ninguna",
@@ -766,8 +775,37 @@
       "obligatoria": false
     },
     {
+      "grupo": "sangrado",
+      "fuenteObsidian": "MP-001 / Checklist 71 / NICE NG88, 1.2",
+      "id": "sangradoFamiliar",
+      "etiqueta": "¿Hay alguien en tu familia de sangre a quien le cueste parar un sangrado, por ejemplo, después de una cirugía o de que le saquen un diente?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": true,
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": false,
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No lo sé"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "condicional": true,
+      "obligatoria": false
+    },
+    {
       "grupo": "dolor",
-      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis",
+      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis / NICE NG73, 1.3.1",
       "id": "dolorFrecuencia",
       "etiqueta": "¿Con qué frecuencia tienes dolor?",
       "tipo": "opcion",
@@ -800,9 +838,9 @@
     },
     {
       "grupo": "dolor",
-      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis",
+      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis / NICE NG73, 1.3.1",
       "id": "dolorImpacto",
-      "etiqueta": "¿Qué tanto ha cambiado tus actividades?",
+      "etiqueta": "Cuando te duele, ¿qué tanto puedes seguir con tus actividades?",
       "tipo": "opcion",
       "opciones": [
         {
@@ -833,9 +871,9 @@
     },
     {
       "grupo": "dolor",
-      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis",
+      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis / NICE NG73, 1.3.1",
       "id": "dolorTratamientos",
-      "etiqueta": "¿Qué has intentado y cuánto te ayudó?",
+      "etiqueta": "¿Qué has probado para aliviar el dolor? ¿Cuánto te ayudó?",
       "tipo": "texto",
       "opciones": null,
       "min": null,
@@ -845,9 +883,9 @@
     },
     {
       "grupo": "dolor",
-      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis",
+      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis / NICE NG73, 1.3.1",
       "id": "dolorRelacionCiclo",
-      "etiqueta": "En los últimos 3 meses, ¿cómo se relacionó el dolor con tu regla?",
+      "etiqueta": "Pensando en los últimos 3 meses, ¿cuándo te duele en relación con tu regla?",
       "tipo": "opcion",
       "opciones": [
         {
@@ -878,9 +916,9 @@
     },
     {
       "grupo": "dolor",
-      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis",
+      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis / NICE NG73, 1.3.1",
       "id": "dolorProfundoPenetracion",
-      "etiqueta": "Cuando hay penetración, ¿sientes dolor profundo dentro de la pelvis?",
+      "etiqueta": "Durante una relación con penetración, ¿sientes dolor en el fondo, por dentro?",
       "tipo": "opcion",
       "opciones": [
         {
@@ -911,9 +949,9 @@
     },
     {
       "grupo": "dolor",
-      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis",
+      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis / NICE NG73, 1.3.1",
       "id": "dolorEvacuarCiclico",
-      "etiqueta": "¿El dolor al evacuar aparece o empeora alrededor de la menstruación?",
+      "etiqueta": "En los días cercanos a tu regla, ¿aparece o aumenta el dolor al evacuar (hacer del baño)?",
       "tipo": "opcion",
       "opciones": [
         {
@@ -935,14 +973,14 @@
       ],
       "min": null,
       "max": null,
-      "condicional": false,
+      "condicional": true,
       "obligatoria": false
     },
     {
       "grupo": "dolor",
-      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis",
+      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis / NICE NG73, 1.3.1",
       "id": "dolorOrinarCiclico",
-      "etiqueta": "¿El dolor al orinar aparece o empeora alrededor de la menstruación?",
+      "etiqueta": "En los días cercanos a tu regla, ¿aparece o aumenta el dolor al orinar?",
       "tipo": "opcion",
       "opciones": [
         {
@@ -964,14 +1002,14 @@
       ],
       "min": null,
       "max": null,
-      "condicional": false,
+      "condicional": true,
       "obligatoria": false
     },
     {
       "grupo": "dolor",
-      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis",
+      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis / NICE NG73, 1.3.1",
       "id": "dolorMejoraVaciar",
-      "etiqueta": "¿El dolor aumenta al llenarse la vejiga y mejora al orinar?",
+      "etiqueta": "¿Te duele más cuando tienes la vejiga llena y sientes alivio después de orinar?",
       "tipo": "opcion",
       "opciones": [
         {
@@ -998,7 +1036,7 @@
     },
     {
       "grupo": "dolor",
-      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis",
+      "fuenteObsidian": "MP-002 / Anamnesis de endometriosis / NICE NG73, 1.3.1",
       "id": "dolorMovimiento",
       "etiqueta": "¿El dolor cambia al caminar, sentarte, hacer ejercicio o cambiar de postura?",
       "tipo": "opcion",
@@ -1166,9 +1204,9 @@
     },
     {
       "grupo": "urinario",
-      "fuenteObsidian": "Walters-Karram capítulo 09 / MP-004",
+      "fuenteObsidian": "Walters-Karram capítulo 09 / MP-004 / NICE NG123, 1.3",
       "id": "urinarioDesde",
-      "etiqueta": "¿Desde cuándo tienes estas molestias?",
+      "etiqueta": "¿Cuándo empezaste a notar estas molestias al orinar?",
       "tipo": "opcion",
       "opciones": [
         {
@@ -1199,26 +1237,26 @@
     },
     {
       "grupo": "urinario",
-      "fuenteObsidian": "Walters-Karram capítulo 09 / MP-004",
+      "fuenteObsidian": "Walters-Karram capítulo 09 / MP-004 / NICE NG123, 1.3",
       "id": "urinarioVaciado",
-      "etiqueta": "Al orinar o después, ¿qué notas?",
+      "etiqueta": "Cuando vas al baño, o entre una ida y otra, ¿te pasa algo de esto?",
       "tipo": "multiple",
       "opciones": [
         {
           "id": "vaciado",
-          "etiqueta": "Siento que no termino de vaciar la vejiga"
+          "etiqueta": "Termino de orinar y siento que todavía queda orina"
         },
         {
           "id": "esfuerzo",
-          "etiqueta": "Necesito hacer fuerza para orinar"
+          "etiqueta": "Tengo que pujar para que salga la orina"
         },
         {
           "id": "continuo",
-          "etiqueta": "La pérdida es casi continua"
+          "etiqueta": "Se me sale la orina casi todo el tiempo"
         },
         {
           "id": "noche",
-          "etiqueta": "Me despierto repetidamente para orinar"
+          "etiqueta": "Me despierto varias veces en la noche para orinar"
         },
         {
           "id": "ninguna",
@@ -1232,9 +1270,9 @@
     },
     {
       "grupo": "urinario",
-      "fuenteObsidian": "Walters-Karram capítulo 09 / MP-004",
+      "fuenteObsidian": "Walters-Karram capítulo 09 / MP-004 / NICE NG123, 1.3",
       "id": "urinarioTratamientos",
-      "etiqueta": "¿Qué tratamientos o estudios has tenido por este problema?",
+      "etiqueta": "¿Qué estudios o tratamientos has tenido por estas molestias?",
       "tipo": "texto",
       "opciones": null,
       "min": null,
@@ -1244,9 +1282,9 @@
     },
     {
       "grupo": "urinario",
-      "fuenteObsidian": "Walters-Karram capítulo 09 / MP-004",
+      "fuenteObsidian": "Walters-Karram capítulo 09 / MP-004 / NICE NG123, 1.3",
       "id": "urinarioProteccion",
-      "etiqueta": "¿Usas toalla o protector por los escapes de orina?",
+      "etiqueta": "¿Usas una toalla o un protector porque a veces se te sale la orina?",
       "tipo": "opcion",
       "opciones": [
         {
@@ -1273,9 +1311,9 @@
     },
     {
       "grupo": "urinario",
-      "fuenteObsidian": "Walters-Karram capítulo 09 / MP-004",
+      "fuenteObsidian": "Walters-Karram capítulo 09 / MP-004 / NICE NG123, 1.3",
       "id": "miccionesDia",
-      "etiqueta": "En un día habitual, ¿cuántas veces orinas mientras estás despierta?",
+      "etiqueta": "En un día normal, ¿cuántas veces vas a orinar mientras estás despierta?",
       "tipo": "numero",
       "opciones": null,
       "min": 0,
@@ -1285,9 +1323,9 @@
     },
     {
       "grupo": "urinario",
-      "fuenteObsidian": "Walters-Karram capítulo 09 / MP-004",
+      "fuenteObsidian": "Walters-Karram capítulo 09 / MP-004 / NICE NG123, 1.3",
       "id": "miccionesNoche",
-      "etiqueta": "¿Cuántas veces te despiertas del sueño para orinar?",
+      "etiqueta": "Una vez que te duermes, ¿cuántas veces te despiertas para orinar?",
       "tipo": "numero",
       "opciones": null,
       "min": 0,
@@ -3796,6 +3834,121 @@
       "licencia": "CC BY 4.0; Modificado: formato electrónico, instrucciones adaptadas a selección en pantalla y corrección tipográfica en el enunciado 6 («pare» → «para»)."
     }
   ],
+  "seguimiento": [
+    {
+      "id": "problema",
+      "pregunta": "¿Qué problema de tu última consulta quieres revisar hoy?"
+    },
+    {
+      "id": "tema",
+      "pregunta": "¿Cuál es el tema principal que te gustaría comparar en tus próximas visitas?"
+    },
+    {
+      "id": "problemaClave",
+      "pregunta": "¿Qué molestia te gustaría revisar y comparar entre visitas?"
+    },
+    {
+      "id": "molestiaUltimos7Dias",
+      "pregunta": "En los últimos 7 días, ¿cuánto te molestó este problema en promedio?"
+    },
+    {
+      "id": "repetirMrs",
+      "pregunta": "Volver a contestar la escala de menopausia para comparar mis síntomas con la visita anterior."
+    },
+    {
+      "id": "evolucion",
+      "pregunta": "Desde la última consulta, ¿cómo ha cambiado este problema?",
+      "requerida": true,
+      "opciones": [
+        {
+          "valor": "resuelto",
+          "etiqueta": "Ya se quitó"
+        },
+        {
+          "valor": "mejor",
+          "etiqueta": "Estoy mejor"
+        },
+        {
+          "valor": "igual",
+          "etiqueta": "Sigo igual"
+        },
+        {
+          "valor": "peor",
+          "etiqueta": "Estoy peor"
+        },
+        {
+          "valor": "variable",
+          "etiqueta": "Va y viene"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No estoy segura"
+        }
+      ]
+    },
+    {
+      "id": "tratamiento",
+      "pregunta": "¿Qué tratamiento o cuidados probaste desde entonces?",
+      "ejemplo": "Escribe el nombre si lo recuerdas. Puedes decir que no usaste ninguno."
+    },
+    {
+      "id": "adherencia",
+      "pregunta": "Si te indicaron un tratamiento, ¿cómo te fue al seguirlo?",
+      "opciones": [
+        {
+          "valor": "completo",
+          "etiqueta": "Pude seguirlo como se indicó"
+        },
+        {
+          "valor": "parcial",
+          "etiqueta": "Solo pude seguir una parte"
+        },
+        {
+          "valor": "no_iniciado",
+          "etiqueta": "Todavía no lo empecé"
+        },
+        {
+          "valor": "sin_indicacion",
+          "etiqueta": "No me indicaron tratamiento"
+        },
+        {
+          "valor": "prefiero_no",
+          "etiqueta": "Prefiero comentarlo en consulta"
+        }
+      ]
+    },
+    {
+      "id": "persiste",
+      "pregunta": "¿Qué molestia sigue afectándote o qué se te ha hecho difícil?"
+    },
+    {
+      "id": "nuevosSintomas",
+      "pregunta": "¿Ha aparecido alguna molestia nueva?",
+      "requerida": true,
+      "opciones": [
+        {
+          "valor": "si",
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": "no",
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_se",
+          "etiqueta": "No estoy segura"
+        }
+      ]
+    },
+    {
+      "id": "detalleNuevo",
+      "pregunta": "¿Qué molestia apareció y desde cuándo?"
+    },
+    {
+      "id": "cambiosSalud",
+      "pregunta": "¿Hubo algún cambio en tus medicamentos, alergias o salud que debamos conocer?"
+    }
+  ],
   "pendientesLicencia": [
     {
       "clave": "pcs",
@@ -3818,7 +3971,7 @@
     {
       "clave": "iciq_ui_sf",
       "nombre": "ICIQ-UI Short Form (incontinencia urinaria)",
-      "estado": "pendiente_registro",
+      "estado": "pendiente_version_oficial",
       "textoIncluido": false
     }
   ]

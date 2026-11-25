@@ -7,7 +7,7 @@ import { evaluarMenopausia } from '../instruments/menopausia/engine.js';
 
 const ids = CAMPOS_ENTREVISTA.map(q => q.id);
 assert.equal(new Set(ids).size, ids.length, 'IDs de preguntas únicos');
-assert.equal(FORMULARIO_VERSION, '2026.10.1');
+assert.equal(FORMULARIO_VERSION, '2026.11.2');
 for (const tema of ['cervical', 'vulvar', 'metabolico', 'piso-pelvico']) {
   assert.ok(pasosPara({hc:{temasConsulta:[tema]}}).some(p=>p.id===tema));
   assert.ok(!pasosPara({hc:{temasConsulta:['control']}}).some(p=>p.id===tema));
@@ -19,6 +19,13 @@ for (const tema of ['cervical', 'vulvar', 'metabolico', 'piso-pelvico']) {
 assert.equal(preguntasEntrevista('intimidad',{molestiasIntimas:['prefiero_no']}).length,0);
 assert.ok(!preguntasEntrevista('cervical',{cervicalTratamientoPrevio:'no'}).some(q=>q.id==='cervicalTratamientoDetalle'));
 assert.ok(!Object.hasOwn(limpiarEntrevista({cervicalTratamientoPrevio:'no',cervicalTratamientoDetalle:'Anterior'},['cervical']),'cervicalTratamientoDetalle'));
+const conSangrado = { sangradoTipos: ['muy_abundante'], sangradoFamiliar: false };
+const respuestaFamiliar = hc => resumenEntrevista(hc).flatMap(grupo => grupo.respuestas).find(q => q.id === 'sangradoFamiliar');
+assert.equal(respuestaFamiliar(conSangrado).respuesta, 'No');
+assert.equal(respuestaFamiliar({ sangradoDesdeMenarca: true, sangradoFamiliar: 'no_se' }).respuesta, 'No lo sé');
+assert.equal(respuestaFamiliar({ sangradoTipos: ['muy_abundante'] }), undefined);
+assert.equal(limpiarEntrevista({ sangradoFamiliar: true, sangradoTipos: ['entre_periodos'] }, ['sangrado']).sangradoFamiliar, undefined);
+assert.equal(limpiarEntrevista({ dolorRelacionCiclo: 'no_menstruo', dolorEvacuarCiclico: true }, ['dolor']).dolorEvacuarCiclico, undefined);
 assert.equal(valorEntrevista(ENTREVISTA.metabolico.preguntas[0],['glucosa']), 'Glucosa, diabetes o resistencia a la insulina');
 assert.ok(instrumentosPara({paciente:{edad:30},autoReporte:{hc:{temasConsulta:['metabolico']}}}).instrumentosSugeridos.some(s=>s.instrumento==='cardiometabolico'));
 assert.equal(instrumentosPara({paciente:{edad:30},autoReporte:{hc:{metabolicoTratamiento:'Tirzepatida'}}}).instrumentosSugeridos.find(s=>s.instrumento==='cardiometabolico')?.prioridad,'alta');

@@ -1,10 +1,10 @@
 import React from 'react';
 import { Pencil } from 'lucide-react';
 import { preguntasEntrevista, tieneRespuesta, valorEntrevista } from '../core/entrevista.js';
+import { capturarSeguimiento, seguimientoBreve } from '../core/seguimiento.js';
 import { TEMAS_CONSULTA, validarPaso } from '../core/preconsultaFlow.js';
 import { formatearDomicilio } from '../core/domicilio.js';
 import { MODULOS } from '../core/profundos/index.js';
-import { MRS_ITEMS } from '../instruments/menopausia/engine.js';
 import * as phq9 from '../core/cuestionarios/phq9.js';
 import * as csi from '../core/cuestionarios/csi.js';
 
@@ -45,21 +45,28 @@ function formato(v) {
   return etiquetas[v] || String(v).replaceAll('_', ' ');
 }
 
-export default function RevisionPreconsulta({ dem, hc, mrs, dolor, profundos, cuestionarios = {}, pasos, irPaso }) {
+export default function RevisionPreconsulta({ dem, hc, mrs, reactivosMrs, opcionesMrs, dolor, profundos, cuestionarios = {}, pasos, irPaso }) {
   return <div className="pc-revision" aria-label="Revisión de respuestas">
     {pasos.filter(p => p.id !== 'envio').map(p => {
       let filas = (campos[p.id] || []).filter(([k]) => tieneRespuesta(hc[k])).map(([k, label]) => [label, formato(hc[k])]);
       if (p.id === 'inicio') filas = [['Nombre', dem.nombre], ['Edad', dem.edad], ['Teléfono', hc.telefono], ['Correo', hc.correo], ['Domicilio (INE)', formatearDomicilio(hc)]].filter(([,v]) => tieneRespuesta(v));
       if (p.id === 'motivo') filas = [['Motivo', hc.motivo], ['Temas', (hc.temasConsulta || []).map(id => TEMAS_CONSULTA.find(t => t.id === id)?.etiqueta || id).join(', ')]];
+      if (p.id === 'seguimiento') {
+        filas = (capturarSeguimiento(hc)?.respuestas || []).map(r => [r.pregunta, r.respuesta]);
+        if (seguimientoBreve(hc) && hc.temasConsulta?.includes('climaterio')) {
+          filas.push(['Escala de menopausia', hc.seguimientoActual?.repetirMrs === true ? 'Elegiste repetirla' : 'No elegiste repetirla en esta visita']);
+        }
+      }
+      if (p.id === 'motivo' && hc.visitaSeguimiento !== true) filas.push(...(capturarSeguimiento(hc)?.respuestas || []).filter(r=>r.id!=='problema').map(r=>[r.pregunta,r.respuesta]));
       if (p.id === 'dolor') filas = Object.entries(dolor).filter(([,v]) => tieneRespuesta(v)).map(([k,v]) => [formato(k), formato(v)]);
-      if (p.id === 'climaterio') filas = MRS_ITEMS.filter(q => mrs[q.id] != null).map(q => [q.texto, `${mrs[q.id]} de 4`]);
+      if (p.id === 'climaterio') filas = reactivosMrs.filter(([id]) => mrs[id] != null).map(([id,texto]) => [texto, `${mrs[id]} de 4 · ${opcionesMrs[mrs[id]]}`]);
       if (p.profundoId) filas = (MODULOS.find(m => m.ID === p.profundoId)?.PREGUNTAS || []).filter(q => tieneRespuesta(profundos[p.profundoId]?.[q.id])).map(q => {
         const v = profundos[p.profundoId][q.id];
         const label = x => q.opciones?.find(o => o.id === x || o.valor === x)?.etiqueta || formato(x);
         return [q.texto, Array.isArray(v) ? v.map(label).join(', ') : label(v)];
       });
       if (p.cuestionarioId) filas = filasCuestionario(p.cuestionarioId, cuestionarios[p.cuestionarioId]?.respuestas);
-      filas.push(...preguntasEntrevista(p.id, hc).filter(q => tieneRespuesta(hc[q.id])).map(q => [q.etiqueta, valorEntrevista(q, hc[q.id])]));
+      if (p.id !== 'climaterio' || !seguimientoBreve(hc)) filas.push(...preguntasEntrevista(p.id, hc).filter(q => tieneRespuesta(hc[q.id])).map(q => [q.etiqueta, valorEntrevista(q, hc[q.id])]));
       const valido = validarPaso(p.id, { demografia: dem, hc, mrs, dolor }).ok;
       const respuestasCuestionario = p.cuestionarioId ? (cuestionarios[p.cuestionarioId]?.respuestas || {}) : null;
       const faltanCuestionario = p.cuestionarioId

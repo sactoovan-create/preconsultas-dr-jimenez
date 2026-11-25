@@ -7,6 +7,7 @@ import React, {
   useState,
 } from 'react';
 import {
+  Camera,
   CircleAlert,
   CircleCheck,
   Clock3,
@@ -24,6 +25,7 @@ import {
   subirEstudio,
   validarArchivoEstudio,
   MAX_ARCHIVOS,
+  MAX_BYTES,
 } from '../core/estudios.js';
 import './SubirEstudios.css';
 
@@ -97,6 +99,7 @@ const SubirEstudios = forwardRef(function SubirEstudios(
   const listos = itemsSubidos.length;
   const pendientes = items.filter((i) => i.estado === 'pendiente').length;
   const errores = items.filter((i) => i.estado === 'error').length;
+  const selectorDeshabilitado = !habilitado || bloqueado || items.length >= MAX_ARCHIVOS;
 
   const cambiarItems = useCallback((actualizador) => {
     if (!vivoRef.current) return;
@@ -400,9 +403,12 @@ const SubirEstudios = forwardRef(function SubirEstudios(
       <header className="pc-estudios-cabecera">
         <span className="pc-estudios-cabecera-icono" aria-hidden="true"><Upload /></span>
         <div>
-          <span className="pc-estudios-kicker">Adjuntos opcionales</span>
-          <h2 id="pc-estudios-titulo">Estudios médicos</h2>
-          <p>Agrega laboratorios, ultrasonidos o recetas en PDF o foto.</p>
+          <h2 id="pc-estudios-titulo">Tus estudios previos</h2>
+          <p>Comparte todos los estudios que tengas sobre el motivo de tu consulta, incluso los anteriores.
+            Comparar fechas y resultados me ayuda a entender qué ha cambiado y a planear tu seguimiento.</p>
+          <p>Puedes incluir análisis de laboratorio, ultrasonidos con su reporte, Papanicolaou,
+            colposcopias o resultados de biopsias. Si los tienes en papel, toma una foto de cada
+            página completa y revisa que se lean la fecha y el resultado.</p>
         </div>
       </header>
 
@@ -419,7 +425,7 @@ const SubirEstudios = forwardRef(function SubirEstudios(
 
       <fieldset disabled={!habilitado || bloqueado} className="pc-estudios-pregunta">
         <legend>
-          ¿Tienes algún estudio para compartir? *
+          ¿Tienes estudios a la mano para compartirlos ahora? *
         </legend>
         <div className="pc-estudios-decision">
           <button
@@ -442,20 +448,37 @@ const SubirEstudios = forwardRef(function SubirEstudios(
       </fieldset>
 
       {decision === 'si' && (
-        <label className="pc-estudios-selector" aria-disabled={!habilitado || bloqueado}>
-          <Upload aria-hidden="true" />
-          <span>
-            <b>Agregar PDF o fotos</b>
-            <small>Hasta {MAX_ARCHIVOS} archivos, máximo 15 MB cada uno</small>
-          </span>
-          <input className="pc-estudios-input" type="file" multiple disabled={!habilitado || bloqueado} accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,image/heic-sequence,image/heif-sequence" onChange={onElegir} />
-        </label>
+        <div>
+          <div className="pc-estudios-selectores">
+            <label className="pc-estudios-selector pc-estudios-camara" aria-disabled={selectorDeshabilitado}>
+              <Camera aria-hidden="true" />
+              <b>Tomar foto</b>
+              <input type="file" accept="image/*" capture="environment" disabled={selectorDeshabilitado} onChange={onElegir} />
+            </label>
+            <label className="pc-estudios-selector" aria-disabled={selectorDeshabilitado}>
+              <FileImage aria-hidden="true" />
+              <b>Elegir de la galería</b>
+              <input type="file" accept="image/*" multiple disabled={selectorDeshabilitado} onChange={onElegir} />
+            </label>
+            <label className="pc-estudios-selector" aria-disabled={selectorDeshabilitado}>
+              <FileText aria-hidden="true" />
+              <b>Adjuntar archivos</b>
+              <input className="pc-estudios-input" type="file" multiple disabled={selectorDeshabilitado} accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,image/heic-sequence,image/heif-sequence" onChange={onElegir} />
+            </label>
+          </div>
+          <p className="pc-estudios-limites">
+            {items.length} de {MAX_ARCHIVOS} archivos agregados · Hasta {MAX_BYTES / (1024 * 1024)} MB por archivo.
+            {' '}{items.length >= MAX_ARCHIVOS
+              ? 'Si tienes más estudios, llévalos a tu consulta.'
+              : 'Puedes volver a tocar «Tomar foto» para agregar otra página.'}
+          </p>
+        </div>
       )}
 
       {decision === 'no' && (
         <div className="pc-estudios-sin-adjuntos" role="status">
           <CircleCheck aria-hidden="true" />
-          <span>Entendido. Puedes enviar el cuestionario y llevarlos después.</span>
+          <span>Puedes enviar tus respuestas ahora. Si encuentras tus estudios, llévalos a la consulta para revisarlos juntos.</span>
         </div>
       )}
 

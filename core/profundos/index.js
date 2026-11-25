@@ -13,6 +13,7 @@ const MODULOS = [incontinencia, genitourinario, saludSexual, dolorPelvico, sop];
 /** Módulos cuya condición de disparo se cumple con el tamizaje actual. */
 export function profundizacionesSugeridas(autoReporte) {
   return MODULOS.filter((m) => {
+    if (['genitourinario','salud-sexual'].includes(m.ID) && autoReporte?.hc?.molestiasIntimas?.includes('prefiero_no')) return false;
     try { return m.disparador(autoReporte); } catch (_) { return false; }
   }).map((m) => ({ id: m.ID, titulo: m.TITULO, fuente: m.FUENTE, tipo: 'Entrevista complementaria', preguntas: m.PREGUNTAS }));
 }

@@ -4,7 +4,8 @@
 import assert from 'node:assert/strict';
 import { CAMPOS_ENTREVISTA, resumenEntrevista } from '../core/entrevista.js';
 import { MRS_IDS, filtrarHistoriaActiva } from '../core/preconsultaFlow.js';
-import { etiquetaCampo, formatoRespuesta, gruposHistoria, resumenLectura, filtrarRespuestas } from '../core/lecturaRespuesta.js';
+import { etiquetaCampo, formatoRespuesta, entrevistaDelEnvio, gruposHistoria, resumenLectura, filtrarRespuestas } from '../core/lecturaRespuesta.js';
+import { construirRegistro } from '../core/registroPreconsulta.js';
 
 let pruebas = 0;
 function prueba(nombre, fn) {
@@ -20,6 +21,24 @@ function congelar(valor) {
   return valor;
 }
 const filas = hc => gruposHistoria(hc).flatMap(g => g.respuestas);
+
+prueba('entrevista nueva conserva en cada envío texto, cero y negativos explícitos', () => {
+  const hc = { dolorEvacuarCiclico: false, miccionesNoche: 0, sangradoDesdeMenarca: true, sangradoFamiliar: 'no_se' };
+  const { autoReporte } = construirRegistro({ hc });
+  const grupos = entrevistaDelEnvio(autoReporte);
+  const capturadas = grupos.flatMap(g => g.respuestas);
+  assert.equal(capturadas.find(r => r.id === 'dolorEvacuarCiclico').respuesta, 'No');
+  assert.equal(capturadas.find(r => r.id === 'miccionesNoche').respuesta, '0');
+  assert.equal(capturadas.find(r => r.id === 'sangradoFamiliar').respuesta, 'No lo sé');
+  assert.deepEqual(entrevistaDelEnvio({ ...autoReporte, hc: {} }), grupos);
+});
+
+prueba('entrevista previa conserva preguntas y opciones aunque haya cambiado su visibilidad', () => {
+  const filas = entrevistaDelEnvio({hc: { dolorRelacionCiclo: 'no_menstruo', dolorEvacuarCiclico: true,
+    sangradoCambios: ['nocturno'] }}).flatMap(g => g.respuestas);
+  assert.equal(filas.find(r => r.id === 'dolorEvacuarCiclico').pregunta, '¿El dolor al evacuar aparece o empeora alrededor de la menstruación?');
+  assert.equal(filas.find(r => r.id === 'sangradoCambios').respuesta, 'Me levanto de noche a cambiarme');
+});
 const mrsCon = valor => Object.fromEntries(MRS_IDS.map(id => [id, valor]));
 const registro = (hc = {}, extra = {}) => ({ autoReporte: { hc }, ...extra });
 const ids = lista => lista.map(r => r.id);

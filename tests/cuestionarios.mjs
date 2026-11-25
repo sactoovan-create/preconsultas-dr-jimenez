@@ -164,7 +164,7 @@ check('alertaSeguridad sin PHQ-9 (registro anterior): sin cambios y sin clave ph
   assert.equal(alertaPhq9({}), null);
 });
 check('ruteo v6: bandera roja del ítem 9 primero; aviso si falta el ítem 9', () => {
-  assert.equal(RUTEO_VERSION, 6); assert.equal(FORMULARIO_VERSION, '2026.10.1');
+  assert.equal(RUTEO_VERSION, 6); assert.equal(FORMULARIO_VERSION, '2026.11.2');
   const reg = { paciente: { edad: 33 }, autoReporte: { mrs: {}, dolor: { tiene: true, intensidad: 9 }, hc: { temasConsulta: ['dolor'] }, phq9: { version: 1, respuestas: phqCon([0, 0, 0, 0, 0, 0, 0, 0, 1]) } } };
   const rt = instrumentosPara(reg);
   assert.equal(rt.banderas[0].tipo, 'roja'); assert.equal(rt.banderas[0].codigo, 'phq9_item9_positivo'); assert.equal(rt.banderas[0].instrumentoRelacionado, 'phq9');
@@ -253,7 +253,10 @@ check('contrato: cada caso trae lo que el ERP debe concluir y coincide con la re
 console.log('\nPendientes de licencia o registro (sin texto)');
 check('ninguno está activo ni trae texto de reactivos', () => {
   assert.deepEqual(ACTIVOS.map((m) => m.CLAVE), ['csi', 'phq9']);
-  assert.deepEqual(PENDIENTES.map((m) => m.ESTADO), ['pendiente_licencia', 'pendiente_licencia', 'pendiente_licencia', 'pendiente_registro']);
+  for (const invalido of [' ', [], [2], '2e0', '0x2', '--1']) {
+    assert.equal(ICIQ_UI_SF.evaluar({ q3: invalido, q4: 2, q5: 3 }).total, null);
+  }
+  assert.deepEqual(PENDIENTES.map((m) => m.ESTADO), ['pendiente_licencia', 'pendiente_licencia', 'pendiente_licencia', 'pendiente_version_oficial']);
   for (const m of PENDIENTES) {
     for (const it of [...(m.ITEMS || []), ...(m.INTENSIDAD || []), ...(m.INTERFERENCIA || [])]) assert.equal('texto' in it, false, m.CLAVE);
     assert.ok(m.INSTRUCCIONES_DR.length >= 3); assert.ok(m.LICENCIA.length > 40);

@@ -24,6 +24,7 @@ export function cargarIntentoEnvio({
   storage = globalThis.sessionStorage,
   backendActivo = buzonActivo(),
   ahora = Date.now(),
+  ambito = '',
   crearId = nuevaRespuestaId,
   crearCarpeta = nuevaCarpeta,
 } = {}) {
@@ -32,10 +33,12 @@ export function cargarIntentoEnvio({
     estudiosFolder: backendActivo ? crearCarpeta() : null,
     adjuntos: [],
     creadoEn: ahora,
+    ambito,
   });
   try {
     const guardado = JSON.parse(storage?.getItem(CLAVE_INTENTO_ENVIO) || 'null');
     const vigente = guardado
+      && (guardado.ambito || '') === ambito
       && ahora - Number(guardado.creadoEn || 0) <= VIGENCIA_INTENTO_MS
       && UUID.test(String(guardado.respuestaId || ''));
     const intento = vigente
@@ -56,10 +59,10 @@ export function cargarIntentoEnvio({
   }
 }
 
-export function guardarAdjuntosIntento(adjuntos, storage = globalThis.sessionStorage) {
+export function guardarAdjuntosIntento(adjuntos, storage = globalThis.sessionStorage, respuestaId = null) {
   try {
     const guardado = JSON.parse(storage?.getItem(CLAVE_INTENTO_ENVIO) || 'null');
-    if (!guardado) return;
+    if (!guardado || (respuestaId && guardado.respuestaId !== respuestaId)) return;
     storage?.setItem(CLAVE_INTENTO_ENVIO, JSON.stringify({
       ...guardado,
       adjuntos: adjuntosValidos(adjuntos),
@@ -67,6 +70,17 @@ export function guardarAdjuntosIntento(adjuntos, storage = globalThis.sessionSto
   } catch (_) { /* sin almacenamiento */ }
 }
 
-export function borrarIntentoEnvio(storage = globalThis.sessionStorage) {
-  try { storage?.removeItem(CLAVE_INTENTO_ENVIO); } catch (_) { /* sin almacenamiento */ }
+export function trasladarIntentoAContinuacion(respuestaId, token, storage = globalThis.sessionStorage) {
+  try {
+    const guardado = JSON.parse(storage?.getItem(CLAVE_INTENTO_ENVIO) || 'null');
+    if (guardado?.respuestaId === respuestaId) {
+      storage.setItem(CLAVE_INTENTO_ENVIO, JSON.stringify({...guardado, ambito:'continuar:'+token}));
+    }
+  } catch (_) { /* sin almacenamiento */ }
+}
+export function borrarIntentoEnvio(storage = globalThis.sessionStorage, respuestaId = null) {
+  try {
+    if (respuestaId && JSON.parse(storage?.getItem(CLAVE_INTENTO_ENVIO) || 'null')?.respuestaId !== respuestaId) return;
+    storage?.removeItem(CLAVE_INTENTO_ENVIO);
+  } catch (_) { /* sin almacenamiento */ }
 }

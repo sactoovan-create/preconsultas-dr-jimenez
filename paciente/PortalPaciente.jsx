@@ -10,15 +10,17 @@ import {
 } from 'lucide-react';
 import { PacienteProvider } from '../core/PacienteContext.jsx';
 import PreConsulta from '../PreConsulta.jsx';
-import { guardarRespuesta, modoAlmacenamiento } from '../core/respuestas.js';
+import { guardarRespuesta, modoAlmacenamiento, nuevaRespuestaId } from '../core/respuestas.js';
 import { bloqueoEnvioEstudios, eliminarEstudioPaciente } from '../core/estudios.js';
 import { AvisoCrisisPhq9 } from './CuestionariosValidados.jsx';
 import { CREDITO } from '../core/marca.js';
 import SubirEstudios from './SubirEstudios.jsx';
+import { invitacionCitaDesdeHash, invitacionDelBorrador } from '../core/invitacionCita.js';
 import { construirRegistro } from '../core/registroPreconsulta.js';
 import {
   borrarIntentoEnvio,
   cargarIntentoEnvio,
+  trasladarIntentoAContinuacion,
   guardarAdjuntosIntento,
 } from '../core/intentoEnvio.js';
 import {
@@ -51,17 +53,30 @@ function Grano() {
 }
 
 export default function PortalPaciente() {
+  const [hash, setHash] = useState(() => globalThis.location?.hash || '');
+  useEffect(() => {
+    const cambiarEnlace = () => setHash(globalThis.location?.hash || '');
+    globalThis.addEventListener?.('hashchange', cambiarEnlace);
+    return () => globalThis.removeEventListener?.('hashchange', cambiarEnlace);
+  }, []);
   return (
-    <PacienteProvider persistirTrabajo={false}>
-      <PortalInterno />
+    <PacienteProvider key={hash} persistirTrabajo={false}>
+      <PortalInterno hash={hash} />
     </PacienteProvider>
   );
 }
 
-function PortalInterno() {
-  const [intentoEnvio] = useState(cargarIntentoEnvio);
+function PortalInterno({hash}) {
+  const entradaCita = invitacionCitaDesdeHash(hash);
+  const tokenInicial = tokenContinuacionDesdeHash(hash);
+  const [ambito] = useState(() => {
+    if (tokenInicial) return 'continuar:' + tokenInicial;
+    if (entradaCita === 'invalida') return 'cita-invalida:' + nuevaRespuestaId();
+    return entradaCita ? 'cita:' + entradaCita : '';
+  });
+  const [intentoEnvio] = useState(() => cargarIntentoEnvio({ambito}));
   const adjuntosRef = useRef(intentoEnvio.adjuntos || []);
-  const tokenInicialRef = useRef(tokenContinuacionDesdeHash());
+  const tokenInicialRef = useRef(tokenInicial);
   const [tokenContinuacion, setTokenContinuacion] = useState(tokenInicialRef.current);
   const [restauracion, setRestauracion] = useState(() => ({
     cargando: !!tokenInicialRef.current,
@@ -94,7 +109,6 @@ function PortalInterno() {
           setError('Este enlace de continuación venció o ya fue utilizado. Puedes iniciar un cuestionario nuevo.');
           setTokenContinuacion('');
           setEnlaceContinuacion('');
-          globalThis.history?.replaceState({}, '', globalThis.location?.pathname || '/');
         } else {
           setMensajeContinuacion('Recuperamos tu cuestionario privado. Puedes continuar donde lo dejaste.');
         }
@@ -118,8 +132,8 @@ function PortalInterno() {
   const onEstudiosEstado = useCallback((estado) => {
     adjuntosRef.current = estado.archivos;
     setEstudiosEstado(estado);
-    guardarAdjuntosIntento(estado.archivos);
-  }, []);
+    guardarAdjuntosIntento(estado.archivos, undefined, respuestaId);
+  }, [respuestaId]);
 
   const copiarEnlace = useCallback(async (enlace = enlaceContinuacion) => {
     if (!enlace) return false;
@@ -134,12 +148,22 @@ function PortalInterno() {
     }
   }, [enlaceContinuacion]);
 
+  const citaRestaurada = invitacionDelBorrador(restauracion.borrador);
+  const invitacionCita = tokenInicial
+    ? (entradaCita && entradaCita !== citaRestaurada ? 'invalida' : citaRestaurada || (restauracion.borrador ? '' : 'invalida'))
+    : entradaCita;
+  const borradorParaContinuar = useCallback(borrador => {
+    const { ambito: ambitoLocal, ...datos } = borrador;
+    return invitacionCita ? { ...datos, invitacionCita } : datos;
+  }, [invitacionCita]);
+
   const onGuardarParaDespues = useCallback(async (borrador) => {
     setGuardandoParaDespues(true);
     setError('');
     try {
       const token = tokenContinuacion || nuevoTokenContinuacion();
-      await guardarBorradorRemoto(token, borrador);
+      await guardarBorradorRemoto(token, borradorParaContinuar(borrador));
+      trasladarIntentoAContinuacion(respuestaId, token);
       const enlace = construirEnlaceContinuacion(token);
       setTokenContinuacion(token);
       setEnlaceContinuacion(enlace);
@@ -150,17 +174,17 @@ function PortalInterno() {
     } finally {
       setGuardandoParaDespues(false);
     }
-  }, [copiarEnlace, tokenContinuacion]);
+  }, [borradorParaContinuar, copiarEnlace, respuestaId, tokenContinuacion]);
 
   const onBorradorCambio = useCallback((borrador) => {
     if (!tokenContinuacion) return;
     clearTimeout(temporizadorBorradorRef.current);
     temporizadorBorradorRef.current = setTimeout(() => {
-      guardarBorradorRemoto(tokenContinuacion, borrador).catch(() => {
+      guardarBorradorRemoto(tokenContinuacion, borradorParaContinuar(borrador)).catch(() => {
         setMensajeContinuacion('No se pudo actualizar el enlace; tu avance sigue guardado en este dispositivo.');
       });
     }, 900);
-  }, [tokenContinuacion]);
+  }, [borradorParaContinuar,tokenContinuacion]);
 
   const onEnviar = async (datos) => {
     setError('');
@@ -169,9 +193,9 @@ function PortalInterno() {
       archivos = estudiosFolder && estudiosRef.current
         ? await estudiosRef.current.subirPendientes()
         : [];
-      guardarAdjuntosIntento(archivos);
+      guardarAdjuntosIntento(archivos, undefined, respuestaId);
       const guardado = await guardarRespuesta(construirRegistro(
-        datos,
+        { ...datos, invitacionCita },
         estudiosFolder,
         archivos,
         respuestaId,
@@ -181,7 +205,7 @@ function PortalInterno() {
         await borrarBorradorRemoto(tokenContinuacion).catch(() => {});
         globalThis.history?.replaceState({}, '', globalThis.location?.pathname || '/');
       }
-      borrarIntentoEnvio();
+      borrarIntentoEnvio(undefined, respuestaId);
       setEnviado(guardado);
     } catch (e) {
       // Un error estructurado de Supabase confirma que el INSERT fue rechazado y
@@ -192,7 +216,7 @@ function PortalInterno() {
         await Promise.allSettled(
           archivos.map((archivo) => eliminarEstudioPaciente(archivo.path)),
         );
-        guardarAdjuntosIntento([]);
+        guardarAdjuntosIntento([], undefined, respuestaId);
         estudiosRef.current?.restablecerPendientes();
       }
       // Un problema de configuración del consultorio no se resuelve reintentando:
@@ -279,17 +303,27 @@ function PortalInterno() {
     );
   }
 
+  if (tokenInicial && !restauracion.borrador) {
+    return <div className="portal portal-centro"><Grano />
+      <div className="portal-tarjeta-fin" role="alert">
+        <h1>No pudimos abrir tu cuestionario</h1><p>{error}</p>
+        <button type="button" className="portal-imprimir-recibo" onClick={() => globalThis.location.reload()}>Reintentar</button>
+        <a href="#cita=invalida">Empezar un cuestionario nuevo</a>
+      </div>
+    </div>;
+  }
+
   return (
     <div className="portal">
       <Grano />
       <header className="portal-hero">
         <div className="portal-hero-inner">
           <div className="portal-masthead">
-            <img className="portal-hero-logo" src="/marca/logo_invertido_web.svg" alt="dr. jiménez, ginecología" />
+            <div className="portal-marca">
+              <img className="portal-hero-logo" src="/marca/logo_maestro_web.svg" alt="dr. jiménez, ginecología" />
+              <p className="portal-hero-titulo">Preconsulta ginecológica</p>
+            </div>
             <a href="/privacidad" target="_blank" rel="noopener noreferrer"><LockKeyhole size={16} aria-hidden="true" />Aviso de privacidad</a>
-          </div>
-          <div className="portal-hero-copy">
-            <p className="portal-hero-titulo">Preconsulta ginecológica</p>
           </div>
         </div>
       </header>
@@ -311,6 +345,7 @@ function PortalInterno() {
         <PreConsulta
           key={tokenInicialRef.current || 'nuevo'}
           onEnviar={onEnviar}
+          ambito={ambito}
           borradorInicial={tokenInicialRef.current ? (restauracion.borrador || {}) : null}
           onGuardarParaDespues={onGuardarParaDespues}
           onBorradorCambio={onBorradorCambio}

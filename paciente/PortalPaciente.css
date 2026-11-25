@@ -4,9 +4,12 @@
   position: relative;
   min-height: 100vh;
   overflow-x: clip;
-  background: #fff;
+  background: var(--papel);
   color: var(--verde);
   font-family: var(--sans);
+  --display: 'Fraunces', Georgia, serif;
+  --texto-secundario: #4c5c53;
+  --linea-portal: #d6dbd2;
 }
 
 .portal *,
@@ -26,95 +29,29 @@
 
 /* Cabecera compacta: la marca se ve primero sin retrasar el cuestionario. */
 .portal-hero {
-  position: relative;
-  padding: 0 24px 20px;
-  background: var(--verde);
-  color: var(--crema);
+  padding: 0 24px;
+  border-bottom: 1px solid var(--linea-portal);
+  background: var(--papel);
 }
-.portal-hero-inner { width: min(100%, 1100px); margin: 0 auto; }
-.portal-masthead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 76px;
-  border-bottom: 1px solid rgba(241, 234, 219, .16);
-}
-.portal-hero-logo {
-  display: block;
-  width: 190px;
-  height: auto;
-  margin: 0;
-}
-.portal-masthead > span {
-  color: rgba(241, 234, 219, .68);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-}
-.portal-hero-copy { max-width: 720px; padding-top: 16px; }
-.portal-masthead a { display: inline-flex; align-items: center; gap: 8px; color: #fff; font-size: 13px; min-height: 44px; }
-.portal-hero-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  margin-bottom: 16px;
-  color: rgba(241, 234, 219, .72);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-}
-.portal-punto-dorado {
-  width: 5px;
-  height: 5px;
-  flex: 0 0 5px;
-  border-radius: 50%;
-  background: var(--dorado);
-}
+.portal-hero-inner { width: min(100%, 1080px); margin: 0 auto; }
+.portal-masthead, .portal-marca { display: flex; align-items: center; gap: 22px; }
+.portal-masthead { justify-content: space-between; min-height: 76px; }
+.portal-hero-logo { display: block; width: 122px; height: auto; }
 .portal-hero-titulo {
-  max-width: 680px;
   margin: 0;
-  color: var(--crema);
-  font-family: var(--display);
-  font-size: 26px;
-  font-variation-settings: 'opsz' 120;
-  font-weight: 300;
-  letter-spacing: 0;
-  line-height: 1.2;
-  animation: portal-entrada .55s ease both;
+  padding-left: 22px;
+  border-left: 1px solid var(--linea-portal);
+  color: var(--texto-secundario);
+  font: 500 15px/1.4 var(--sans);
 }
-.portal-hero-titulo em { font-style: italic; }
-.portal-hero-sub {
-  max-width: 600px;
-  margin: 0;
-  color: rgba(241, 234, 219, .76);
-  font-size: 16px;
-  font-weight: 350;
-  line-height: 1.65;
-}
-.portal-hero-datos {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 22px;
-  margin-top: 26px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(241, 234, 219, .14);
-}
-.portal-hero-datos span {
+.portal-masthead a {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  color: rgba(241, 234, 219, .78);
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.3;
-}
-.portal-hero-datos svg { width: 15px; height: 15px; color: var(--dorado); }
-
-@keyframes portal-entrada {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: none; }
+  gap: 8px;
+  min-height: 44px;
+  color: var(--verde);
+  font-size: 13px;
+  text-underline-offset: 3px;
 }
 
 .portal-error {
@@ -214,8 +151,8 @@
 .portal-credito {
   max-width: 32rem;
   margin: 0 auto;
-  color: rgba(31, 58, 46, .56);
-  font-size: 10px;
+  color: var(--texto-secundario);
+  font-size: 12px;
   letter-spacing: .02em;
   line-height: 1.5;
 }
@@ -260,7 +197,7 @@
   font-size: 15px;
   line-height: 1.65;
 }
-.portal-fin-nota { margin-top: 18px !important; color: rgba(31, 58, 46, .52) !important; font-size: 12.5px !important; }
+.portal-tarjeta-fin .portal-fin-nota { margin-top: 18px; color: var(--texto-secundario); font-size: 14px; }
 .portal-recibo {
   display: grid;
   grid-template-columns: 1fr 1.6fr .7fr;
@@ -274,10 +211,10 @@
 }
 .portal-recibo > div { display: grid; gap: 4px; padding: 12px; border-right: 1px solid rgba(31, 58, 46, .1); }
 .portal-recibo > div:nth-child(3) { border-right: 0; }
-.portal-recibo span { color: rgba(31, 58, 46, .54); font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-.portal-recibo b { color: var(--verde); font-size: 12px; line-height: 1.35; }
+.portal-recibo span { color: var(--texto-secundario); font-size: 13px; font-weight: 550; line-height: 1.4; }
+.portal-recibo b { color: var(--verde); font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; }
 .portal-recibo ul { grid-column: 1 / -1; margin: 0; padding: 8px 12px 10px; border-top: 1px solid rgba(31, 58, 46, .1); list-style: none; }
-.portal-recibo li { display: flex; min-width: 0; align-items: center; gap: 7px; padding: 3px 0; overflow: hidden; color: rgba(31, 58, 46, .72); font-size: 10.5px; text-overflow: ellipsis; white-space: nowrap; }
+.portal-recibo li { display: flex; min-width: 0; align-items: baseline; gap: 7px; padding: 4px 0; color: var(--verde); font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
 .portal-recibo li svg { width: 13px; height: 13px; flex: 0 0 13px; color: var(--oro-texto); }
 .portal-imprimir-recibo {
   width: 100%;
@@ -303,18 +240,85 @@
 .portal-fin-urgente p { margin: 6px 0 0; color: #87372F; font-size: 13px; }
 .portal-tarjeta-fin .portal-credito { margin-top: 24px; }
 
+/* El formulario comparte una sola hoja; las áreas clínicas conservan su acento. */
+.portal-form .pc-principal {
+  background: #fffefa;
+  border: 1px solid var(--linea-portal);
+  border-radius: 12px;
+  padding: clamp(16px, 3vw, 34px);
+}
+.portal-form .pc-ruta { border-color: var(--linea-portal); }
+.portal-form .pc-ruta h2 { font: 500 24px/1.15 var(--display); }
+.portal-form .pc-ruta li.actual button { background: #e6eddf; }
+.portal-form .pc-progreso { margin: 0; padding: 0 0 9px; background: transparent; }
+.portal-form .pc-progreso-identidad img, .portal-form .pc-progreso-meta b { display: none; }
+.portal-form .pc-progreso-identidad span {
+  color: var(--texto-secundario);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: none;
+}
+.portal-form .pc-progreso-linea > span { color: var(--texto-secundario); font-size: 11px; }
+.portal-form .pc-progreso-pista { background: #e7e8df; }
+.portal-form .pc-progreso-pista span { background: var(--verde); }
+.portal-form .pc-continuar-despues { margin: 0; }
+.portal-form .pc-continuar-despues button { font-size: 13px; font-weight: 550; color: var(--verde); }
+.portal-form .pc-paso { padding: 10px 0 4px; border-top: 0; background: transparent; }
+.portal-form .pc-paso-cab { gap: 8px; padding-bottom: 14px; margin-bottom: 18px; }
+.portal-form .pc-paso-cab > .area-identidad {
+  justify-self: start;
+  margin: 0;
+  background: transparent;
+  padding: 0;
+}
+.portal-form .pc-paso-cab > span:not(.area-identidad) { display: none; }
+.portal-form .pc-paso-cab h1 {
+  font: 400 clamp(30px, 4vw, 43px)/1.12 var(--display);
+  overflow-wrap: anywhere;
+}
+.portal-form .pc-paso-intro { max-width: 65ch; font-size: 16px; color: var(--texto-secundario); }
+.portal-form .pc-campo > span, .portal-form .pc-grupo legend {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--verde-tinta);
+}
+.portal-form .pc-opciones-lista { gap: 0 16px; }
+.portal-form .pc-opciones-lista .pc-eleccion {
+  justify-content: space-between;
+  align-items: center;
+  min-height: 48px;
+  border-width: 0 0 1px;
+  border-radius: 0;
+  background: transparent;
+}
+.portal-form .pc-opciones-lista .pc-eleccion.on { background: #e8efdf; box-shadow: none; }
+.portal-form .pc-opciones-lista .pc-eleccion:hover { background: #f0f3e9; }
+.portal-form .pc-opciones-lista .pc-eleccion-marca { order: 1; margin: 0; }
+.portal-form .pc-eleccion b { font-size: 15px; }
+.portal-form .pc-campo input::placeholder, .portal-form .pc-campo textarea::placeholder { color: #607066; }
+.portal-form .pc-campo > small, .portal-form .pc-grupo-ayuda { color: var(--texto-secundario); }
+.portal-form .pc-siguiente, .portal-form .pc-guardar { box-shadow: none; }
+.portal-form :is(button, a, select, summary):focus-visible,
+.portal-masthead a:focus-visible {
+  outline: 3px solid #76542b;
+  outline-offset: 2px;
+}
+.portal-form .pc-subtitulo { color: var(--verde-tinta); }
+.portal-form .pc-paso .pf-oferta, .portal-form .pc-paso .pf-bloque { background: transparent; }
+@media (max-width: 620px) {
+  .portal-form .pc-principal { border: 0; border-radius: 0; padding: 6px 0 16px; background: transparent; }
+  .portal-form .pc-ruta ol { gap: 4px; }
+  .portal-form .pc-campo input, .portal-form .pc-campo textarea, .portal-form .pc-campo select { font-size: 16px; }
+  .portal-form .pc-paso-cab { padding-bottom: 12px; }
+}
+
 @media (max-width: 640px) {
-  .portal-hero { padding: 0 16px 16px; }
-  .portal-masthead { min-height: 66px; gap: 12px; }
-  .portal-hero-logo { width: 150px; }
-  .portal-masthead a { font-size: 12px; max-width: 110px; line-height: 1.4; }
-  .portal-masthead > span { font-size: 9px; }
-  .portal-hero-copy { padding-top: 12px; }
-  .portal-hero-eyebrow { margin-bottom: 13px; }
-  .portal-hero-titulo { margin: 0; font-size: 24px; line-height: 1.2; }
-  .portal-hero-sub { max-width: 350px; font-size: 14.5px; line-height: 1.6; }
-  .portal-hero-datos { gap: 9px 15px; margin-top: 20px; padding-top: 15px; }
-  .portal-hero-datos span { font-size: 11.5px; }
+  .portal-hero { padding: 0 16px; }
+  .portal-masthead { min-height: 68px; gap: 10px; }
+  .portal-marca { flex-wrap: wrap; gap: 0 12px; min-width: 0; }
+  .portal-hero-logo { width: 100px; }
+  .portal-hero-titulo { border: 0; padding: 0; font-size: 12px; }
+  .portal-masthead a { flex-shrink: 0; max-width: 104px; font-size: 12px; }
   .portal-form { margin-top: 0; padding: 8px 16px 28px; }
   .portal-colofon { padding-top: 30px; }
   .portal-tarjeta-fin { padding: 38px 24px; }
@@ -336,6 +340,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .portal-hero-titulo,
   .portal-form .pc-paso { animation: none; }
 }

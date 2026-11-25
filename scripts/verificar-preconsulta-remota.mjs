@@ -95,7 +95,7 @@ try {
   const rol = await pedir('/rest/v1/rpc/es_medico_principal', { method: 'POST', body: {} });
   check('Rol medico autorizado', rol.ok && rol.data === true);
   const version = await (await fetch(base + '/version-preconsulta.json')).json();
-  check('Version del formulario correcta', version.formulario === '2026.10.1' && version.precarga === '2.0.0');
+  check('Version del formulario correcta', version.formulario === '2026.11.2' && version.precarga === '2.0.0');
 
   etapa = 'archivos ficticios';
   const artefacto = await browser.newPage();
@@ -118,7 +118,15 @@ try {
   await page.getByRole('button', { name: 'Sí, los agregaré', exact: true }).click();
   const archivos = [{ name: 'qa-documento.pdf', mimeType: 'application/pdf', buffer: pdf }, { name: 'qa-imagen.png', mimeType: 'image/png', buffer: png }];
   etapa = 'subida con corte de red';
-  await page.locator('.pc-estudios-input').setInputFiles(archivos);
+  const camara = page.getByLabel('Tomar foto', { exact: true });
+  const galeria = page.getByLabel('Elegir de la galería', { exact: true });
+  const documentos = page.getByLabel('Adjuntar archivos', { exact: true });
+  check('Captura de una página con cámara trasera', await camara.getAttribute('capture') === 'environment'
+    && await camara.getAttribute('accept') === 'image/*' && await camara.getAttribute('multiple') === null);
+  check('Galería múltiple y archivos múltiples sin forzar cámara', await galeria.getAttribute('multiple') !== null
+    && await galeria.getAttribute('capture') === null && await documentos.getAttribute('multiple') !== null);
+  await documentos.setInputFiles(archivos[0]);
+  await camara.setInputFiles(archivos[1]);
   await page.getByLabel('Reintentar qa-documento.pdf', { exact: true }).waitFor({ timeout: 45000 });
   check('Fallo de red no se presenta como recibido', falloUpload && await page.locator('.pc-estudios-estado.is-error').count() === 1);
   await page.waitForTimeout(2100);
